@@ -10,4 +10,4 @@ IMPROVEMENTS
     RMP-6448: hdp.version
 
 BUG FIXES
-
+    BUG-48982 Add hadoop lzo jar to the classpath
