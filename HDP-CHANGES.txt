@@ -3,6 +3,7 @@ Changes only in Hortonworks github and not in Apache SPARK-2.1.0 and hence not c
 INCOMPATIBLE CHANGES
 
 NEW FEATURES
+    SPARK-13587: Support virtualenv in pyspark    
 
 IMPROVEMENTS
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
