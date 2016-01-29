@@ -189,6 +189,18 @@ class SparkContext(object):
         self._jsc.sc().register(self._javaAccumulator)
 
         self.pythonExec = os.environ.get("PYSPARK_PYTHON", 'python')
+        if self._conf.get("spark.pyspark.virtualenv.enabled") == "true":
+            requirements = self._conf.get("spark.pyspark.virtualenv.requirements")
+            virtualEnvBinPath = self._conf.get("spark.pyspark.virtualenv.bin.path")
+            if not requirements:
+                raise Exception("spark.pyspark.virtualenv.enabled is set as true but no value for "
+                                "spark.pyspark.virtualenv.requirements")
+            if not virtualEnvBinPath:
+                raise Exception("spark.pyspark.virtualenv.enabled is set as true but no value for "
+                                "spark.pyspark.virtualenv.bin.path")
+            else:
+                self.addFile(self._conf.get("spark.pyspark.virtualenv.requirements"))
+
         self.pythonVer = "%d.%d" % sys.version_info[:2]
 
         # Broadcast's __reduce__ method stores Broadcast instances here.
