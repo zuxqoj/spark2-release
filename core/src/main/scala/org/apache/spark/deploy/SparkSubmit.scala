@@ -370,6 +370,13 @@ object SparkSubmit {
       }
     }
 
+    if (args.isPython) {
+      if (args.sparkProperties.contains("spark.pyspark.virtualenv.requirements")) {
+        args.files = mergeFileLists(args.files,
+          args.sparkProperties("spark.pyspark.virtualenv.requirements"))
+      }
+    }
+
     // In YARN mode for an R app, add the SparkR package archive and the R package
     // archive containing all of the built R libraries to archives so that they can
     // be distributed with the job
