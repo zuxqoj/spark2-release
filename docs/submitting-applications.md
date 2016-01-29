@@ -202,6 +202,74 @@ These commands can be used with `pyspark`, `spark-shell`, and `spark-submit` to 
 For Python, the equivalent `--py-files` option can be used to distribute `.egg`, `.zip` and `.py` libraries
 to executors.
 
+# VirtualEnv for Pyspark
+For simple pyspark application, we can use `--py-files` to add its dependencies. While for a large pyspark application,
+usually you will have many dependencies which also have transitive dependencies and sometimes some dependcies need to be compiled
+to be installed. In this case `--py-files` is not so convenient. Luckily, in python world, we have virtualenv to help create isolated
+python work enviroment. We also implement virtualenv in pyspark (It is only supported in yarn mode for now).
+
+# Prerequisites
+- Each node have virtualenv/conda, python-devel installed
+- Each node is internet accessible (for downloading packages)
+
+{% highlight bash %}
+# Setup virtualenv using native virtualenv on yarn-client mode
+bin/spark-submit \
+    --master yarn \
+    --deploy-mode client \
+    --conf "spark.pyspark.virtualenv.enabled=true" \
+    --conf "spark.pyspark.virtualenv.type=native" \
+    --conf "spark.pyspark.virtualenv.requirements=<local_requirement_file>" \
+    --conf "spark.pyspark.virtualenv.bin.path=/Users/jzhang/anaconda/bin/virtualenv" \
+    <pyspark_script>
+
+# Setup virtualenv using conda on yarn-client mode
+bin/spark-submit \
+    --master yarn \
+    --deploy-mode client \
+    --conf "spark.pyspark.virtualenv.enabled=true" \
+    --conf "spark.pyspark.virtualenv.type=conda" \
+    --conf "spark.pyspark.virtualenv.requirements=/Users/jzhang/work/virtualenv/conda.txt" \
+    --conf "spark.pyspark.virtualenv.bin.path=/Users/jzhang/anaconda/bin/conda" \
+    <pyspark_script>
+{% endhighlight %}
+
+## PySpark VirtualEnv Configurations
+<table class="table">
+<tr><th>Property Name</th><th>Default</th><th>Meaning</th></tr>
+<tr>
+  <td><code>spark.pyspark.virtualenv.enabled</code></td>
+  <td>false</td>
+  <td>Whether to enable virtualenv</td>
+</tr>
+<tr>
+  <td><code>Spark.pyspark.virtualenv.type</code></td>
+  <td>virtualenv</td>
+  <td>There're 2 approaches to support virtualenv in pyspark. One is the native virtualenv another is conda. By default it is virtualenv.</td>
+</tr>
+<tr>
+  <td><code>spark.pyspark.virtualenv.requirements</code></td>
+  <td>(none)</td>
+  <td>Requirement file where required packages are specified, to be noted, the requirement file of virtualenv and conda is not compatible with each other.</td>
+</tr>
+<tr>
+  <td><code>spark.pyspark.virtualenv.bin.path</code></td>
+  <td>(none)</td>
+  <td>Path for virtualenv executable file conda executable file in the cluster. It requires that the virtualenv/conda is installed in the same location across the cluster.</td>
+</tr>
+</table>
+
+# How to create requirement file ?
+Usually before running distributed pyspark job, you need first to run it in local environment.  So it is encouraged to first create your own virtualenv for your project, so you know what packages you need. After you are confident with your work and want to move it to cluster, you can run the following command to generate the requirement file for virtualenv and conda.
+- pip freeze > requirements.txt
+- conda list --name env_name  > requirements.txt
+       
+Here's 2 example command of using virtualenv in pyspark.
+
+# Penalty of virtualenv
+For each executor, it needs to take some time to setup the virtualenv (installing the packages), and for the first time, it may be very slow. e.g. The first time I install numpy on each node it takes almost 3 minutes, because it needs to download it and compiling it to wheel format. But for the next time, it only takes 3 seconds to install numpy, because it would install the numpy from the cached wheel file.
+   
+  
 # More Information
 
 Once you have deployed your application, the [cluster mode overview](cluster-overview.html) describes
