@@ -11,3 +11,4 @@ IMPROVEMENTS
 
 BUG FIXES
     BUG-48982 Add hadoop lzo jar to the classpath
+    SPARK-11182   HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
