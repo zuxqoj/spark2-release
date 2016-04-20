@@ -85,16 +85,15 @@
         <include>**/*</include>
       </includes>
     </fileSet>
-<!--
     <fileSet>
       <directory>
-        ${project.parent.basedir}/network/yarn/target/${spark.jar.dir}/
+        ${project.parent.basedir}/common/network-yarn/target/${spark.jar.dir}/
       </directory>
       <outputDirectory>/lib</outputDirectory>
       <includes>
         <include>spark-${project.version}-yarn-shuffle.jar</include>
       </includes>
-    </fileSet> -->
+    </fileSet>
   </fileSets>
 
   <dependencySets>
