@@ -37,6 +37,13 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <distributionManagement>
+    <repository>
+      <id>${repo.id}</id>
+      <name>Internal Repository</name>
+      <url>${internal.maven.repo}</url>
+    </repository>
+  </distributionManagement>
   <scm>
     <connection>scm:git:git@github.com:apache/spark.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/spark.git</developerConnection>
@@ -220,6 +227,17 @@
     <CodeCacheSize>512m</CodeCacheSize>
   </properties>
   <repositories>
+    <repository>
+      <id>horton-repo</id>
+      <name>Hortonworks Repository</name>
+      <url>http://repo.hortonworks.com/content/repositories/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
     <repository>
       <id>central</id>
       <!-- This should be at top, it makes maven try the central repo first and then others and hence faster dep resolution -->
