@@ -99,7 +99,7 @@
 
   <dependencySets>
     <dependencySet>
-      <outputDirectory>jar</outputDirectory>
+      <outputDirectory>jars</outputDirectory>
       <includes>
         <include>org.apache.spark:*:jar</include>
       </includes>
