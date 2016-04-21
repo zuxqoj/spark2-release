@@ -87,7 +87,7 @@
     </fileSet>
     <fileSet>
       <directory>
-        ${project.parent.basedir}/common/network-yarn/target/${spark.jar.dir}/
+        ${project.parent.basedir}/common/network-yarn/target/scala-${scala.binary.version}/
       </directory>
       <outputDirectory>/lib</outputDirectory>
       <includes>
