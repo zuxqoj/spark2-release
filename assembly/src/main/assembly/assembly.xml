@@ -94,6 +94,24 @@
         <include>spark-${project.version}-yarn-shuffle.jar</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/examples/target/scala-${scala.binary.version}/jars/
+      </directory>
+      <outputDirectory>/examples/jars</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/examples/target/
+      </directory>
+      <outputDirectory>/examples</outputDirectory>
+      <includes>
+        <include>spark-examples_${scala.binary.version}-${project.version}.jar</include>
+      </includes>
+    </fileSet>
   </fileSets>
 
   <dependencySets>
