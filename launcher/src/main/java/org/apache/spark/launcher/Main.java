@@ -20,6 +20,7 @@ package org.apache.spark.launcher;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +85,45 @@ class Main {
 
     Map<String, String> env = new HashMap<>();
     List<String> cmd = builder.buildCommand(env);
+
+    // Check again here, since there're many other ways can set hdp.version, we should make sure
+    // HDP_VERSION always takes the priority.
+    boolean isShell;
+    if (SparkSubmitCommandBuilder.PYSPARK_SHELL_RESOURCE.equals(builder.appResource)) {
+      isShell = true;
+    } else if (SparkSubmitCommandBuilder.SPARKR_SHELL_RESOURCE.equals(builder.appResource)) {
+      isShell = true;
+    } else {
+      isShell = false;
+    }
+
+    if (System.getenv("HDP_VERSION") != null) {
+      for (int i = 0; i < cmd.size(); i++) {
+        if (cmd.get(i).startsWith("-Dhdp.version=")) {
+          // hdp.version is already set, so replace it
+          cmd.set(i, "-Dhdp.version=" + System.getenv("HDP_VERSION"));
+        }
+      }
+    }
+
+    // Check if hdp.version is well set or not.
+    if (!isShell) {
+      HashSet<String> hdpConfs = new HashSet<String>();
+      for (String c : cmd) {
+        if (c.startsWith("-Dhdp.version=") && c.length() > "-Dhdp.version=".length()) {
+          hdpConfs.add(c);
+        }
+      }
+      if (hdpConfs.isEmpty()) {
+        throw new IllegalStateException("hdp.version is not set while running Spark under HDP, " +
+          "please set through HDP_VERSION in spark-env.sh or add a java-opts file in conf " +
+          "with -Dhdp.version=xxx");
+      } else if (hdpConfs.size() > 1) {
+        throw new IllegalStateException("hdp.version is set more than once with different versions," +
+          " please check your configurations and environments to remove redundancy.");
+      }
+    }
+
     if (printLaunchCommand) {
       System.err.println("Spark Command: " + join(" ", cmd));
       System.err.println("========================================");
