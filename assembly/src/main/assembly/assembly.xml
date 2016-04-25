@@ -125,7 +125,7 @@
       </excludes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>jars</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>
       <unpack>false</unpack>
       <scope>runtime</scope>
