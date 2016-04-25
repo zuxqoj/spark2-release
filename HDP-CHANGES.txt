@@ -1,0 +1,10 @@
+Changes only in Hortonworks github and not in Apache SPARK-1.6.1 and hence not covered by CHANGES.txt.
+
+INCOMPATIBLE CHANGES
+
+NEW FEATURES
+
+IMPROVEMENTS
+
+
+BUG FIXES
