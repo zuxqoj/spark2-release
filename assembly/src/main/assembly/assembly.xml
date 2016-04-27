@@ -105,9 +105,9 @@
     </fileSet>
     <fileSet>
       <directory>
-        ${project.parent.basedir}/examples/target/
+        ${project.parent.basedir}/examples/target/scala-${scala.binary.version}/jars/
       </directory>
-      <outputDirectory>/examples</outputDirectory>
+      <outputDirectory>/lib</outputDirectory>
       <includes>
         <include>spark-examples_${scala.binary.version}-${project.version}.jar</include>
       </includes>

@@ -404,6 +404,14 @@ class SparkSubmitCommandBuilder extends AbstractCommandBuilder {
     boolean isAppResourceReq = true;
 
     @Override
+    protected void parseEnv() {
+      String appJars = System.getenv("SPARK_APP_JARS");
+      if (appJars != null && appJars.length() > 0) {
+        handle(JARDIRS, appJars);
+      }
+    }
+
+    @Override
     protected boolean handle(String opt, String value) {
       if (opt.equals(MASTER)) {
         master = value;
@@ -443,6 +451,15 @@ class SparkSubmitCommandBuilder extends AbstractCommandBuilder {
       } else if (opt.equals(VERSION)) {
         isAppResourceReq = false;
         sparkArgs.add(opt);
+      } else if (opt.equals(JARS)) {
+        for (String j : value.split(",")) {
+          jars.add(j);
+        }
+      } else if (opt.equals(JARDIRS)) {
+        List<String>  files = expand(value);
+        for (String file : files) {
+          jars.add(file);
+        }
       } else {
         sparkArgs.add(opt);
         if (value != null) {
@@ -450,6 +467,20 @@ class SparkSubmitCommandBuilder extends AbstractCommandBuilder {
         }
       }
       return true;
+    }
+
+
+    private List<String> expand(String paths) {
+      List<String> results = new ArrayList<String>();
+      for(String path: paths.split(",")) {
+        File[] files = new File(path).listFiles();
+        for (File file : files) {
+          if (file.isFile() && file.getName().toLowerCase().endsWith(".jar")) {
+            results.add(file.getAbsolutePath());
+          }
+        }
+      }
+      return results;
     }
 
     @Override

@@ -47,6 +47,7 @@ class SparkSubmitOptionParser {
   protected final String EXECUTOR_MEMORY = "--executor-memory";
   protected final String FILES = "--files";
   protected final String JARS = "--jars";
+  protected final String JARDIRS = "--jarDirs";
   protected final String KILL_SUBMISSION = "--kill";
   protected final String MASTER = "--master";
   protected final String NAME = "--name";
@@ -100,6 +101,7 @@ class SparkSubmitOptionParser {
     { EXECUTOR_MEMORY },
     { FILES },
     { JARS },
+    { JARDIRS },
     { KEYTAB },
     { KILL_SUBMISSION },
     { MASTER },
@@ -128,6 +130,9 @@ class SparkSubmitOptionParser {
     { VERSION },
   };
 
+  protected void parseEnv() {
+
+  }
   /**
    * Parse a list of spark-submit command line options.
    * <p>
@@ -137,7 +142,7 @@ class SparkSubmitOptionParser {
    */
   protected final void parse(List<String> args) {
     Pattern eqSeparatedOpt = Pattern.compile("(--[^=]+)=(.+)");
-
+    parseEnv();
     int idx = 0;
     for (idx = 0; idx < args.size(); idx++) {
       String arg = args.get(idx);
