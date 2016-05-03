@@ -27,6 +27,7 @@ import scala.util.control.NonFatal
 import kafka.api._
 import kafka.common.{ErrorMapping, OffsetAndMetadata, OffsetMetadataAndError, TopicAndPartition}
 import kafka.consumer.{ConsumerConfig, SimpleConsumer}
+import org.apache.kafka.common.protocol.SecurityProtocol
 
 import org.apache.spark.SparkException
 import org.apache.spark.annotation.DeveloperApi
@@ -55,9 +56,12 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
     _config
   }
 
-  def connect(host: String, port: Int): SimpleConsumer =
+  def connect(host: String, port: Int): SimpleConsumer = {
+    val secPol = SecurityProtocol.valueOf(
+      kafkaParams.getOrElse(KafkaUtils.securityProtocolConfig, KafkaUtils.securityProtocolDefault))
     new SimpleConsumer(host, port, config.socketTimeoutMs,
-      config.socketReceiveBufferBytes, config.clientId)
+      config.socketReceiveBufferBytes, config.clientId, secPol)
+  }
 
   def connectLeader(topic: String, partition: Int): Either[Err, SimpleConsumer] =
     findLeader(topic, partition).right.map(hp => connect(hp._1, hp._2))

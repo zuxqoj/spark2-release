@@ -21,6 +21,8 @@ package org.apache.spark.examples.streaming
 import java.util.HashMap
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import _root_.kafka.serializer.StringDecoder
+import org.apache.spark.storage.StorageLevel
 
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
@@ -42,19 +44,28 @@ import org.apache.spark.streaming.kafka._
 object KafkaWordCount {
   def main(args: Array[String]) {
     if (args.length < 4) {
-      System.err.println("Usage: KafkaWordCount <zkQuorum> <group> <topics> <numThreads>")
+      System.err.println("Usage: KafkaWordCount <zkQuorum> <group> <topics> <numThreads> " +
+        "<securityProtocol>")
       System.exit(1)
     }
 
     StreamingExamples.setStreamingLogLevels()
 
-    val Array(zkQuorum, group, topics, numThreads) = args
+    val Array(zkQuorum, groupId, topics, numThreads, securityProtocol) =
+      if (args.length > 4) args else args :+ KafkaUtils.securityProtocolDefault
+
     val sparkConf = new SparkConf().setAppName("KafkaWordCount")
     val ssc = new StreamingContext(sparkConf, Seconds(2))
     ssc.checkpoint("checkpoint")
 
     val topicMap = topics.split(",").map((_, numThreads.toInt)).toMap
-    val lines = KafkaUtils.createStream(ssc, zkQuorum, group, topicMap).map(_._2)
+    val kafkaParams = Map[String, String](
+      KafkaUtils.securityProtocolConfig -> securityProtocol,
+      "zookeeper.connect" -> zkQuorum, "group.id" -> groupId,
+      "zookeeper.connection.timeout.ms" -> "10000")
+    val lines = KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
+      ssc, kafkaParams, topicMap,
+      StorageLevel.MEMORY_AND_DISK_SER_2).map(_._2)
     val words = lines.flatMap(_.split(" "))
     val wordCounts = words.map(x => (x, 1L))
       .reduceByKeyAndWindow(_ + _, _ - _, Minutes(10), Seconds(2), 2)
