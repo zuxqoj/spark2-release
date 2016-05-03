@@ -23,7 +23,7 @@ import scala.reflect.{classTag, ClassTag}
 import kafka.api.{FetchRequestBuilder, FetchResponse}
 import kafka.common.{ErrorMapping, TopicAndPartition}
 import kafka.consumer.SimpleConsumer
-import kafka.message.{MessageAndMetadata, MessageAndOffset}
+import kafka.message.{MessageAndMetadata, MessageAndOffset, Message}
 import kafka.serializer.Decoder
 import kafka.utils.VerifiableProperties
 
@@ -223,8 +223,10 @@ class KafkaRDD[
           null.asInstanceOf[R]
         } else {
           requestOffset = item.nextOffset
+          val itemAsMessage = item.asInstanceOf[Message]
           messageHandler(new MessageAndMetadata(
-            part.topic, part.partition, item.message, item.offset, keyDecoder, valueDecoder))
+            part.topic, part.partition, item.message, item.offset, itemAsMessage.timestamp,
+            itemAsMessage.timestampType, keyDecoder, valueDecoder))
         }
       }
     }

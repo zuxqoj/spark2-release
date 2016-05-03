@@ -22,6 +22,8 @@ import java.lang.{Integer => JInt, Long => JLong, Number => JNumber}
 import java.nio.charset.StandardCharsets
 import java.util.{List => JList, Map => JMap, Set => JSet}
 
+import org.apache.kafka.common.protocol.SecurityProtocol
+
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 
@@ -610,6 +612,10 @@ object KafkaUtils {
       Set(topics.asScala.toSeq: _*)
     )
   }
+
+  def securityProtocolConfig : String = "security.protocol"
+
+  def securityProtocolDefault: String = SecurityProtocol.PLAINTEXT.name
 }
 
 /**

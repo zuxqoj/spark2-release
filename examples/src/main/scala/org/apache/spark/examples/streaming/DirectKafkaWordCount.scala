@@ -41,22 +41,23 @@ object DirectKafkaWordCount {
         |Usage: DirectKafkaWordCount <brokers> <topics>
         |  <brokers> is a list of one or more Kafka brokers
         |  <topics> is a list of one or more kafka topics to consume from
-        |
+        |  <securityProtocol> is the desired Kafka security protocol
         """.stripMargin)
       System.exit(1)
     }
 
     StreamingExamples.setStreamingLogLevels()
 
-    val Array(brokers, topics) = args
-
+    val Array(brokers, topics, securityProtocol) =
+      if (args.length > 2) args else args :+ KafkaUtils.securityProtocolDefault
     // Create context with 2 second batch interval
     val sparkConf = new SparkConf().setAppName("DirectKafkaWordCount")
     val ssc = new StreamingContext(sparkConf, Seconds(2))
 
     // Create direct kafka stream with brokers and topics
     val topicsSet = topics.split(",").toSet
-    val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers)
+    val kafkaParams = Map[String, String]("metadata.broker.list" -> brokers,
+      KafkaUtils.securityProtocolConfig -> securityProtocol)
     val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
       ssc, kafkaParams, topicsSet)
 

@@ -87,7 +87,9 @@ class KafkaReceiver[
 
   def onStart() {
 
-    logInfo("Starting Kafka Consumer Stream with group: " + kafkaParams("group.id"))
+    logInfo("Starting Kafka Consumer Stream with group: " + kafkaParams("group.id") +
+             " security.protocol: " + kafkaParams.getOrElse(
+      KafkaUtils.securityProtocolConfig, "default"))
 
     // Kafka connection properties
     val props = new Properties()
