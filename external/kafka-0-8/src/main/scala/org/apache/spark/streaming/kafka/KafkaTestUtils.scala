@@ -108,7 +108,7 @@ private[kafka] class KafkaTestUtils extends Logging {
     // Kafka broker startup
     Utils.startServiceOnPort(brokerPort, port => {
       brokerPort = port
-      brokerConf = new KafkaConfig(brokerConfiguration)
+      brokerConf = KafkaConfig.fromProps(brokerConfiguration)
       server = new KafkaServer(brokerConf)
       server.startup()
       (server, brokerPort)
