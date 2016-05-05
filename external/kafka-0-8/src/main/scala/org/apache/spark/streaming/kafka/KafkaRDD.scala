@@ -23,7 +23,7 @@ import scala.reflect.{classTag, ClassTag}
 import kafka.api.{FetchRequestBuilder, FetchResponse}
 import kafka.common.{ErrorMapping, TopicAndPartition}
 import kafka.consumer.SimpleConsumer
-import kafka.message.{MessageAndMetadata, MessageAndOffset, Message}
+import kafka.message.{Message, MessageAndMetadata, MessageAndOffset}
 import kafka.serializer.Decoder
 import kafka.utils.VerifiableProperties
 
