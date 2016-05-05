@@ -22,8 +22,6 @@ import java.lang.{Integer => JInt, Long => JLong, Number => JNumber}
 import java.nio.charset.StandardCharsets
 import java.util.{List => JList, Map => JMap, Set => JSet}
 
-import org.apache.kafka.common.protocol.SecurityProtocol
-
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 
@@ -31,6 +29,7 @@ import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.{Decoder, DefaultDecoder, StringDecoder}
 import net.razorvine.pickle.{IObjectPickler, Opcodes, Pickler}
+import org.apache.kafka.common.protocol.SecurityProtocol
 
 import org.apache.spark.{SparkContext, SparkException}
 import org.apache.spark.api.java.{JavaPairRDD, JavaRDD, JavaSparkContext}
