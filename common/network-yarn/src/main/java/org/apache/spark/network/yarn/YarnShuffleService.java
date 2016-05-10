@@ -106,6 +106,10 @@ public class YarnShuffleService extends AuxiliaryService {
 
   private Configuration _conf = null;
 
+  // The recovery path used to shuffle service recovery
+  @VisibleForTesting
+  Path _recoveryPath = null;
+
   // Handles registering executors and opening shuffle blocks
   @VisibleForTesting
   ExternalShuffleBlockHandler blockHandler;
@@ -141,7 +145,7 @@ public class YarnShuffleService extends AuxiliaryService {
    */
   @Override
   protected void serviceInit(Configuration conf) {
-     _conf = conf;
+    _conf = conf;
 
     try {
       // In case this NM was killed while there were running spark applications, we need to restore
@@ -149,7 +153,7 @@ public class YarnShuffleService extends AuxiliaryService {
       // If we don't find one, then we choose a file to use to save the state next time.  Even if
       // an application was stopped while the NM was down, we expect yarn to call stopApplication()
       // when it comes back
-      registeredExecutorFile = findRecoveryDb(RECOVERY_FILE_NAME);
+      registeredExecutorFile = new File(getRecoveryPath().toUri().getPath(), RECOVERY_FILE_NAME);
 
       TransportConf transportConf = new TransportConf("shuffle", new HadoopConfigProvider(conf));
         blockHandler = new ExternalShuffleBlockHandler(transportConf, registeredExecutorFile);
@@ -324,6 +328,50 @@ public class YarnShuffleService extends AuxiliaryService {
   }
 
   /**
+   * Set the recovery path for shuffle service recovery when NM is restarted. The method will be
+   * overrode and called when Hadoop version is 2.5+ and NM recovery is enabled, otherwise we
+   * have to manually call this to set our own recovery path.
+   */
+  public void setRecoveryPath(Path recoveryPath) {
+    _recoveryPath = recoveryPath;
+  }
+
+  /**
+   * Get the recovery path, this will override the default one to get our own maintained
+   * recovery path.
+   */
+  protected Path getRecoveryPath() {
+    String[] localDirs = _conf.getTrimmedStrings("yarn.nodemanager.local-dirs");
+    for (String dir : localDirs) {
+      File f = new File(new Path(dir).toUri().getPath(), RECOVERY_FILE_NAME);
+      if (f.exists()) {
+        if (_recoveryPath == null) {
+          // If NM recovery is not enabled, we should specify the recovery path using NM local
+          // dirs, which is compatible with the old code.
+          _recoveryPath = new Path(dir);
+        } else {
+          // If NM recovery is enabled and the recovery file exists in old NM local dirs, which
+          // means old version of Spark already generated the recovery file, we should copy the
+          // old file in to a new recovery path for the compatibility.
+          if (!f.renameTo(new File(_recoveryPath.toUri().getPath(), RECOVERY_FILE_NAME))) {
+            // Fail to move recovery file to new path
+            logger.error("Failed to move recovery file {} to the path {}",
+              RECOVERY_FILE_NAME, _recoveryPath.toString());
+          }
+        }
+        break;
+      }
+    }
+
+    if (_recoveryPath == null) {
+      _recoveryPath = new Path(localDirs[0]);
+    }
+
+    return _recoveryPath;
+  }
+
+
+  /**
    * Simply encodes an application ID.
    */
   public static class AppId {
@@ -351,9 +399,8 @@ public class YarnShuffleService extends AuxiliaryService {
     @Override
     public String toString() {
       return Objects.toStringHelper(this)
-          .add("appId", appId)
-          .toString();
+              .add("appId", appId)
+              .toString();
     }
   }
-
 }
