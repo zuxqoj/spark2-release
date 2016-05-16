@@ -21,7 +21,6 @@ package org.apache.spark.examples.streaming
 import java.util.HashMap
 
 import _root_.kafka.serializer.StringDecoder
-
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 
 import org.apache.spark.storage.StorageLevel
