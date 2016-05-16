@@ -23,6 +23,7 @@ import java.util.HashMap
 import _root_.kafka.serializer.StringDecoder
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
