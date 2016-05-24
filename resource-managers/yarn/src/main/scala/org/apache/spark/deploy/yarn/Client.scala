@@ -543,31 +543,44 @@ private[spark] class Client(
           sparkConf.set(SPARK_JARS, localJars)
 
         case None =>
-          // No configuration, so fall back to uploading local jar files.
-          logWarning(s"Neither ${SPARK_JARS.key} nor ${SPARK_ARCHIVE.key} is set, falling back " +
-            "to uploading libraries under SPARK_HOME.")
-          val jarsDir = new File(YarnCommandBuilderUtils.findJarsDir(
-            sparkConf.getenv("SPARK_HOME")))
-          val jarsArchive = File.createTempFile(LOCALIZED_LIB_DIR, ".zip",
-            new File(Utils.getLocalDir(sparkConf)))
-          val jarsStream = new ZipOutputStream(new FileOutputStream(jarsArchive))
+          // Check hdfs cache first for HDP
+          val hdp_version = sys.env.get("HDP_VERSION")
+          if (hdp_version.isDefined && fs.exists(
+            new Path("/hdp/apps/" + hdp_version.get + "/spark2/spark2-hdp-yarn-archive.tar.gz"))) {
+            val archive = "hdfs:///hdp/apps/" + hdp_version.get +
+              "/spark2/spark2-hdp-yarn-archive.tar.gz"
+            logInfo("Use hdfs cache file as spark.yarn.archive for HDP, hdfsCacheFile:" + archive)
+            require(!isLocalUri(archive), s"${SPARK_ARCHIVE.key} cannot be a local URI.")
+            distribute(Utils.resolveURI(archive).toString,
+              resType = LocalResourceType.ARCHIVE,
+              destName = Some(LOCALIZED_LIB_DIR))
+          } else {
+            // No configuration, so fall back to uploading local jar files.
+            logWarning(s"Neither ${SPARK_JARS.key} nor ${SPARK_ARCHIVE.key} is set, falling back " +
+              "to uploading libraries under SPARK_HOME.")
+            val jarsDir = new File(YarnCommandBuilderUtils.findJarsDir(
+              sparkConf.getenv("SPARK_HOME")))
+            val jarsArchive = File.createTempFile(LOCALIZED_LIB_DIR, ".zip",
+              new File(Utils.getLocalDir(sparkConf)))
+            val jarsStream = new ZipOutputStream(new FileOutputStream(jarsArchive))
 
-          try {
-            jarsStream.setLevel(0)
-            jarsDir.listFiles().foreach { f =>
-              if (f.isFile && f.getName.toLowerCase().endsWith(".jar") && f.canRead) {
-                jarsStream.putNextEntry(new ZipEntry(f.getName))
-                Files.copy(f, jarsStream)
-                jarsStream.closeEntry()
+            try {
+              jarsStream.setLevel(0)
+              jarsDir.listFiles().foreach { f =>
+                if (f.isFile && f.getName.toLowerCase().endsWith(".jar") && f.canRead) {
+                  jarsStream.putNextEntry(new ZipEntry(f.getName))
+                  Files.copy(f, jarsStream)
+                  jarsStream.closeEntry()
+                }
               }
+            } finally {
+              jarsStream.close()
             }
-          } finally {
-            jarsStream.close()
-          }
 
-          distribute(jarsArchive.toURI.getPath,
-            resType = LocalResourceType.ARCHIVE,
-            destName = Some(LOCALIZED_LIB_DIR))
+            distribute(jarsArchive.toURI.getPath,
+              resType = LocalResourceType.ARCHIVE,
+              destName = Some(LOCALIZED_LIB_DIR))
+          }
       }
     }
 
