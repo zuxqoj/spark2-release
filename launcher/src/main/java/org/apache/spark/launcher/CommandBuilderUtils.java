@@ -127,6 +127,18 @@ class CommandBuilderUtils {
     return JavaVendor.Unknown;
   }
 
+  /** Checks if this is an Azure Spark installation. */
+  static boolean isHumboldt() {
+    String azureSpark = System.getenv("AZURE_SPARK");
+
+    /** The environment variable will not be set by Windows and non-Humboldt clusters. */
+    if (azureSpark != null) {
+      return true;
+    }
+
+    return false;
+  }
+
   /**
    * Updates the user environment, appending the given pathList to the existing value of the given
    * environment variable (or setting it if it hasn't yet been set).
