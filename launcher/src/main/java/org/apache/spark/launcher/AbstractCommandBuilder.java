@@ -17,11 +17,7 @@
 
 package org.apache.spark.launcher;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,7 +221,57 @@ abstract class AbstractCommandBuilder {
       addToClassPath(cp, lzo);
     }
 
+    // Add Azure wasb paths only on linux sku
+    if (isHumboldt() && !isWindows()){
+      try {
+        String hadoopClientHome = "/usr/hdp/current/hadoop-client";
+        File azureJar = new File(hadoopClientHome, "hadoop-azure.jar");
+        checkState(azureJar.isFile(), "Library directory '%s' does not exist.",
+                azureJar.getAbsolutePath());
+        addToClassPath(cp, "/usr/hdp/current/hadoop-client/hadoop-azure.jar");
+        // find first matched azure-storage jar at hadoop-client/lib
+        // i.e. /usr/hdp/current/hadoop-client/lib/azure-storage-2.2.0.jar
+        String azureStorageJar = findAzureStorageJar();
+        addToClassPath(cp, azureStorageJar);
+
+        String log4jHome = "/usr/lib/hdinsight-logging";
+        File sinkJar = new File(log4jHome, "mdsdclient-1.0.jar");
+        checkState(sinkJar.isFile(), "Library directory '%s' does not exist.",
+                sinkJar.getAbsolutePath());
+        addToClassPath(cp, "/usr/lib/hdinsight-logging/mdsdclient-1.0.jar");
+
+        sinkJar = new File(log4jHome, "microsoft-log4j-etwappender-1.0.jar");
+        checkState(sinkJar.isFile(), "Library directory '%s' does not exist.",
+                sinkJar.getAbsolutePath());
+        addToClassPath(cp, "/usr/lib/hdinsight-logging/microsoft-log4j-etwappender-1.0.jar");
+
+        sinkJar = new File(log4jHome, "json-simple-1.1.jar");
+        checkState(sinkJar.isFile(), "Library directory '%s' does not exist.",
+                sinkJar.getAbsolutePath());
+        addToClassPath(cp, "/usr/lib/hdinsight-logging/json-simple-1.1.jar");
+      } catch (Exception e) {
+        System.err.println("The azure jar cannot be located. Skip adding it to classpath");
+      }
+    }
     return cp;
+  }
+
+  private String findAzureStorageJar() {
+    String hadoopClientHome = "/usr/hdp/current/hadoop-client";
+    File libdir;
+    libdir = new File(hadoopClientHome, "lib");
+    checkState(libdir.isDirectory(), "Library directory '%s' does not exist.", libdir.getAbsolutePath());
+    final Pattern re = Pattern.compile("azure-storage.*\\.jar");
+    FileFilter filter = new FileFilter() {
+      @Override
+      public boolean accept(File file) {
+        return file.isFile() && re.matcher(file.getName()).matches();
+      }
+    };
+    File[] azureStorageJars = libdir.listFiles(filter);
+    // return first jar if found, else return empty string
+    return azureStorageJars != null && azureStorageJars.length > 0 ?
+            azureStorageJars[0].getAbsolutePath() : "";
   }
 
   /**
