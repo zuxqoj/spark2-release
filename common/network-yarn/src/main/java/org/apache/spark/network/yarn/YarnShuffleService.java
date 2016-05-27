@@ -62,7 +62,7 @@ public class YarnShuffleService extends AuxiliaryService {
 
   // Port on which the shuffle server listens for fetch requests
   private static final String SPARK_SHUFFLE_SERVICE_PORT_KEY = "spark.shuffle.service.port";
-  private static final int DEFAULT_SPARK_SHUFFLE_SERVICE_PORT = 7337;
+  private static final int DEFAULT_SPARK_SHUFFLE_SERVICE_PORT = 7447;
 
   // Whether the shuffle server should authenticate fetch requests
   private static final String SPARK_AUTHENTICATE_KEY = "spark.authenticate";
@@ -93,6 +93,7 @@ public class YarnShuffleService extends AuxiliaryService {
   static YarnShuffleService instance;
 
   public YarnShuffleService() {
+    // Only can be hardcoded here, since we couldn't get it through conf at this time
     super("spark_shuffle");
     logger.info("Initializing YARN shuffle service for Spark");
     instance = this;
@@ -192,12 +193,21 @@ public class YarnShuffleService extends AuxiliaryService {
 
   private File findRegisteredExecutorFile(String[] localDirs) {
     for (String dir: localDirs) {
-      File f = new File(new Path(dir).toUri().getPath(), "registeredExecutors.ldb");
+      File f = new File(new Path(dir + File.separator + getName()).toUri().getPath(),
+        "registeredExecutors.ldb");
       if (f.exists()) {
         return f;
       }
     }
-    return new File(new Path(localDirs[0]).toUri().getPath(), "registeredExecutors.ldb");
+
+    File parent = new File(new Path(localDirs[0] + File.separator + getName()).toUri().getPath());
+    try {
+      parent.mkdir();
+    } catch (Exception e) {
+      logger.error("Exception when creating folder {}", parent, e);
+    }
+
+    return new File(parent, "registeredExecutors.ldb");
   }
 
   /**
