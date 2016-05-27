@@ -344,4 +344,7 @@ package object config {
     CACHED_FILES_TYPES,
     CACHED_CONF_ARCHIVE)
 
+  private[yarn] val SPARK_SHUFFLE_SERVICE_NAME = ConfigBuilder("spark.shuffle.service.name")
+    .stringConf
+    .createWithDefault("spark_shuffle")
 }

@@ -115,7 +115,8 @@ private[yarn] class ExecutorRunnable(
           // Authentication is not enabled, so just provide dummy metadata
           ByteBuffer.allocate(0)
         }
-      ctx.setServiceData(Collections.singletonMap("spark_shuffle", secretBytes))
+      ctx.setServiceData(Collections.singletonMap(
+        sparkConf.get(SPARK_SHUFFLE_SERVICE_NAME), secretBytes))
     }
 
     // Send the start request to the ContainerManager

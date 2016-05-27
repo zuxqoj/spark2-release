@@ -76,7 +76,7 @@ public class YarnShuffleService extends AuxiliaryService {
 
   // Port on which the shuffle server listens for fetch requests
   private static final String SPARK_SHUFFLE_SERVICE_PORT_KEY = "spark.shuffle.service.port";
-  private static final int DEFAULT_SPARK_SHUFFLE_SERVICE_PORT = 7337;
+  private static final int DEFAULT_SPARK_SHUFFLE_SERVICE_PORT = 7447;
 
   // Whether the shuffle server should authenticate fetch requests
   private static final String SPARK_AUTHENTICATE_KEY = "spark.authenticate";
