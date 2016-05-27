@@ -58,6 +58,7 @@ import org.apache.parquet.hadoop.metadata.BlockMetaData;
 import org.apache.parquet.hadoop.metadata.ParquetMetadata;
 import org.apache.parquet.hadoop.util.ConfigurationUtil;
 import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Types;
 import org.apache.spark.sql.types.StructType;
 
@@ -201,10 +202,12 @@ public abstract class SpecificParquetRecordReaderBase<T> extends RecordReader<Vo
       }
     }
     this.sparkSchema = new ParquetSchemaConverter(config).convert(requestedSchema);
-    this.reader = new ParquetFileReader(config, file, blocks, requestedSchema.getColumns());
+    this.reader = new ParquetFileReader(
+            config, footer.getFileMetaData(), file, blocks, requestedSchema.getColumns());
     for (BlockMetaData block : blocks) {
       this.totalRowCount += block.getRowCount();
     }
+
   }
 
   @Override
