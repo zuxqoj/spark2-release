@@ -280,7 +280,8 @@ private[spark] object JsonProtocol {
     ("Getting Result Time" -> taskInfo.gettingResultTime) ~
     ("Finish Time" -> taskInfo.finishTime) ~
     ("Failed" -> taskInfo.failed) ~
-    ("Accumulables" -> JArray(taskInfo.accumulables.toList.map(accumulableInfoToJson)))
+    ("Killed" -> taskInfo.killed) ~
+    ("Accumulables" -> JArray(taskInfo.accumulables.map(accumulableInfoToJson).toList))
   }
 
   def accumulableInfoToJson(accumulableInfo: AccumulableInfo): JValue = {
@@ -698,6 +699,7 @@ private[spark] object JsonProtocol {
     val gettingResultTime = (json \ "Getting Result Time").extract[Long]
     val finishTime = (json \ "Finish Time").extract[Long]
     val failed = (json \ "Failed").extract[Boolean]
+    val killed = (json \ "Killed").extractOpt[Boolean].getOrElse(false)
     val accumulables = (json \ "Accumulables").extractOpt[Seq[JValue]] match {
       case Some(values) => values.map(accumulableInfoFromJson)
       case None => Seq[AccumulableInfo]()
@@ -708,6 +710,7 @@ private[spark] object JsonProtocol {
     taskInfo.gettingResultTime = gettingResultTime
     taskInfo.finishTime = finishTime
     taskInfo.failed = failed
+    taskInfo.killed = killed
     accumulables.foreach { taskInfo.accumulables += _ }
     taskInfo
   }
