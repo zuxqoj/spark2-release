@@ -1044,7 +1044,6 @@ private[spark] class Client(
     amContainer.setApplicationACLs(
       YarnSparkHadoopUtil.getApplicationAclsForYarn(securityManager).asJava)
     setupSecurityToken(amContainer)
-    UserGroupInformation.getCurrentUser().addCredentials(credentials)
 
     amContainer
   }
@@ -1065,7 +1064,8 @@ private[spark] class Client(
       sparkConf.set(KEYTAB.key, keytabFileName)
       sparkConf.set(PRINCIPAL.key, principal)
     }
-    credentials = UserGroupInformation.getCurrentUser.getCredentials
+    // Defensive copy of the credentials
+    credentials = new Credentials(UserGroupInformation.getCurrentUser.getCredentials)
   }
 
   /**
