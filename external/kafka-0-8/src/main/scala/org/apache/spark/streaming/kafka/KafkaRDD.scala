@@ -225,8 +225,9 @@ class KafkaRDD[
           requestOffset = item.nextOffset
           val itemAsMessage = item.asInstanceOf[Message]
           messageHandler(new MessageAndMetadata(
-            part.topic, part.partition, item.message, item.offset, itemAsMessage.timestamp,
-            itemAsMessage.timestampType, keyDecoder, valueDecoder))
+            topic = part.topic, partition = part.partition, rawMessage = item.message,
+            offset = item.offset, keyDecoder = keyDecoder, valueDecoder = valueDecoder,
+            timestamp = itemAsMessage.timestamp, timestampType = itemAsMessage.timestampType))
         }
       }
     }
