@@ -288,7 +288,7 @@ object HistoryServer extends Logging {
    * @param config configuration for the SecurityManager constructor
    * @return
    */
-  def createSecurityManager(config: SparkConf): SecurityManager = {
+  private[history] def createSecurityManager(config: SparkConf): SecurityManager = {
     patchSecuritySettings(config)
     new SecurityManager(config)
   }
