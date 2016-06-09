@@ -304,6 +304,23 @@ object HistoryServer extends Logging {
     new SecurityManager(config)
   }
 
+
+  /**
+   * Fix up the configuration of a spark configuration so that the security manager will
+   * start. Specifically, if spark authentication is set via an environment variable
+   * or a a spark config option, the configuration must be patched with a dummy authentication
+   * secret.
+   * @param config configuration to be used in a SecurityManager constructor
+   */
+  private def patchSecuritySettings(config: SparkConf): Unit = {
+    if (config.getBoolean(SecurityManager.SPARK_AUTH_CONF, false)
+        && config.getenv(SecurityManager.ENV_AUTH_SECRET) == null
+        && config.getOption(SecurityManager.SPARK_AUTH_SECRET_CONF).isEmpty) {
+      logDebug(s"Setting ${SecurityManager.SPARK_AUTH_SECRET_CONF} to a dummy value")
+      config.set(SecurityManager.SPARK_AUTH_SECRET_CONF, "dummy")
+    }
+  }
+
   def initSecurity() {
     // If we are accessing HDFS and it has security enabled (Kerberos), we have to login
     // from a keytab file so that we can access HDFS beyond the kerberos ticket expiration.
