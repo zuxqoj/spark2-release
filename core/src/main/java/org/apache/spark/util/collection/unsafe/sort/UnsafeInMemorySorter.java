@@ -18,6 +18,7 @@
 package org.apache.spark.util.collection.unsafe.sort;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 
 import org.apache.avro.reflect.Nullable;
 
@@ -169,6 +170,7 @@ public final class UnsafeInMemorySorter {
       usableCapacity = getUsableCapacity();
     }
     pos = 0;
+    nullBoundaryPos = 0;
   }
 
   /**
@@ -306,21 +308,20 @@ public final class UnsafeInMemorySorter {
     int offset = 0;
     long start = System.nanoTime();
     if (sortComparator != null) {
-      if (this.radixSortSupport != null) {
-        // TODO(ekl) we should handle NULL values before radix sort for efficiency, since they
-        // force a full-width sort (and we cannot radix-sort nullable long fields at all).
-        offset = RadixSort.sortKeyPrefixArray(
-          array, pos / 2, 0, 7, radixSortSupport.sortDescending(), radixSortSupport.sortSigned());
-      } else {
-        MemoryBlock unused = new MemoryBlock(
-          array.getBaseObject(),
-          array.getBaseOffset() + pos * 8L,
-          (array.size() - pos) * 8L);
-        LongArray buffer = new LongArray(unused);
-        Sorter<RecordPointerAndKeyPrefix, LongArray> sorter =
-          new Sorter<>(new UnsafeSortDataFormat(buffer));
-        sorter.sort(array, 0, pos / 2, sortComparator);
-      }
+        if (this.radixSortSupport != null) {
+            offset = RadixSort.sortKeyPrefixArray(
+                    array, nullBoundaryPos, (pos - nullBoundaryPos) / 2, 0, 7,
+                    radixSortSupport.sortDescending(), radixSortSupport.sortSigned());
+        } else {
+            MemoryBlock unused = new MemoryBlock(
+                    array.getBaseObject(),
+                    array.getBaseOffset() + pos * 8L,
+                    (array.size() - pos) * 8L);
+            LongArray buffer = new LongArray(unused);
+            Sorter<RecordPointerAndKeyPrefix, LongArray> sorter =
+                    new Sorter<>(new UnsafeSortDataFormat(buffer));
+            sorter.sort(array, 0, pos / 2, sortComparator);
+        }
     }
     totalSortTimeNanos += System.nanoTime() - start;
     return new SortedIterator(pos / 2, offset);
