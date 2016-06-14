@@ -94,7 +94,7 @@ public class YarnShuffleService extends AuxiliaryService {
 
   public YarnShuffleService() {
     // Only can be hardcoded here, since we couldn't get it through conf at this time
-    super("spark_shuffle");
+    super("spark2_shuffle");
     logger.info("Initializing YARN shuffle service for Spark");
     instance = this;
   }
