@@ -250,7 +250,6 @@ mkdir "$DISTDIR"/conf
 cp "$SPARK_HOME"/conf/*.template "$DISTDIR"/conf
 cp "$SPARK_HOME/README.md" "$DISTDIR"
 cp -r "$SPARK_HOME/bin" "$DISTDIR"
-cp -r "$SPARK_HOME/dist-bin" "$DISTDIR"
 cp -r "$SPARK_HOME/python" "$DISTDIR"
 
 # Remove the python distribution from dist/ if we built it
