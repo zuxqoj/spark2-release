@@ -92,6 +92,15 @@ public final class UnsafeInMemorySorter {
    */
   private int pos = 0;
 
+    /**
+     * If sorting with radix sort, specifies the starting position in the sort buffer where records
+     * with non-null prefixes are kept. Positions [0..nullBoundaryPos) will contain null-prefixed
+     * records, and positions [nullBoundaryPos..pos) non-null prefixed records. This lets us avoid
+     * radix sorting over null values.
+     */
+    private int nullBoundaryPos = 0;
+
+
   /**
    * How many records could be inserted, because part of the array should be left for sorting.
    */
@@ -199,22 +208,35 @@ public final class UnsafeInMemorySorter {
     usableCapacity = getUsableCapacity();
   }
 
-  /**
-   * Inserts a record to be sorted. Assumes that the record pointer points to a record length
-   * stored as a 4-byte integer, followed by the record's bytes.
-   *
-   * @param recordPointer pointer to a record in a data page, encoded by {@link TaskMemoryManager}.
-   * @param keyPrefix a user-defined key prefix
-   */
-  public void insertRecord(long recordPointer, long keyPrefix) {
-    if (!hasSpaceForAnotherRecord()) {
-      throw new IllegalStateException("There is no space for new record");
+    /**
+     * Inserts a record to be sorted. Assumes that the record pointer points to a record length
+     * stored as a 4-byte integer, followed by the record's bytes.
+     *
+     * @param recordPointer pointer to a record in a data page, encoded by {@link TaskMemoryManager}.
+     * @param keyPrefix a user-defined key prefix
+     */
+    public void insertRecord(long recordPointer, long keyPrefix, boolean prefixIsNull) {
+        if (!hasSpaceForAnotherRecord()) {
+            throw new IllegalStateException("There is no space for new record");
+        }
+        if (prefixIsNull && radixSortSupport != null) {
+            // Swap forward a non-null record to make room for this one at the beginning of the array.
+            array.set(pos, array.get(nullBoundaryPos));
+            pos++;
+            array.set(pos, array.get(nullBoundaryPos + 1));
+            pos++;
+            // Place this record in the vacated position.
+            array.set(nullBoundaryPos, recordPointer);
+            nullBoundaryPos++;
+            array.set(nullBoundaryPos, keyPrefix);
+            nullBoundaryPos++;
+        } else {
+            array.set(pos, recordPointer);
+            pos++;
+            array.set(pos, keyPrefix);
+            pos++;
+        }
     }
-    array.set(pos, recordPointer);
-    pos++;
-    array.set(pos, keyPrefix);
-    pos++;
-  }
 
   public final class SortedIterator extends UnsafeSorterIterator implements Cloneable {
 

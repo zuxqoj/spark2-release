@@ -55,8 +55,9 @@ public final class UnsafeKVExternalSorter {
       StructType valueSchema,
       BlockManager blockManager,
       SerializerManager serializerManager,
-      long pageSizeBytes) throws IOException {
-    this(keySchema, valueSchema, blockManager, serializerManager, pageSizeBytes, null);
+      long pageSizeBytes,
+      long numElementsForSpillThreshold) throws IOException {
+    this(keySchema, valueSchema, blockManager, serializerManager, pageSizeBytes, numElementsForSpillThreshold, null);
   }
 
   public UnsafeKVExternalSorter(
@@ -65,6 +66,7 @@ public final class UnsafeKVExternalSorter {
       BlockManager blockManager,
       SerializerManager serializerManager,
       long pageSizeBytes,
+      long numElementsForSpillThreshold,
       @Nullable BytesToBytesMap map) throws IOException {
     this.keySchema = keySchema;
     this.valueSchema = valueSchema;
@@ -90,6 +92,7 @@ public final class UnsafeKVExternalSorter {
         SparkEnv.get().conf().getInt("spark.shuffle.sort.initialBufferSize",
                                      UnsafeExternalRowSorter.DEFAULT_INITIAL_SORT_BUFFER_SIZE),
         pageSizeBytes,
+        numElementsForSpillThreshold,
         canUseRadixSort);
     } else {
       // The array will be used to do in-place sort, which require half of the space to be empty.
@@ -120,9 +123,10 @@ public final class UnsafeKVExternalSorter {
 
         // Compute prefix
         row.pointTo(baseObject, baseOffset, loc.getKeyLength());
-        final long prefix = prefixComputer.computePrefix(row);
+        final UnsafeExternalRowSorter.PrefixComputer.Prefix prefix =
+                prefixComputer.computePrefix(row);
 
-        inMemSorter.insertRecord(address, prefix);
+        inMemSorter.insertRecord(address, prefix.value, prefix.isNull);
       }
 
       sorter = UnsafeExternalSorter.createWithExistingInMemorySorter(
@@ -135,6 +139,7 @@ public final class UnsafeKVExternalSorter {
         SparkEnv.get().conf().getInt("spark.shuffle.sort.initialBufferSize",
                                      UnsafeExternalRowSorter.DEFAULT_INITIAL_SORT_BUFFER_SIZE),
         pageSizeBytes,
+        numElementsForSpillThreshold,
         inMemSorter);
 
       // reset the map, so we can re-use it to insert new records. the inMemSorter will not used
@@ -149,10 +154,12 @@ public final class UnsafeKVExternalSorter {
    * sorted runs, and then reallocates memory to hold the new record.
    */
   public void insertKV(UnsafeRow key, UnsafeRow value) throws IOException {
-    final long prefix = prefixComputer.computePrefix(key);
+    final UnsafeExternalRowSorter.PrefixComputer.Prefix prefix =
+            prefixComputer.computePrefix(key);
     sorter.insertKVRecord(
-      key.getBaseObject(), key.getBaseOffset(), key.getSizeInBytes(),
-      value.getBaseObject(), value.getBaseOffset(), value.getSizeInBytes(), prefix);
+            key.getBaseObject(), key.getBaseOffset(), key.getSizeInBytes(),
+            value.getBaseObject(), value.getBaseOffset(), value.getSizeInBytes(),
+            prefix.value, prefix.isNull);
   }
 
   /**

@@ -52,7 +52,20 @@ public final class UnsafeExternalRowSorter {
   private final UnsafeExternalSorter sorter;
 
   public abstract static class PrefixComputer {
-    abstract long computePrefix(InternalRow row);
+
+    public static class Prefix {
+      /** Key prefix value, or the null prefix value if isNull = true. **/
+      long value;
+
+      /** Whether the key is null. */
+      boolean isNull;
+    }
+
+    /**
+     * Computes prefix for the given row. For efficiency, the returned object may be reused in
+     * further calls to a given PrefixComputer.
+     */
+    abstract Prefix computePrefix(InternalRow row);
   }
 
   public UnsafeExternalRowSorter(
@@ -76,6 +89,8 @@ public final class UnsafeExternalRowSorter {
       sparkEnv.conf().getInt("spark.shuffle.sort.initialBufferSize",
                              DEFAULT_INITIAL_SORT_BUFFER_SIZE),
       pageSizeBytes,
+      SparkEnv.get().conf().getLong("spark.shuffle.spill.numElementsForceSpillThreshold", UnsafeExternalSorter
+          .DEFAULT_NUM_ELEMENTS_FOR_SPILL_THRESHOLD),
       canUseRadixSort
     );
   }
@@ -90,12 +105,13 @@ public final class UnsafeExternalRowSorter {
   }
 
   public void insertRow(UnsafeRow row) throws IOException {
-    final long prefix = prefixComputer.computePrefix(row);
+    final PrefixComputer.Prefix prefix = prefixComputer.computePrefix(row);
     sorter.insertRecord(
-      row.getBaseObject(),
-      row.getBaseOffset(),
-      row.getSizeInBytes(),
-      prefix
+            row.getBaseObject(),
+            row.getBaseOffset(),
+            row.getSizeInBytes(),
+            prefix.value,
+            prefix.isNull
     );
     numRowsInserted++;
     if (testSpillFrequency > 0 && (numRowsInserted % testSpillFrequency) == 0) {
