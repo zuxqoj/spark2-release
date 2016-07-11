@@ -90,24 +90,28 @@ public class SparkLauncherSuite {
     SparkSubmitOptionParser opts = new SparkSubmitOptionParser();
     Map<String, String> env = new HashMap<>();
     env.put("SPARK_PRINT_LAUNCH_COMMAND", "1");
+    env.put("HDP_VERSION", "2.5");
 
-    SparkLauncher launcher = new SparkLauncher(env)
-      .setSparkHome(System.getProperty("spark.test.home"))
-      .setMaster("local")
-      .setAppResource(SparkLauncher.NO_RESOURCE)
-      .addSparkArg(opts.CONF,
-        String.format("%s=-Dfoo=ShouldBeOverriddenBelow", SparkLauncher.DRIVER_EXTRA_JAVA_OPTIONS))
-      .setConf(SparkLauncher.DRIVER_EXTRA_JAVA_OPTIONS,
-        "-Dfoo=bar -Dtest.appender=childproc")
-      .setConf(SparkLauncher.DRIVER_EXTRA_CLASSPATH, System.getProperty("java.class.path"))
-      .addSparkArg(opts.CLASS, "ShouldBeOverriddenBelow")
-      .setMainClass(SparkLauncherTestApp.class.getName())
-      .addAppArgs("proc");
-    final Process app = launcher.launch();
+    try {
+      SparkLauncher launcher = new SparkLauncher(env)
+        .setSparkHome(System.getProperty("spark.test.home"))
+        .setMaster("local")
+        .setAppResource(SparkLauncher.NO_RESOURCE)
+        .addSparkArg(opts.CONF,
+          String.format("%s=-Dfoo=ShouldBeOverriddenBelow", SparkLauncher.DRIVER_EXTRA_JAVA_OPTIONS))
+        .setConf(SparkLauncher.DRIVER_EXTRA_JAVA_OPTIONS, "-Dfoo=bar -Dtest.appender=childproc")
+        .setConf(SparkLauncher.DRIVER_EXTRA_CLASSPATH, System.getProperty("java.class.path"))
+        .addSparkArg(opts.CLASS, "ShouldBeOverriddenBelow")
+        .setMainClass(SparkLauncherTestApp.class.getName())
+        .addAppArgs("proc");
+      final Process app = launcher.launch();
 
-    new OutputRedirector(app.getInputStream(), TF);
-    new OutputRedirector(app.getErrorStream(), TF);
-    assertEquals(0, app.waitFor());
+      new OutputRedirector(app.getInputStream(), TF);
+      new OutputRedirector(app.getErrorStream(), TF);
+      assertEquals(0, app.waitFor());
+    } finally {
+      env.remove("HDP_VERSION");
+    }
   }
 
   public static class SparkLauncherTestApp {
