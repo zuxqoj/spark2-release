@@ -10,7 +10,9 @@ IMPROVEMENTS
     RMP-6448: hdp.version
 
 BUG FIXES
-    BUG-58486 Use cache file created by ambari as spark.yarn.archive
-    BUG-48982 Add hadoop lzo jar to the classpath
-    SPARK-11182   HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
-    BUG-52253     Support configuring YARN correctly for multiple Spark versions and their aux-services
+    BUG-58486   Use cache file created by ambari as spark.yarn.archive
+    BUG-48982   Add hadoop lzo jar to the classpath
+    SPARK-11182 HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
+    BUG-52253   Support configuring YARN correctly for multiple Spark versions and their aux-services
+    BUG-60289   Spark2 jersey and Timeline Jersey are incompatible
+    BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
