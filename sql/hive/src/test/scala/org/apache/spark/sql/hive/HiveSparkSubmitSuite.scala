@@ -265,6 +265,7 @@ class HiveSparkSubmitSuite
     val env = builder.environment()
     env.put("SPARK_TESTING", "1")
     env.put("SPARK_HOME", sparkHome)
+    env.put("HDP_VERSION", "2.5.0.0")
 
     def captureOutput(source: String)(line: String): Unit = {
       // This test suite has some weird behaviors when executed on Jenkins:
