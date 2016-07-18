@@ -666,7 +666,7 @@ class SparkSubmitSuite
     val process = Utils.executeCommand(
       Seq(sparkSubmitFile.getCanonicalPath) ++ args,
       new File(sparkHome),
-      Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome))
+      Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome, "HDP_VERSION" -> "2.5.0.0"))
 
     try {
       val exitCode = failAfter(60 seconds) { process.waitFor() }
