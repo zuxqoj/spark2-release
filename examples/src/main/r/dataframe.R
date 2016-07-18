@@ -32,16 +32,8 @@ printSchema(df)
 #  |-- name: string (nullable = true)
 #  |-- age: double (nullable = true)
 
-# Create a DataFrame from a JSON file
-path <- file.path(Sys.getenv("SPARK_HOME"), "examples/src/main/resources/people.json")
-peopleDF <- read.json(path)
-printSchema(peopleDF)
-# root
-#  |-- age: long (nullable = true)
-#  |-- name: string (nullable = true)
-
 # Register this DataFrame as a table.
-createOrReplaceTempView(peopleDF, "people")
+createOrReplaceTempView(df, "people")
 
 # SQL statements can be run by using the sql methods
 teenagers <- sql("SELECT name FROM people WHERE age >= 13 AND age <= 19")
