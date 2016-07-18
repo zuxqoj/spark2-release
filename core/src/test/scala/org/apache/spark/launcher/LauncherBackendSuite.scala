@@ -42,6 +42,7 @@ class LauncherBackendSuite extends SparkFunSuite with Matchers {
   private def testWithMaster(master: String): Unit = {
     val env = new java.util.HashMap[String, String]()
     env.put("SPARK_PRINT_LAUNCH_COMMAND", "1")
+    env.put("HDP_VERSION", "2.5.0.0")
     val handle = new SparkLauncher(env)
       .setSparkHome(sys.props("spark.test.home"))
       .setConf(SparkLauncher.DRIVER_EXTRA_CLASSPATH, System.getProperty("java.class.path"))
