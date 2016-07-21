@@ -17,5 +17,3 @@ BUG FIXES
     BUG-60289   Spark2 jersey and Timeline Jersey are incompatible
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-61726   SparkLauncherSuite unit test failing
-    SPARK-16435 Add warning log if initialExecutors is less than minExecutors
-    SPARK-16540 Avoid adding jars twice for Spark running on yarn
