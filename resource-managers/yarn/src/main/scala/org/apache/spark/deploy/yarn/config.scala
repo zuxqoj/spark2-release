@@ -346,5 +346,5 @@ package object config {
 
   private[yarn] val SPARK_SHUFFLE_SERVICE_NAME = ConfigBuilder("spark.shuffle.service.name")
     .stringConf
-    .createWithDefault("spark_shuffle")
+    .createWithDefault("spark2_shuffle")
 }
