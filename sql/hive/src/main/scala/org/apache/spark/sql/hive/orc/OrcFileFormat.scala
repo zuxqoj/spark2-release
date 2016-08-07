@@ -102,6 +102,33 @@ private[sql] class OrcFileFormat
     true
   }
 
+  def mapRequiredColumns(
+      conf: Configuration,
+      dataSchema: StructType,
+      physicalSchema: StructType,
+      requiredSchema: StructType): StructType = {
+
+    // requiredSchema names might not match with physical schema names.
+    // This is especially true when data is generated via Hive wherein
+    // orc files would have column names as _col0, _col1 etc. This is
+    // fixed in Hive 2.0, where in physical col names would match that
+    // of metastore. To make it backward compatible, it is required to
+    // map physical names to that of requiredSchema.
+
+    // for requiredSchema, get the ordinal from dataSchema
+    val ids = requiredSchema.map(a => dataSchema.fieldIndex(a.name): Integer).sorted
+
+    // for ids, get corresponding name from physicalSchema (e.g _col1 in
+    // case of hive. otherwise it would match physical name)
+    val names = ids.map(i => physicalSchema.fieldNames(i))
+    HiveShim.appendReadColumns(conf, ids, names)
+
+    val mappedReqPhysicalSchemaStruct =
+      StructType(physicalSchema.filter(struct => names.contains(struct.name)))
+
+    mappedReqPhysicalSchemaStruct
+  }
+
   override def buildReader(
       sparkSession: SparkSession,
       dataSchema: StructType,
@@ -132,7 +159,9 @@ private[sql] class OrcFileFormat
         Iterator.empty
       } else {
         val physicalSchema = maybePhysicalSchema.get
-        OrcRelation.setRequiredColumns(conf, physicalSchema, requiredSchema)
+        // Get StructType for newly mapped schema
+        val mappedReqPhysicalSchema =
+          mapRequiredColumns(conf, dataSchema, physicalSchema, requiredSchema)
 
         val orcRecordReader = {
           val job = Job.getInstance(conf)
@@ -153,7 +182,7 @@ private[sql] class OrcFileFormat
         // Unwraps `OrcStruct`s to `UnsafeRow`s
         OrcRelation.unwrapOrcStructs(
           conf,
-          requiredSchema,
+          mappedReqPhysicalSchema,
           Some(orcRecordReader.getObjectInspector.asInstanceOf[StructObjectInspector]),
           new RecordReaderIterator[OrcStruct](orcRecordReader))
       }
