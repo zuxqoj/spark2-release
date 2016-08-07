@@ -11,6 +11,7 @@ IMPROVEMENTS
     RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.0
 
 BUG FIXES
+    BUG-63630	SPARK-14387. Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
     BUG-48982   Add hadoop lzo jar to the classpath
     SPARK-11182 HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
