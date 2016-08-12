@@ -59,7 +59,7 @@ private[cloud] trait S3ExampleBase extends TimeOperations {
         exitCode = EXIT_ERROR
     }
     logInfo(s"Exit code = $exitCode")
-    exit(exitCode)
+    if (exitCode != 0) exit(exitCode)
   }
 
   /**
