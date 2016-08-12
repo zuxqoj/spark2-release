@@ -19,5 +19,6 @@ BUG FIXES
     BUG-60289   Spark2 jersey and Timeline Jersey are incompatible
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-61726   SparkLauncherSuite unit test failing
+    BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844   HistoryServer doesn't come up if spark.authenticate = true
