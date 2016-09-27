@@ -809,7 +809,7 @@ object SparkSession {
      * @since 2.0.0
      */
     def enableHiveSupport(): Builder = synchronized {
-      if (hiveClassesArePresent) {
+      if (llapClassesArePresent || hiveClassesArePresent) {
         config(CATALOG_IMPLEMENTATION.key, "hive")
       } else {
         throw new IllegalArgumentException(
@@ -957,10 +957,23 @@ object SparkSession {
   private val defaultSession = new AtomicReference[SparkSession]
 
   private val HIVE_SESSION_STATE_CLASS_NAME = "org.apache.spark.sql.hive.HiveSessionState"
+  private val HIVE_SHARED_STATE_CLASS_NAME = "org.apache.spark.sql.hive.HiveSharedState"
+
+  private val LLAP_SHARED_STATE_CLASS_NAME = "org.apache.spark.sql.hive.llap.LlapSharedState"
+  private val LLAP_SESSION_STATE_CLASS_NAME = "org.apache.spark.sql.hive.llap.LlapSessionState"
+
+  private def sharedStateClassName(conf: SparkConf): String = {
+    conf.get(CATALOG_IMPLEMENTATION) match {
+      case "hive" =>
+        if (llapClassesArePresent) LLAP_SHARED_STATE_CLASS_NAME else HIVE_SHARED_STATE_CLASS_NAME
+      case "in-memory" => classOf[SharedState].getCanonicalName
+    }
+  }
 
   private def sessionStateClassName(conf: SparkConf): String = {
     conf.get(CATALOG_IMPLEMENTATION) match {
-      case "hive" => HIVE_SESSION_STATE_CLASS_NAME
+      case "hive" =>
+        if (llapClassesArePresent) LLAP_SESSION_STATE_CLASS_NAME else HIVE_SESSION_STATE_CLASS_NAME
       case "in-memory" => classOf[SessionState].getCanonicalName
     }
   }
@@ -995,4 +1008,17 @@ object SparkSession {
     }
   }
 
+  /**
+   * Return true if LLAP classes can be loaded, otherwise false.
+   */
+  private[spark] def llapClassesArePresent: Boolean = {
+    try {
+      Utils.classForName(LLAP_SESSION_STATE_CLASS_NAME)
+      Utils.classForName(LLAP_SHARED_STATE_CLASS_NAME)
+      Utils.classForName("org.apache.hadoop.hive.conf.HiveConf")
+      true
+    } catch {
+      case _: ClassNotFoundException | _: NoClassDefFoundError => false
+    }
+  }
 }

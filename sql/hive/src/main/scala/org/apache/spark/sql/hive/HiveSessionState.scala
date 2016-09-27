@@ -142,4 +142,20 @@ private[hive] class HiveSessionState(sparkSession: SparkSession)
     conf.getConf(HiveUtils.HIVE_THRIFT_SERVER_ASYNC)
   }
 
+
+  // TODO: why do we get this from SparkConf but not SQLConf?
+  def hiveThriftServerSingleSession: Boolean = {
+    sparkSession.sparkContext.conf.getBoolean(
+      "spark.sql.hive.thriftServer.singleSession", defaultValue = false)
+  }
+
+  private var userName = System.getProperty("user.name")
+
+  def setUser(user: String): Unit = {
+    userName = user
+  }
+
+  def getUser(): String = {
+    userName
+  }
 }
