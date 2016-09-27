@@ -78,6 +78,7 @@ private[hive] class SparkSQLSessionManager(hiveServer: HiveServer2, sqlContext: 
     } else {
       sqlContext.newSession()
     }
+    ctx.sessionState.asInstanceOf[HiveSessionState].setUser(session.getUserName())
     ctx.setConf("spark.sql.hive.version", HiveUtils.hiveExecutionVersion)
     sparkSqlOperationManager.sessionToContexts.put(sessionHandle, ctx)
     sessionHandle

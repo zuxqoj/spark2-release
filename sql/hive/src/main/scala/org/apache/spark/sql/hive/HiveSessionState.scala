@@ -146,4 +146,13 @@ private[hive] class HiveSessionState(sparkSession: SparkSession)
       "spark.sql.hive.thriftServer.singleSession", defaultValue = false)
   }
 
+  private var userName = System.getProperty("user.name")
+
+  def setUser(user: String): Unit = {
+    userName = user
+  }
+
+  def getUser(): String = {
+    userName
+  }
 }
