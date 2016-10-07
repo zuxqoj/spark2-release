@@ -1,11 +1,10 @@
-Changes only in Hortonworks github and not in Apache SPARK-1.6.1 and hence not covered by CHANGES.txt.
+Changes only in Hortonworks github and not in Apache SPARK-2.0.1 and hence not covered by CHANGES.txt.
 
 INCOMPATIBLE CHANGES
 
 NEW FEATURES
 
 IMPROVEMENTS
-    RMP-6443: Resolving symlinks in bin/spark-* scripts
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
     RMP-6448: hdp.version
 
@@ -13,228 +12,13 @@ BUG FIXES
     BUG-63630	SPARK-14387. Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
     BUG-48982   Add hadoop lzo jar to the classpath
-    SPARK-11182 HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
     BUG-52253   Support configuring YARN correctly for multiple Spark versions and their aux-services
     BUG-60289   Spark2 jersey and Timeline Jersey are incompatible
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-61726   SparkLauncherSuite unit test failing
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
-    (Spark 2.1 backport)
-    SPARK-17512 Avoid formatting to python path for yarn and mesos cluster mode
+    (Spark 2.0.2 backport)
+    SPARK-17612 Support `DESCRIBE table PARTITION` SQL syntax
     (Jira in Apache Spark is IN PROGRESS)
+    SPARK-11182 HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
-    SPARK-16568 Update sql programming guide refreshTable API in python code
-    SPARK-10683 Move SparkR include jar test to SparkSubmitSuite
-    SPARK-16632 Respect Hive schema when merging parquet schema.
-    SPARK-16440 Destroy broadcasted variables even on driver
-    SPARK-15923 Spark Application rest api returns 'no such app: …
-    SPARK-16613 RDD.pipe returns values for empty partitions
-    SPARK-16634 Workaround JVM bug by moving some code out of ctor.
-    SPARK-16644 Aggregate should not propagate constraints containing aggregate expressions
-    SPARK-16632 Use Spark requested schema to guide vectorized Parquet reader initialization
-    SPARK-16632 Revert PR #14272: Respect Hive schema when merging parquet schema
-    SPARK-16656 Try to make CreateTableAsSelectSuite more stable
-    SPARK-16334 Maintain single dictionary per row-batch in vectorized parquet reader
-    SPARK-16287 Implement str_to_map SQL function
-    SPARK-16650 Improve documentation of spark.task.maxFailures
-    SPARK-16651 Make `withColumnRenamed/drop` description more consistent with Scala API
-    SPARK-16380 Update SQL examples and programming guide for Python language binding
-    SPARK-16690 Rename SQLTestUtils.withTempTable to withTempView
-    SPARK-16515 Fix test `script` on OS X/Windows...
-    SPARK-16699 Fix performance bug in hash aggregate on long string keys
-    SPARK-16648 Make ignoreNullsExpr a child expression of First and Last
-    SPARK-16698 Field names having dots should be allowed for datasources based on FileFormat
-    SPARK-16703 Remove extra whitespace in SQL generation for window functions
-    SPARK-16485 Fixed several inline formatting in ml features doc
-    SPARK-16715 Fix a potential ExprId conflict for SubexpressionEliminationSuite."Semantic equals and hash"
-    SPARK-14131 SQL Improved fix for avoiding potential deadlocks in HDFSMetadataLog
-    SPARK-16722 Fix a StreamingContext leak in StreamingContextSuite when eventually fails
-    SPARK-16672 SQLBuilder should not raise exceptions on EXISTS queries
-    SPARK-16724 Expose DefinedByConstructorParams
-    SPARK-16633 Fixes three issues related to lead and lag functions
-    SPARK-16621 Generate stable SQLs in SQLBuilder
-    SPARK-16729 Throw analysis exception for invalid date casts
-    SPARK-16730 Implement function aliases for type casts
-    SPARK-15232 Add subquery SQL building tests to LogicalPlanToSQLSuite
-    SPARK-16639 The query with having condition that contains grouping by column should work
-    SPARK-16740 Fix Long overflow in LongToUnsafeRowMap
-    SPARK-16764 Recommend disabling vectorized parquet reader on OutOfMemoryError
-    SPARK-16772 Correct API doc references to PySpark classes + formatting fixes
-    SPARK-16664 Fix persist call on Data frames with more than 200…
-    SPARK-16750 Fix GaussianMixture training failed due to feature column type mistake
-    SPARK-16751 Upgrade derby to 10.12.1.1
-    SPARK-16761 Fix doc link in docs/ml-guide.md
-    SPARK-16748 SparkExceptions during planning should not wrapped in TreeNodeException
-    SPARK-16800 Fix Java examples that fail to run due to exception
-    SPARK-16812 Open up SparkILoop.getAddedJars
-    SPARK-16813 Remove private[sql] and private[spark] from catalyst package
-    SPARK-16805 Log timezone when query result does not match
-    SPARK-16778 Fix deprecation warning with SQLContext
-    SPARK-16776 Replace deprecated API in KafkaTestUtils for 0.10.0.
-    SPARK-16791 cast struct with timestamp field fails
-    SPARK-16774 Fix use of deprecated timestamp constructor & improve timezone handling
-    SPARK-15869 Fix a potential NPE in StreamingJobProgressListener.getBatchUIData
-    SPARK-16818 Exchange reuse incorrectly reuses scans over different sets of partitions
-    SPARK-16734 Revise examples of all language bindings
-    SPARK-16558 examples/mllib/LDAExample should use MLVector instead of MLlib Vector
-    SPARK-15541 Casting ConcurrentHashMap to ConcurrentMap (master branch)
-    SPARK-16837 TimeWindow incorrectly drops slideDuration in constructors
-    SPARK-16062 Fix two bugs of Python-only UDTs
-    SPARK-16836 Add support for CURRENT_DATE/CURRENT_TIMESTAMP literals
-    SPARK-16850 Improve type checking error message for greatest/least
-    SPARK-16787 SparkContext.addFile() should not throw if called twice with the same file
-    SPARK-16831 Fixed bug in CrossValidator.avgMetrics
-    SPARK-16796 Visible passwords on Spark environment page
-    SPARK-16714 array, map, greatest, least's type coercion should handle decimal type
-    SPARK-14204 Register driverClass rather than user-specified class
-    SPARK-16770 Fix JLine dependency management and version (Sca…
-    SPARK-16873 Fix SpillReader NPE when spillFile has no data
-    SPARK-16802 Fix overflow in LongToUnsafeRowMap
-    SPARK-16875 Add args checking for DataSet randomSplit and sample
-    SPARK-16880 Make ann training data persisted if needed
-    SPARK-16877 Add rules for preventing to use Java annotations (Deprecated and Override)
-    SPARK-16863 ProbabilisticClassifier.fit check threshoulds' length
-    SPARK-16907 Fix performance regression for parquet table when vectorized parquet record reader is not being used
-    SPARK-16312 Doc for Kafka 0.10 integration
-    SPARK-16750 Add transformSchema for StringIndexer/VectorAssembler and fix failed tests.
-    SPARK-16901 Hive settings in hive-site.xml may be overridden by Hive's default values
-    SPARK-16772 Fix API doc references to UDFRegistration + Update "important classes"
-    SPARK-16925 Master should call schedule() after all executor exit events, not only failures
-    SPARK-16932 Changed programming guide to not reference old accumulator API in Scala
-    SPARK-16870 Summary:add "spark.sql.broadcastTimeout" into docs/sql-programming-gu…
-    SPARK-16911 Fix the links in the programming guide
-    SPARK-16409 regexp_extract with optional groups causes NPE
-    SPARK-16939 Fix build error by using `Tuple1` explicitly in StringFunctionsSuite
-    SPARK-16457 Fix Wrong Messages when CTAS with a Partition By Clause
-    SPARK-16936 Case Sensitivity Support for Refresh Temp Table
-    SPARK-16586 Handle JVM errors printed to stdout.
-    SPARK-16953 Make requestTotalExecutors public Developer API to be consistent with requestExecutors/killExecutors
-    SPARK-16563 Fix spark sql thrift server FetchResults bug
-    SPARK-16610 Add `orc.compress` as an alias for `compression` option.
-    SPARK-16950 fromOffsets parameter support in KafkaUtils.createDirectStream for python3
-    SPARK-16956 Make ApplicationState.MAX_NUM_RETRY configurable
-    SPARK-16905 SQL DDL: MSCK REPAIR TABLE
-    SPARK-16522 Spark application throws exception on exit.
-    SPARK-16324 regexp_extract should doc that it returns empty string when match fails
-    SPARK-15639 Push down filter at RowGroups level for parquet reader
-    SPARK-16579 Add install.spark function
-    SPARK-17010 Wrong description in memory management document
-    SPARK-16866 Infrastructure for file-based SQL end-to-end tests
-    SPARK-17008 Normalization and isolation in SQLQueryTestSuite.
-    SPARK-17007 Move test data files into a test-data folder
-    SPARK-17011 Support testing exceptions in SQLQueryTestSuite
-    SPARK-15899 Fix the construction of the file path with hadoop Path for Spark 2.0
-    SPARK-17015 group-by/order-by ordinal and arithmetic tests
-    SPARK-17018 literals.sql for testing literal parsing
-    SPARK-17022 Handle potential deadlock in driver handling messages
-    SPARK-16975 Column-partition path starting '_' should be handled correctly
-    SPARK-17013 Parse negative numeric literals
-    SPARK-12370 Documentation should link to examples …
-    SPARK-16966 App Name is a randomUUID even when "spark.app.name" exists
-    SPARK-17027 Avoid integer overflow in PolynomialExpansion.getPolySize
-    SPARK-16508 Split docs for arrange and orderBy methods
-    SPARK-17065 Improve the error message when encountering an incompatible DataSourceRegister
-    SPARK-16964 Remove private[sql] and private[spark] from sql.execution package [Backport]
-    SPARK-16519 Handle SparkR RDD generics that create warnings in R CMD check
-    SPARK-17089 Remove api doc link for mapReduceTriplets operator
-    SPARK-17084 Rename ParserUtils.assert to validate
-    SPARK-15285 Generated SpecificSafeProjection.apply method grows beyond 64 KB
-    SPARK-17102 Bypass UserDefinedGenerator for json format check
-    SPARK-17096 Improve exception string reported through the StreamingQueryListener
-    SPARK-17038 Fix metrics retrieval source of 'lastReceivedBatch'
-    SPARK-16995 TreeNodeException when flat mapping RelationalGroupedDataset created from DataFrame containing a column created with lit/expr
-    SPARK-16391 Support partial aggregation for reduceGroups
-    SPARK-17117 1 / NULL should not fail analysis
-    SPARK-17069 Expose spark.range() as table-valued function in SQL
-    SPARK-16947 Support type coercion and foldable expression for inline tables
-    SPARK-16961 Fixed off-by-one error that biased randomizeInPlace
-    SPARK-16994 Whitelist operators for predicate pushdown
-    SPARK-11227 UnknownHostException can be thrown when NameNode HA is enabled.
-    SPARK-16686 Remove PushProjectThroughSample since it is handled by ColumnPruning
-    SPARK-17113 Job failure due to Executor OOM in offheap mode
-    SPARK-17149 array.sql for testing array related functions
-    SPARK-17158 Change error message for out of range numeric literals
-    SPARK-17150 Support SQL generation for inline tables
-    SPARK-17104 LogicalRelation.newInstance should follow the semantics of MultiInstanceRelation
-    SPARK-17124 RelationalGroupedDataset.agg should preserve order and allow multiple aggregates per column
-    SPARK-12666 SparkSubmit packages fix for when 'default' conf doesn't exist in dependent module
-    SPARK-16508 Fix CRAN undocumented/duplicated arguments warnings.
-    SPARK-17098 Fix `NullPropagation` optimizer to handle `COUNT(NULL) OVER` correctly
-    SPARK-17115 Decrease the threshold when split expressions
-    SPARK-16320 Document G1 heap region's effect on spark 2.0 vs 1.6
-    SPARK-17162 Range does not support SQL generation
-    SPARK-16508 doc updates and more CRAN check fixes
-    SPARK-16550 Certain classes fail to deserialize in block manager replication
-    SPARK-16577 Add CRAN documentation checks to run-tests.sh
-    SPARK-17182 Mark Collect as non-deterministic
-    SPARK-13286 Add the next expression of SQLException as cause
-    SPARK-17194 Use single quotes when generating SQL for string literals
-    SPARK-17186 Remove catalog table type INDEX
-    SPARK-17086 Fix InvalidArgumentException issue in QuantileDiscretizer when some quantiles are duplicated
-    SPARK-16781 Java launched by PySpark as gateway may not be the same java used in the spark environment
-    SPARK-16216 Backport Read/write dateFormat/timestampFormat options for CSV and JSON
-    SPARK-17228 Not infer/propagate non-deterministic constraints
-    SPARK-17193 HadoopRDD NPE at DEBUG log level when getLocationInfo == null
-    SPARK-17061 MapObjects should make copies of unsafe-backed data
-    SPARK-16991 Fix Outer Join Elimination when Filter's isNotNull Constraints Unable to Filter Out All Null-supplying Rows
-    SPARK-17167 Issue Exceptions when Analyze Table on In-Memory Cataloged Tables
-    SPARK-16700 Create DataFrame from dict/Row with schema
-    SPARK-15083 History Server can OOM due to unlimited TaskUIData
-    SPARK-17205 Literal.sql should handle Infinity and NaN
-    SPARK-17231 Avoid building debug or trace log messages unless the respective log level is enabled
-    SPARK-17242 Update links of external dstream projects
-    SPARK-17165 FileStreamSource should not track the list of seen files indefinitely
-    SPARK-17246 Add BigDecimal literal
-    SPARK-17235 Support purging of old logs in MetadataLog
-    SPARK-17244 Catalyst should not pushdown non-deterministic join conditions
-    SPARK-17269 Move finish analysis optimization stage into its own file
-    SPARK-17270 Move object optimization rules into its own file (branch-2.0)
-    SPARK-17274 Move join optimizer rules into a separate file
-    SPARK-15382 Fix a bug in sampling with replacement
-    SPARK-17216 Fix event timeline bars length
-    SPARK-16216 Bacoport enabling timestamp type tests for JSON and verify all unsupported types in CSV
-    SPARK-17063 Improve performance of MSCK REPAIR TABLE with Hive metastore
-    SPARK-16581 Make JVM backend calling functions public
-    SPARK-17301 Remove unused classTag field from AtomicType base class
-    SPARK-17264 DataStreamWriter should document that it only supports Parquet for now
-    SPARK-17318 Fix ReplSuite replicating blocks of object with class defined in repl
-    SPARK-17243 Spark 2.0 History Server won't load with very large application history
-    SPARK-17316 Make CoarseGrainedSchedulerBackend.removeExecutor non-blocking
-    SPARK-17326 Fix tests with HiveContext in SparkR not to be skipped always
-    SPARK-17316 Fix MesosCoarseGrainedSchedulerBackendSuite
-    SPARK-16581 Fix JVM API tests in SparkR
-    SPARK-17180 Create AlterViewAsCommand to handle ALTER VIEW AS
-    SPARK-17318 Fix ReplSuite replicating blocks of object with class defined in repl again
-    SPARK-17271 Planner adds un-necessary Sort even if child orde…
-    SPARK-16926 Remove partition columns from partition metadata.
-    SPARK-17355 Workaround for HIVE-14684 / HiveResultSetMetaData.isSigned exception
-    SPARK-17342 Style of event timeline is broken
-    SPARK-16883 SQL decimal type is not properly cast to number when collecting SparkDataFrame
-    SPARK-17352 Executor computing time can be negative-number because of calculation error
-    SPARK-16935 Verification of Function-related ExternalCatalog APIs
-    SPARK-17261 Using HiveContext after re-creating SparkContext in Spark 2.0 throws "Java.lang.illegalStateException: Cannot call methods on a stopped sparkContext"
-    SPARK-17376 Spark version should be available in R
-    SPARK-17376 followup - change since version
-    SPARK-17230 Should not pass optimized query into QueryExecution in DataFrameWriter
-    SPARK-17347 Encoder in Dataset example has incorrect type
-    SPARK-16959 Rebuild Table Comment when Retrieving Metadata from Hive Metastore
-    SPARK-16663 desc table should be consistent between data source and hive serde tables
-    SPARK-17335 Fix ArrayType and MapType CatalogString.
-    SPARK-17391 Fix Two Test Failures After Backport
-    SPARK-17353 Fix multiple bugs in CREATE TABLE LIKE command
-    SPARK-17369 MetastoreRelation toJSON throws AssertException due to missing otherCopyArgs
-    SPARK-17358 Cached table(parquet/orc) should be shard between beelines
-    SPARK-17356 Fix out of memory issue when generating JSON for TreeNode
-    SPARK-16922 Make the address of values portable in LongToUnsafeRowMap
-    SPARK-16334 Reusing same dictionary column for decoding consecutive row groups shouldn't throw an error
-    SPARK-17378 Upgrade snappy-java to 1.1.2.6
-    SPARK-17299 TRIM/LTRIM/RTRIM should not strips characters other than spaces
-    SPARK-17110 Fix StreamCorruptionException in BlockManager.getRemoteValues()
-    SPARK-17316 Fix the 'ask' type parameter in 'removeExecutor'
-    SPARK-17279 Better error message for exceptions during ScalaUDF execution
-    SPARK-17372 Avoid serialization issues by using Arrays to save file names in FileStreamSource
-    SPARK-16785 R dapply doesn't return array or raw columns
-    SPARK-17296 Simplify parser join processing [BACKPORT 2.0]
-    SPARK-17370 Shuffle service files not invalidated when a slave is lost
-    SPARK-16533 backport driver deadlock fix to 2.0
-    SPARK-17339 Do not use path to get a filesystem in hadoopFile and newHadoopFile APIs
