@@ -823,7 +823,7 @@ object SparkSession {
       if ((session ne null) && !session.sparkContext.isStopped) {
         options.foreach { case (k, v) => session.sessionState.conf.setConfString(k, v) }
         if (options.nonEmpty) {
-          logWarning("Use an existing SparkSession, some configuration may not take effect.")
+          logWarning("Using an existing SparkSession; some configuration may not take effect.")
         }
         return session
       }
@@ -835,7 +835,7 @@ object SparkSession {
         if ((session ne null) && !session.sparkContext.isStopped) {
           options.foreach { case (k, v) => session.sessionState.conf.setConfString(k, v) }
           if (options.nonEmpty) {
-            logWarning("Use an existing SparkSession, some configuration may not take effect.")
+            logWarning("Using an existing SparkSession; some configuration may not take effect.")
           }
           return session
         }
