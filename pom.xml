@@ -1461,6 +1461,11 @@
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
           </exclusion>
+          <!-- Cat X license now; see SPARK-18262 -->
+          <exclusion>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
