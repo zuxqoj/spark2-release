@@ -446,7 +446,7 @@ object SetWarehouseLocationTest extends Logging {
         catalog.getTableMetadata(TableIdentifier("testLocation", Some("default")))
       val expectedLocation =
         "file:" + expectedWarehouseLocation.toString + "/testlocation"
-      val actualLocation = tableMetadata.storage.locationUri.get
+      val actualLocation = tableMetadata.location
       if (actualLocation != expectedLocation) {
         throw new Exception(
           s"Expected table location is $expectedLocation. But, it is actually $actualLocation")
@@ -462,7 +462,7 @@ object SetWarehouseLocationTest extends Logging {
         catalog.getTableMetadata(TableIdentifier("testLocation", Some("testLocationDB")))
       val expectedLocation =
         "file:" + expectedWarehouseLocation.toString + "/testlocationdb.db/testlocation"
-      val actualLocation = tableMetadata.storage.locationUri.get
+      val actualLocation = tableMetadata.location
       if (actualLocation != expectedLocation) {
         throw new Exception(
           s"Expected table location is $expectedLocation. But, it is actually $actualLocation")
