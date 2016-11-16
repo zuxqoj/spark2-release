@@ -18,7 +18,7 @@
 #
 
 if [ -z "${SPARK_HOME}" ]; then
-  export SPARK_HOME="$(cd "`dirname $(readlink -nf "$0")`"/..; pwd -P)"
+  source "$(dirname "$0")"/find-spark-home
 fi
 
 . "${SPARK_HOME}"/bin/load-spark-env.sh
@@ -27,7 +27,7 @@ fi
 if [ -n "${JAVA_HOME}" ]; then
   RUNNER="${JAVA_HOME}/bin/java"
 else
-  if [ `command -v java` ]; then
+  if [ "$(command -v java)" ]; then
     RUNNER="java"
   else
     echo "JAVA_HOME is not set" >&2
@@ -36,7 +36,7 @@ else
 fi
 
 # Find Spark jars.
-if [ -f "${SPARK_HOME}/RELEASE" ]; then
+if [ -d "${SPARK_HOME}/jars" ]; then
   SPARK_JARS_DIR="${SPARK_HOME}/jars"
 else
   SPARK_JARS_DIR="${SPARK_HOME}/assembly/target/scala-$SPARK_SCALA_VERSION/jars"
@@ -49,22 +49,6 @@ if [ ! -d "$SPARK_JARS_DIR" ] && [ -z "$SPARK_TESTING$SPARK_SQL_TESTING" ]; then
 else
   LAUNCH_CLASSPATH="$SPARK_JARS_DIR/*"
 fi
-
-HADOOP_LZO_JAR=
-HADOOP_LZO_DIR="/usr/hdp/${HDP_VERSION}/hadoop/lib"
-num_jars="$(ls -1 "$HADOOP_LZO_DIR" | grep "^hadoop-lzo.*${HDP_VERSION}\.jar$" | wc -l)"
-if [ "$num_jars" -eq "0" -a -z "$HADOOP_LZO_JAR" ]; then
-  HADOOP_LZO_JAR=
-elif [ "$num_jars" -gt "1" ]; then
-  echo "Found multiple Hadoop lzo jars in $HADOOP_LZO_DIR:" 1>&2
-  echo "Please remove all but one jar." 1>&2
-  exit 1
-elif [ "$num_jars" -eq "1" ]; then
-  LZO_JARS="$(ls -1 "$HADOOP_LZO_DIR" | grep "^hadoop-lzo-.*${HDP_VERSION}\.jar$" || true)"
-  HADOOP_LZO_JAR="${HADOOP_LZO_DIR}/${LZO_JARS}"
-fi
-
-export _HADOOP_LZO_JAR="${HADOOP_LZO_JAR}"
 
 # Add the launcher build dir to the classpath if requested.
 if [ -n "$SPARK_PREPEND_CLASSES" ]; then
