@@ -2532,6 +2532,13 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+              <tags>
+                <tag>
+                  <name>note</name>
+                  <placement>a</placement>
+                  <head>Note:</head>
+                </tag>
+              </tags>
             </configuration>
           </plugin>
         </plugins>
