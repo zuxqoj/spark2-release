@@ -48,7 +48,7 @@ object KafkaUtils {
    * @param ssc       StreamingContext object
    * @param zkQuorum  Zookeeper quorum (hostname:port,hostname:port,..)
    * @param groupId   The group id for this consumer
-   * @param topics    Map of (topic_name -> numPartitions) to consume. Each partition is consumed
+   * @param topics    Map of (topic_name to numPartitions) to consume. Each partition is consumed
    *                  in its own thread
    * @param storageLevel  Storage level to use for storing the received objects
    *                      (default: StorageLevel.MEMORY_AND_DISK_SER_2)
@@ -73,7 +73,7 @@ object KafkaUtils {
    * @param ssc         StreamingContext object
    * @param kafkaParams Map of kafka configuration parameters,
    *                    see http://kafka.apache.org/08/configuration.html
-   * @param topics      Map of (topic_name -> numPartitions) to consume. Each partition is consumed
+   * @param topics      Map of (topic_name to numPartitions) to consume. Each partition is consumed
    *                    in its own thread.
    * @param storageLevel Storage level to use for storing the received objects
    * @tparam K type of Kafka message key
@@ -98,7 +98,7 @@ object KafkaUtils {
    * @param jssc      JavaStreamingContext object
    * @param zkQuorum  Zookeeper quorum (hostname:port,hostname:port,..)
    * @param groupId   The group id for this consumer
-   * @param topics    Map of (topic_name -> numPartitions) to consume. Each partition is consumed
+   * @param topics    Map of (topic_name to numPartitions) to consume. Each partition is consumed
    *                  in its own thread
    * @return DStream of (Kafka message key, Kafka message value)
    */
@@ -116,7 +116,7 @@ object KafkaUtils {
    * @param jssc      JavaStreamingContext object
    * @param zkQuorum  Zookeeper quorum (hostname:port,hostname:port,..).
    * @param groupId   The group id for this consumer.
-   * @param topics    Map of (topic_name -> numPartitions) to consume. Each partition is consumed
+   * @param topics    Map of (topic_name to numPartitions) to consume. Each partition is consumed
    *                  in its own thread.
    * @param storageLevel RDD storage level.
    * @return DStream of (Kafka message key, Kafka message value)
@@ -141,7 +141,7 @@ object KafkaUtils {
    * @param valueDecoderClass Type of kafka value decoder
    * @param kafkaParams Map of kafka configuration parameters,
    *                    see http://kafka.apache.org/08/configuration.html
-   * @param topics  Map of (topic_name -> numPartitions) to consume. Each partition is consumed
+   * @param topics  Map of (topic_name to numPartitions) to consume. Each partition is consumed
    *                in its own thread
    * @param storageLevel RDD storage level.
    * @tparam K type of Kafka message key
@@ -397,7 +397,7 @@ object KafkaUtils {
    *    You can access the offsets used in each batch from the generated RDDs (see
    *    [[org.apache.spark.streaming.kafka.HasOffsetRanges]]).
    *  - Failure Recovery: To recover from driver failures, you have to enable checkpointing
-   *    in the [[StreamingContext]]. The information on consumed offset can be
+   *    in the `StreamingContext`. The information on consumed offset can be
    *    recovered from the checkpoint. See the programming guide for details (constraints, etc.).
    *  - End-to-end semantics: This stream ensures that every records is effectively received and
    *    transformed exactly once, but gives no guarantees on whether the transformed data are
@@ -449,7 +449,7 @@ object KafkaUtils {
    *    You can access the offsets used in each batch from the generated RDDs (see
    *    [[org.apache.spark.streaming.kafka.HasOffsetRanges]]).
    *  - Failure Recovery: To recover from driver failures, you have to enable checkpointing
-   *    in the [[StreamingContext]]. The information on consumed offset can be
+   *    in the `StreamingContext`. The information on consumed offset can be
    *    recovered from the checkpoint. See the programming guide for details (constraints, etc.).
    *  - End-to-end semantics: This stream ensures that every records is effectively received and
    *    transformed exactly once, but gives no guarantees on whether the transformed data are
@@ -500,7 +500,7 @@ object KafkaUtils {
    *    You can access the offsets used in each batch from the generated RDDs (see
    *    [[org.apache.spark.streaming.kafka.HasOffsetRanges]]).
    *  - Failure Recovery: To recover from driver failures, you have to enable checkpointing
-   *    in the [[StreamingContext]]. The information on consumed offset can be
+   *    in the `StreamingContext`. The information on consumed offset can be
    *    recovered from the checkpoint. See the programming guide for details (constraints, etc.).
    *  - End-to-end semantics: This stream ensures that every records is effectively received and
    *    transformed exactly once, but gives no guarantees on whether the transformed data are
@@ -566,7 +566,7 @@ object KafkaUtils {
    *    You can access the offsets used in each batch from the generated RDDs (see
    *    [[org.apache.spark.streaming.kafka.HasOffsetRanges]]).
    *  - Failure Recovery: To recover from driver failures, you have to enable checkpointing
-   *    in the [[StreamingContext]]. The information on consumed offset can be
+   *    in the `StreamingContext`. The information on consumed offset can be
    *    recovered from the checkpoint. See the programming guide for details (constraints, etc.).
    *  - End-to-end semantics: This stream ensures that every records is effectively received and
    *    transformed exactly once, but gives no guarantees on whether the transformed data are
