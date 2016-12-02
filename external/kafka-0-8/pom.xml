@@ -28,7 +28,7 @@
   <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
   <properties>
     <sbt.project.name>streaming-kafka-0-8</sbt.project.name>
-    <kafka.version>0.10.0.2.5.0.0-435</kafka.version>
+    <kafka.version>0.10.0.2.5.3.0-12</kafka.version>
   </properties>
   <packaging>jar</packaging>
   <name>Spark Integration for Kafka 0.8</name>
