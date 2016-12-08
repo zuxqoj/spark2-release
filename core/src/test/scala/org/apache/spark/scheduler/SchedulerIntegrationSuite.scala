@@ -92,11 +92,6 @@ abstract class SchedulerIntegrationSuite[T <: MockBackend: ClassTag] extends Spa
     }
   }
 
-  // still a few races to work out in the blacklist tests, so ignore some tests
-  def ignoreScheduler(name: String, extraConfs: Seq[(String, String)])(testBody: => Unit): Unit = {
-    ignore(name)(testBody)
-  }
-
   /**
    * A map from partition -> results for all tasks of a job when you call this test framework's
    * [[submit]] method.  Two important considerations:
@@ -565,10 +560,11 @@ class BasicSchedulerIntegrationSuite extends SchedulerIntegrationSuite[SingleCor
 
       // make sure the required map output is available
       task.stageId match {
-        case 1 => assertMapOutputAvailable(b)
-        case 3 => assertMapOutputAvailable(c)
         case 4 => assertMapOutputAvailable(d)
-        case _ => // no shuffle map input, nothing to check
+        case _ =>
+        // we can't check for the output for the two intermediate stages, unfortunately,
+        // b/c the stage numbering is non-deterministic, so stage number alone doesn't tell
+        // us what to check
       }
 
       (task.stageId, task.stageAttemptId, task.partitionId) match {
@@ -604,11 +600,9 @@ class BasicSchedulerIntegrationSuite extends SchedulerIntegrationSuite[SingleCor
       val (taskDescription, task) = backend.beginTask()
       stageToAttempts.getOrElseUpdate(task.stageId, new HashSet()) += task.stageAttemptId
 
-      // make sure the required map output is available
-      task.stageId match {
-        case 1 => assertMapOutputAvailable(shuffledRdd)
-        case _ => // no shuffle map input, nothing to check
-      }
+      // We cannot check if shuffle output is available, because the failed fetch will clear the
+      // shuffle output.  Then we'd have a race, between the already-started task from the first
+      // attempt, and when the failure clears out the map output status.
 
       (task.stageId, task.stageAttemptId, task.partitionId) match {
         case (0, _, _) =>
