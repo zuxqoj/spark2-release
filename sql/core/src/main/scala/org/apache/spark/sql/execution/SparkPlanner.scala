@@ -43,14 +43,16 @@ class SparkPlanner(
       InMemoryScans ::
       BasicOperators :: Nil)
 
-  override def plan(plan: LogicalPlan): Iterator[SparkPlan] = {
-    super.plan(plan).map {
-      _.transformUp {
-        case PlanLater(p) =>
-          // TODO: use the first plan for now, but we will implement plan space exploaration later.
-          this.plan(p).next()
-      }
+  override protected def collectPlaceholders(plan: SparkPlan): Seq[(SparkPlan, LogicalPlan)] = {
+    plan.collect {
+      case placeholder @ PlanLater(logicalPlan) => placeholder -> logicalPlan
     }
+  }
+
+  override protected def prunePlans(plans: Iterator[SparkPlan]): Iterator[SparkPlan] = {
+    // TODO: We will need to prune bad plans when we improve plan space exploration
+    //       to prevent combinatorial explosion.
+    plans
   }
 
   /**

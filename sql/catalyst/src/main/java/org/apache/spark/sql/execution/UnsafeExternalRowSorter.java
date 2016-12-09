@@ -107,11 +107,11 @@ public final class UnsafeExternalRowSorter {
   public void insertRow(UnsafeRow row) throws IOException {
     final PrefixComputer.Prefix prefix = prefixComputer.computePrefix(row);
     sorter.insertRecord(
-            row.getBaseObject(),
-            row.getBaseOffset(),
-            row.getSizeInBytes(),
-            prefix.value,
-            prefix.isNull
+      row.getBaseObject(),
+      row.getBaseOffset(),
+      row.getSizeInBytes(),
+      prefix.value,
+      prefix.isNull
     );
     numRowsInserted++;
     if (testSpillFrequency > 0 && (numRowsInserted % testSpillFrequency) == 0) {

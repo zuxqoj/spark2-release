@@ -32,7 +32,7 @@
 
   <properties>
     <sbt.project.name>spark-examples-assembly</sbt.project.name>
-    <kafka.version>0.10.0.2.5.0.0-435</kafka.version>
+    <kafka.version>0.10.0.2.6.0.0-SNAPSHOT</kafka.version>
   </properties>
 
   <profiles>
