@@ -19,5 +19,4 @@ BUG FIXES
     BUG-61726   SparkLauncherSuite unit test failing
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
     (Jira in Apache Spark is IN PROGRESS)
-    SPARK-11182 HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
