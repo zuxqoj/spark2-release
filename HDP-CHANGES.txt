@@ -1,23 +1,23 @@
-Changes only in Hortonworks github and not in Apache SPARK-1.6.1 and hence not covered by CHANGES.txt.
+Changes only in Hortonworks github and not in Apache SPARK-2.1.0 and hence not covered by CHANGES.txt.
 
 INCOMPATIBLE CHANGES
 
 NEW FEATURES
 
 IMPROVEMENTS
-    RMP-6443: Resolving symlinks in bin/spark-* scripts
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
     RMP-6448: hdp.version
-    RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.0
+    RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.1
 
 BUG FIXES
     BUG-63630	SPARK-14387. Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
     BUG-48982   Add hadoop lzo jar to the classpath
-    SPARK-11182 HDFS Delegation Token will be expired when calling "UserGroupInformation.getCurrentUser.addCredentials" in HA mode
     BUG-52253   Support configuring YARN correctly for multiple Spark versions and their aux-services
     BUG-60289   Spark2 jersey and Timeline Jersey are incompatible
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-61726   SparkLauncherSuite unit test failing
+    BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
+    BUG-68592   Implement `spark-llap2` package for Spark 2.1.x
     (Jira in Apache Spark is IN PROGRESS)
-    SPARK-15844   HistoryServer doesn't come up if spark.authenticate = true
+    SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
