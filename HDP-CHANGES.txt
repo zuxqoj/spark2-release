@@ -18,5 +18,6 @@ BUG FIXES
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-61726   SparkLauncherSuite unit test failing
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
+    BUG-68592   Implement `spark-llap2` package for Spark 2.1.x
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true

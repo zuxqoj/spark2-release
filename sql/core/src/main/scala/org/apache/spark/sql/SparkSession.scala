@@ -957,17 +957,7 @@ object SparkSession {
   private val defaultSession = new AtomicReference[SparkSession]
 
   private val HIVE_SESSION_STATE_CLASS_NAME = "org.apache.spark.sql.hive.HiveSessionState"
-
-  private val LLAP_SHARED_STATE_CLASS_NAME = "org.apache.spark.sql.hive.llap.LlapSharedState"
   private val LLAP_SESSION_STATE_CLASS_NAME = "org.apache.spark.sql.hive.llap.LlapSessionState"
-
-  private def sharedStateClassName(conf: SparkConf): String = {
-    conf.get(CATALOG_IMPLEMENTATION) match {
-      case "hive" =>
-        if (llapClassesArePresent) LLAP_SHARED_STATE_CLASS_NAME else HIVE_SESSION_STATE_CLASS_NAME
-      case "in-memory" => classOf[SharedState].getCanonicalName
-    }
-  }
 
   private def sessionStateClassName(conf: SparkConf): String = {
     conf.get(CATALOG_IMPLEMENTATION) match {
@@ -1013,7 +1003,6 @@ object SparkSession {
   private[spark] def llapClassesArePresent: Boolean = {
     try {
       Utils.classForName(LLAP_SESSION_STATE_CLASS_NAME)
-      Utils.classForName(LLAP_SHARED_STATE_CLASS_NAME)
       Utils.classForName("org.apache.hadoop.hive.conf.HiveConf")
       true
     } catch {
