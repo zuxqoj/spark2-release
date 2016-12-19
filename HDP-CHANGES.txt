@@ -144,3 +144,4 @@ BUG FIXES
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
     SPARK-21407 Support spnego for ThriftServer thrift/http auth
   SPARK-18356   Improve MLKmeans Performance
+  SPARK-18356   KMeans should cache RDD before training
