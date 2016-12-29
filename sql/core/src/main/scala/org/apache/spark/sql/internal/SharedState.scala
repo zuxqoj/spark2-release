@@ -147,7 +147,7 @@ object SharedState {
   private def externalCatalogClassName(conf: SparkConf): String = {
     conf.get(CATALOG_IMPLEMENTATION) match {
       case "hive" =>
-        if (SparkSession.llapClassesArePresent) {
+        if (SparkSession.isLLAPEnabled(conf)) {
           LLAP_EXTERNAL_CATALOG_CLASS_NAME
         } else {
           HIVE_EXTERNAL_CATALOG_CLASS_NAME

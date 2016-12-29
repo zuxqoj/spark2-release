@@ -41,7 +41,7 @@ import org.apache.spark.sql.execution._
 import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.execution.ui.SQLListener
 import org.apache.spark.sql.internal.{CatalogImpl, SessionState, SharedState}
-import org.apache.spark.sql.internal.StaticSQLConf.CATALOG_IMPLEMENTATION
+import org.apache.spark.sql.internal.StaticSQLConf.{CATALOG_IMPLEMENTATION, LLAP_ENABLED}
 import org.apache.spark.sql.sources.BaseRelation
 import org.apache.spark.sql.streaming._
 import org.apache.spark.sql.types.{DataType, LongType, StructType}
@@ -809,7 +809,7 @@ object SparkSession {
      * @since 2.0.0
      */
     def enableHiveSupport(): Builder = synchronized {
-      if (llapClassesArePresent || hiveClassesArePresent) {
+      if (hiveClassesArePresent) {
         config(CATALOG_IMPLEMENTATION.key, "hive")
       } else {
         throw new IllegalArgumentException(
@@ -962,7 +962,7 @@ object SparkSession {
   private def sessionStateClassName(conf: SparkConf): String = {
     conf.get(CATALOG_IMPLEMENTATION) match {
       case "hive" =>
-        if (llapClassesArePresent) LLAP_SESSION_STATE_CLASS_NAME else HIVE_SESSION_STATE_CLASS_NAME
+        if (isLLAPEnabled(conf)) LLAP_SESSION_STATE_CLASS_NAME else HIVE_SESSION_STATE_CLASS_NAME
       case "in-memory" => classOf[SessionState].getCanonicalName
     }
   }
@@ -998,15 +998,24 @@ object SparkSession {
   }
 
   /**
-   * Return true if LLAP classes can be loaded, otherwise false.
+   * Return true if `spark.sql.hive.llap=true` and classes can be loaded.
+   * On class loading errors, it will fails.
+   * Return false if `spark.sql.hive.llap=false`.
    */
-  private[spark] def llapClassesArePresent: Boolean = {
-    try {
-      Utils.classForName(LLAP_SESSION_STATE_CLASS_NAME)
-      Utils.classForName("org.apache.hadoop.hive.conf.HiveConf")
-      true
-    } catch {
-      case _: ClassNotFoundException | _: NoClassDefFoundError => false
+  private[spark] def isLLAPEnabled(conf: SparkConf): Boolean = {
+    if (conf.get(LLAP_ENABLED.key, "false") == "true") {
+      try {
+        Utils.classForName(LLAP_SESSION_STATE_CLASS_NAME)
+        Utils.classForName("org.apache.hadoop.hive.conf.HiveConf")
+        true
+      } catch {
+        case _: ClassNotFoundException | _: NoClassDefFoundError =>
+          throw new IllegalArgumentException(
+            "Unable to instantiate SparkSession with LLAP support because " +
+              "LLAP or Hive classes are not found.")
+      }
+    } else {
+      false
     }
   }
 }
