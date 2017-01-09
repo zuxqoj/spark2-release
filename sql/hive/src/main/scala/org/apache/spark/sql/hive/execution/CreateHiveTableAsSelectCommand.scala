@@ -21,9 +21,11 @@ import scala.util.control.NonFatal
 
 import org.apache.spark.sql.{AnalysisException, Row, SparkSession}
 import org.apache.spark.sql.catalyst.catalog.CatalogTable
-import org.apache.spark.sql.catalyst.plans.logical.{InsertIntoTable, LogicalPlan, OverwriteOptions}
+import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.execution.command.RunnableCommand
+import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.hive.MetastoreRelation
+import org.apache.spark.sql.sources.InsertableRelation
 
 
 /**
@@ -45,7 +47,7 @@ case class CreateHiveTableAsSelectCommand(
   override def innerChildren: Seq[LogicalPlan] = Seq(query)
 
   override def run(sparkSession: SparkSession): Seq[Row] = {
-    lazy val metastoreRelation: MetastoreRelation = {
+    lazy val metastoreRelation = {
       import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
       import org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe
       import org.apache.hadoop.io.Text
@@ -74,6 +76,7 @@ case class CreateHiveTableAsSelectCommand(
       // Get the Metastore Relation
       sparkSession.sessionState.catalog.lookupRelation(tableIdentifier) match {
         case r: MetastoreRelation => r
+        case SubqueryAlias(_, r @ LogicalRelation(_: InsertableRelation, _, _), _) => r
       }
     }
     // TODO ideally, we should get the output data ready first and then
