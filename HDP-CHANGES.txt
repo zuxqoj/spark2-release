@@ -23,3 +23,4 @@ BUG FIXES
     BUG-60788   Spark-LLAP should support CTAS.
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
+    SPARK-19158 ml.R example fails in yarn-cluster mode due to lacks of e1071 package
