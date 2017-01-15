@@ -304,3 +304,4 @@ BUG FIXES
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
     SPARK-20517 Fix broken history UI download link
+  SPARK-18971   Upgrade Netty to 4.0.43.Final
