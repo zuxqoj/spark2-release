@@ -60,7 +60,7 @@ private[yarn] final class ConfigurableCredentialManager(
               s"using ${providerEnabledConfig.format(p.serviceName)} instead")
             c
           }
-        }.map(_.toBoolean).getOrElse(true)
+        }.map(_.toBoolean).getOrElse { if (p.serviceName == "hiveserver2") false else true }
     }.map { p => (p.serviceName, p) }.toMap
   }
 
