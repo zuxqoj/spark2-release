@@ -21,5 +21,77 @@ BUG FIXES
     BUG-68592   Implement `spark-llap2` package for Spark 2.1.x
     BUG-71525   Support `spark.sql.hive.llap` configuration
     BUG-60788   Spark-LLAP should support CTAS.
+    (Backport from 2.1.1)
+    SPARK-18892 Alias percentile_approx approx_percentile
+    SPARK-18850 Make StreamExecution and progress classes serializable
+    SPARK-18108 Fix a schema inconsistent bug that makes a parquet reader fail to read data
+    SPARK-18897 Fix SparkR SQL Test to drop test table
+    SPARK-18904 Merge two FileStreamSourceSuite files
+    SPARK-18849 vignettes final check reorg
+    SPARK-18918 Missing </td> in Configuration page
+    SPARK-18827 Fix cannot read broadcast on disk
+    SPARK-18703 CTAS for hive serde table should work for all hive versions AND Drop Staging Directories and Data Files
+    SPARK-18700 Add StripedLock for each table's relation in cache
+    SPARK-18921 check database existence with Hive.databaseExists instead of getDatabase
+    SPARK-18928 Check TaskContext.isInterrupted() in FileScanRDD, JDBCRDD & UnsafeSorter
+    SPARK-18761 Introduce "task reaper" to oversee task killing in executors
+    SPARK-18281 Remove timeout for reading data through socket for local iterator
+    SPARK-18927 MemorySink for StructuredStreaming can't recover from checkpoint if location is provided in SessionConf
+    SPARK-18900 StateStoreSuite.maintenance
+    SPARK-18947 SQLContext.tableNames should not call Catalog.listTables
+    SPARK-18894 Fix event time watermark delay threshold specified in months or years
+    SPARK-18031 Fix flaky test ExecutorAllocationManagerSuite.basic functionality
+    SPARK-18954 Fix flaky test: o.a.s.streaming.BasicOperationsSuite rdd cleanup - map and window
+    SPARK-18949 Add recoverPartitions API to Catalog
+    SPARK-18588 Create a new KafkaConsumer when error happens to fix the flaky test
+    SPARK-18234 Made update mode public
+    SPARK-18528 Fix a bug to initialise an iterator of aggregation buffer
+    SPARK-18908 Creating StreamingQueryException should check if logicalPlan is created
+    SPARK-18973 Remove SortPartitions and RedistributeData
+    SPARK-17807 split test-tags into test-JAR
+    SPARK-18985 Add missing @InterfaceStability.Evolving for Structured Streaming APIs
+    SPARK-18972 Fix the netty thread names for RPC
+    SPARK-18991 Change ContextCleaner.referenceBuffer to use ConcurrentHashMap to make it faster
+    SPARK-18837 Very long stage descriptions do not wrap in the UI
+    SPARK-18993 Unable to build/compile Spark in IntelliJ due to missing Scala deps in spark-tags
+    SPARK-18669 Update Apache docs for Structured Streaming regarding watermarking and status
+    SPARK-19003 Add Java example in Spark Streaming Guide, section Design Patterns for using foreachRDD
+    SPARK-19016 Document scalable partition handling
+    SPARK-19050 Fix EventTimeWatermarkSuite 'delay in months and years handled correctly'
+    SPARK-18379 Make the parallelism of parallelPartitionDiscovery configurable.
+    SPARK-19041 Fix code snippet compilation issues in Structured Streaming Programming Guide
+    SPARK-19028 Fixed non-thread-safe functions used in SessionCatalog
+    SPARK-19048 Delete Partition Location when Dropping Managed Partitioned Tables in InMemoryCatalog
+    SPARK-18877 CSVInferSchema.inferField` on DecimalType should find a common type with `typeSoFar`
+    SPARK-19033 Add admin acls for history server
+    SPARK-19083 sbin/start-history-server.sh script use of $@ without quotes
+    SPARK-19074 Updated Structured Streaming Programming Guide for update mode and source/sink options
+    SPARK-19110 DistributedLDAModel returns different logPrior for original and loaded model
+    SPARK-19106 Styling for the configuration docs is broken
+    SPARK-18941 Add a new behavior document on `CREATE/DROP TABLE` with `LOCATION`
+    SPARK-19127 Update Rank Function Documentation
+    SPARK-19126 Update Join Documentation Across Languages
+    SPARK-18903 Add API to get SparkUI URL
+    SPARK-18952 Regex strings not properly escaped in codegen for aggregations
+    SPARK-16845 `GeneratedClass$SpecificOrdering` grows beyond 64 KB
+    SPARK-19137 Fix `withSQLConf` to reset `OptionalConfigEntry` correctly
+    SPARK-19113 Set UncaughtExceptionHandler in onQueryStarted to ensure catching fatal errors during query initialization
+    SPARK-18997 Recommended upgrade libthrift to 0.9.3
+    SPARK-19140 Allow update mode for non-aggregation streaming queries
+    SPARK-19133 Fix glm for Gamma, clarify glm family supported
+    SPARK-19130 Support setting literal value as column implicitly
+    SPARK-19158 Fix ml.R example fails due to lack of e1071 package.
+    SPARK-18857 Don't use `Iterator.duplicate` for `incrementalCollect` in Thrift Server
+    SPARK-18969 Support grouping by nondeterministic expressions
+    SPARK-19055 Fix SparkSession initialization when SparkContext is stopped
+    SPARK-17237 Remove backticks in a pivot result schema
+    SPARK-18687 Backward compatibility - creating a Dataframe on a new SQLContext object fails with a Derby error
+    SPARK-19178 convert string of large numbers to int should return null
+    SPARK-18335 createDataFrame to support numPartitions parameter
+    SPARK-19180 the offset of short should be 2 in OffHeapColumn
+    SPARK-19120 Refresh Metadata Cache After Loading Hive Tables
+    SPARK-19092 Save() API of DataFrameWriter should not scan all the saved files #16481
+    SPARK-19082 Make ignoreCorruptFiles work for Parquet
+    SPARK-19232 Update Spark distribution download cache location on Windows
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
