@@ -132,7 +132,7 @@ public class YarnShuffleService extends AuxiliaryService {
   private DB db;
 
   public YarnShuffleService() {
-    super("spark_shuffle");
+    super("spark2_shuffle");
     logger.info("Initializing YARN shuffle service for Spark");
     instance = this;
   }
