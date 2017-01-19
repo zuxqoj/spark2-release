@@ -96,3 +96,4 @@ BUG FIXES
     SPARK-19232 Update Spark distribution download cache location on Windows
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
+    SPARK-19158 ml.R example fails in yarn-cluster mode due to lacks of e1071 package
