@@ -94,6 +94,20 @@ BUG FIXES
     SPARK-19092 Save() API of DataFrameWriter should not scan all the saved files #16481
     SPARK-19082 Make ignoreCorruptFiles work for Parquet
     SPARK-19232 Update Spark distribution download cache location on Windows
+    SPARK-18905 Fix the issue of removing a failed jobset from JobScheduler.jobSets
+    SPARK-19019 Fix hijacked `collections.namedtuple` and port cloudpickle changes for PySpark to work with Python 3.6.0
+    SPARK-19065 Don't inherit expression id in dropDuplicates
+    SPARK-19129 SessionCatalog: Disallow empty part col values in partition spec
+    SPARK-19066 LDA doesn't set optimizer correctly
+    SPARK-19231 add error handling for download and untar for Spark release
+    SPARK-19113 Ignore StreamingQueryException thrown from awaitInitialization to avoid breaking tests
+    SPARK-19168 StateStore should be aborted upon error
+    SPARK-18899 refactor the error checking when append data to an existing table
+    SPARK-19314 Do not allow sort before aggregation in Structured Streaming plan
+    SPARK-18589 Fix Python UDF accessing attributes from both side of join
+    SPARK-19267 Fix a race condition when stopping StateStore
+    SPARK-19155 MLlib GeneralizedLinearRegression family and link should case insensitive
+    SPARK-19155 Make family case insensitive in GLM
+    SPARK-19306 Fix inconsistent state in DiskBlockObject when expection occurred
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
-    SPARK-19158 ml.R example fails in yarn-cluster mode due to lacks of e1071 package
