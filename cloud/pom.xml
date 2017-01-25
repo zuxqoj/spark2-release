@@ -130,6 +130,33 @@
           </dependency>
         </dependencies>
     </profile>
+
+    <profile>
+      <id>hadoop-3.0</id>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-aws</artifactId>
+            <scope>${hadoop.deps.scope}</scope>
+          </dependency>
+          <!-- AWS SDK 10.6+ needs this JAR in sync with Spark's Jackson 2 version. -->
+          <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <scope>${hadoop.deps.scope}</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-azure</artifactId>
+            <scope>${hadoop.deps.scope}</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-openstack</artifactId>
+            <scope>${hadoop.deps.scope}</scope>
+          </dependency>
+        </dependencies>
+    </profile>
     
   </profiles>
 

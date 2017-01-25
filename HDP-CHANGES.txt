@@ -9,6 +9,7 @@ IMPROVEMENTS
     RMP-6448: hdp.version
     RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.1
     BUG-62302 Support HiveServer2 delegation token acquisition in Spark
+    BUG-70581 Add hadoop-3.0 profile
 
 BUG FIXES
     BUG-63630	SPARK-14387. Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
