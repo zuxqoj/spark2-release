@@ -109,5 +109,25 @@ BUG FIXES
     SPARK-19155 MLlib GeneralizedLinearRegression family and link should case insensitive
     SPARK-19155 Make family case insensitive in GLM
     SPARK-19306 Fix inconsistent state in DiskBlockObject when expection occurred
+    SPARK-9435  Reuse function in Java UDF to correctly support expressions that require equality comparison between ScalaUDF
+    SPARK-19268 Disallow adaptive query execution for streaming queries
+    SPARK-18823 add support for assigning to column
+    SPARK-16473 Fix BisectingKMeans Algorithm failing in edge case
+    SPARK-19017 NOT IN subquery with more than one column may return incorrect results
+    SPARK-19330 Also show tooltip for successful batches
+    SPARK-16046 Aggregations in the Spark SQL programming guide
+    SPARK-18750 Avoid using "mapValues" when allocating containers.
+    SPARK-18863 Output non-aggregate expressions without GROUP BY in a subquery does not yield an error
+    SPARK-19307 Make sure user conf is propagated to SparkContext.
+    SPARK-18750 Follow up: move test to correct directory in 2.1 branch.
+    SPARK-19064 Fix pip installing of sub components
+    SPARK-14804 Fix checkpointing of VertexRDD/EdgeRDD
+    SPARK-19338 Add UDF names in explain
+    SPARK-19220 Make redirection to HTTPS apply to all URIs. (branch-2.1)
+    SPARK-18788 Add API for getNumPartitions
+    SPARK-19333 Add Apache License headers to R files
+    SPARK-19324 Spark VJM stdout output is getting dropped in SparkR
+    SPARK-19396 JDBC Options are Case In-sensitive
+    SPARK-19406 Fix function to_json to respect user-provided options
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
