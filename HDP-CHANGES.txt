@@ -131,5 +131,6 @@ BUG FIXES
     SPARK-19396 JDBC Options are Case In-sensitive
     SPARK-19406 Fix function to_json to respect user-provided options
     SPARK-19038 Avoid overwriting keytab configuration in yarn-client
+    SPARK-17874 Add SSL port configuration
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
