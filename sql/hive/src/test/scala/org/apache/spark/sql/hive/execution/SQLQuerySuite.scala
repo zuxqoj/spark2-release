@@ -1288,7 +1288,7 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
         "interval 4 minutes 59 seconds 889 milliseconds 987 microseconds")))
   }
 
-  test("specifying database name for a temporary table is not allowed") {
+  test("specifying database name for a temporary view is not allowed") {
     withTempPath { dir =>
       val path = dir.getCanonicalPath
       val df = sparkContext.parallelize(1 to 10).map(i => (i, i.toString)).toDF("num", "str")
@@ -1298,26 +1298,26 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
         .save(path)
 
       // We don't support creating a temporary table while specifying a database
-      val message = intercept[AnalysisException] {
+      intercept[AnalysisException] {
         spark.sql(
           s"""
-          |CREATE TEMPORARY TABLE db.t
-          |USING parquet
-          |OPTIONS (
-          |  path '$path'
-          |)
-        """.stripMargin)
-      }.getMessage
+            |CREATE TEMPORARY VIEW db.t
+            |USING parquet
+            |OPTIONS (
+            |  path '$path'
+            |)
+           """.stripMargin)
+      }
 
       // If you use backticks to quote the name then it's OK.
       spark.sql(
         s"""
-          |CREATE TEMPORARY TABLE `db.t`
+          |CREATE TEMPORARY VIEW `db.t`
           |USING parquet
           |OPTIONS (
           |  path '$path'
           |)
-        """.stripMargin)
+         """.stripMargin)
       checkAnswer(spark.table("`db.t`"), df)
     }
   }
