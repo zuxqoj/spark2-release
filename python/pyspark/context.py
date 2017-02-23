@@ -198,8 +198,6 @@ class SparkContext(object):
             if not virtualEnvBinPath:
                 raise Exception("spark.pyspark.virtualenv.enabled is set as true but no value for "
                                 "spark.pyspark.virtualenv.bin.path")
-            else:
-                self.addFile(self._conf.get("spark.pyspark.virtualenv.requirements"))
 
         self.pythonVer = "%d.%d" % sys.version_info[:2]
 
