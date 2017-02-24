@@ -549,7 +549,6 @@ private[spark] class Client(
               hdp_version.get + "/spark2/spark2-hdp-yarn-archive.tar.gz"
             logInfo("Use hdfs cache file as spark.yarn.archive for HDP, hdfsCacheFile:" + archive)
             require(!isLocalUri(archive), s"${archive} cannot be a local URI.")
-            
             distribute(Utils.resolveURI(archive).toString,
               resType = LocalResourceType.ARCHIVE,
               destName = Some(LOCALIZED_LIB_DIR))
