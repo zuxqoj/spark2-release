@@ -521,10 +521,10 @@ private[spark] class Client(
           val hdp_version = sys.env.get("HDP_VERSION")
           if (hdp_version.isDefined && fs.exists(
             new Path("/hdp/apps/" + hdp_version.get + "/spark2/spark2-hdp-yarn-archive.tar.gz"))) {
-            val archive = "hdfs:///hdp/apps/" + hdp_version.get +
-              "/spark2/spark2-hdp-yarn-archive.tar.gz"
+            val archive = fs.getUri().toString() + "/hdp/apps/" +
+              hdp_version.get + "/spark2/spark2-hdp-yarn-archive.tar.gz"
             logInfo("Use hdfs cache file as spark.yarn.archive for HDP, hdfsCacheFile:" + archive)
-            require(!isLocalUri(archive), s"${SPARK_ARCHIVE.key} cannot be a local URI.")
+            require(!isLocalUri(archive), s"${archive} cannot be a local URI.")
             distribute(Utils.resolveURI(archive).toString,
               resType = LocalResourceType.ARCHIVE,
               destName = Some(LOCALIZED_LIB_DIR))
