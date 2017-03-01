@@ -18,6 +18,7 @@ BUG FIXES
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-61726   SparkLauncherSuite unit test failing
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
+    SPARK-207   Spark2 thrift server service start failed
     (Spark 2.1.0 backport)
     SPARK-16110 Fix allowing python version to be specified per submit for cluster mode. (SPARK-189: Port SPARK-16110 to 2.0 branch)
     (Jira in Apache Spark is IN PROGRESS)
