@@ -18,6 +18,7 @@
 package org.apache.spark.cloud.s3
 
 import com.amazonaws.services.s3.S3ClientOptions
+import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.s3a.S3AFileSystem
 import org.apache.hadoop.fs.s3native.NativeS3FileSystem
 import org.jets3t.service.S3ServiceException
@@ -47,4 +48,10 @@ private[cloud] class DependencyCheckSuite extends SparkFunSuite {
     new S3AFileSystem
   }
 
+  test("look for s3a impl") {
+    val conf = new Configuration()
+    val impl = conf.get("fs.s3a.impl")
+    assert(null != impl)
+    logInfo(s"implementation of s3a: $impl")
+  }
 }

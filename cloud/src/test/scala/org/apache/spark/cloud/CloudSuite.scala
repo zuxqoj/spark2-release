@@ -247,7 +247,7 @@ private[cloud] abstract class CloudSuite extends SparkFunSuite with CloudTestKey
       val f = new File(filename)
       if (f.exists()) {
         logInfo(s"Loading configuration from $f")
-        val c = new Configuration(false)
+        val c = new Configuration(true)
         c.addResource(f.toURI.toURL)
         Some(c)
       } else {
