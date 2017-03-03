@@ -57,6 +57,12 @@ class VersionsSuite extends SparkFunSuite with Logging {
       Some(new File(sys.props("java.io.tmpdir"), "hive-ivy-cache").getAbsolutePath))
   }
 
+  // To make it possible to test against private/corporate repositories
+  private val ivyRepositories: Option[String] = {
+    sys.env.get("SPARK_VERSIONS_SUITE_IVY_REPOSITORIES")
+  }
+
+
   private def buildConf() = {
     lazy val warehousePath = Utils.createTempDir()
     lazy val metastorePath = Utils.createTempDir()
@@ -73,6 +79,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
       sparkConf = sparkConf,
       hadoopConf = new Configuration(),
       config = buildConf(),
+      remoteRepositories = ivyRepositories,
       ivyPath = ivyPath).createClient()
     val db = new CatalogDatabase("default", "desc", "loc", Map())
     badClient.createDatabase(db, ignoreIfExists = true)
@@ -87,6 +94,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
       sparkConf = sparkConf,
       hadoopConf = hadoopConf,
       config = buildConf(),
+      remoteRepositories = ivyRepositories,
       ivyPath = ivyPath).createClient()
     assert("success" === client.getConf("test", null))
   }
@@ -116,6 +124,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
           sparkConf = sparkConf,
           hadoopConf = new Configuration(),
           config = buildConf(),
+          remoteRepositories = ivyRepositories,
           ivyPath = ivyPath).createClient()
       }
     }
@@ -139,6 +148,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
           sparkConf = sparkConf,
           hadoopConf = hadoopConf,
           config = buildConf(),
+          remoteRepositories = ivyRepositories,
           ivyPath = ivyPath).createClient()
     }
 

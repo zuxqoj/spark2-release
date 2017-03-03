@@ -48,6 +48,7 @@ private[hive] object IsolatedClientLoader extends Logging {
       hadoopConf: Configuration,
       config: Map[String, String] = Map.empty,
       ivyPath: Option[String] = None,
+      remoteRepositories: Option[String] = None,
       sharedPrefixes: Seq[String] = Seq.empty,
       barrierPrefixes: Seq[String] = Seq.empty): IsolatedClientLoader = synchronized {
     val resolvedVersion = hiveVersion(hiveMetastoreVersion)
@@ -59,7 +60,7 @@ private[hive] object IsolatedClientLoader extends Logging {
     } else {
       val (downloadedFiles, actualHadoopVersion) =
         try {
-          (downloadVersion(resolvedVersion, hadoopVersion, ivyPath), hadoopVersion)
+          (downloadVersion(resolvedVersion, hadoopVersion, remoteRepositories, ivyPath), hadoopVersion)
         } catch {
           case e: RuntimeException if e.getMessage.contains("hadoop") =>
             // If the error message contains hadoop, it is probably because the hadoop
@@ -73,7 +74,7 @@ private[hive] object IsolatedClientLoader extends Logging {
               "It is recommended to set jars used by Hive metastore client through " +
               "spark.sql.hive.metastore.jars in the production environment.")
             sharesHadoopClasses = false
-            (downloadVersion(resolvedVersion, "2.4.0", ivyPath), "2.4.0")
+            (downloadVersion(resolvedVersion, "2.4.0", ivyPath, remoteRepositories), "2.4.0")
         }
       resolvedVersions.put((resolvedVersion, actualHadoopVersion), downloadedFiles)
       resolvedVersions((resolvedVersion, actualHadoopVersion))
@@ -102,6 +103,7 @@ private[hive] object IsolatedClientLoader extends Logging {
   private def downloadVersion(
       version: HiveVersion,
       hadoopVersion: String,
+      remoteRepositories: Option[String],
       ivyPath: Option[String]): Seq[URL] = {
     val hiveArtifacts = version.extraDeps ++
       Seq("hive-metastore", "hive-exec", "hive-common", "hive-serde")
@@ -112,7 +114,7 @@ private[hive] object IsolatedClientLoader extends Logging {
     val classpath = quietly {
       SparkSubmitUtils.resolveMavenCoordinates(
         hiveArtifacts.mkString(","),
-        Some("http://www.datanucleus.org/downloads/maven2"),
+        Some(List(Some("http://www.datanucleus.org/downloads/maven2"), remoteRepositories).flatten.mkString(",")),
         ivyPath,
         exclusions = version.exclusions)
     }
