@@ -318,6 +318,15 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression w
     if (value.changePrecision(decimalType.precision, decimalType.scale)) value else null
   }
 
+  /**
+   * Create new `Decimal` with precision and scale given in `decimalType` (if any),
+   * returning null if it overflows or creating a new `value` and returning it if successful.
+   *
+   */
+  private[this] def toPrecision(value: Decimal, decimalType: DecimalType): Decimal =
+    value.toPrecision(decimalType.precision, decimalType.scale).orNull
+
+
   private[this] def castToDecimal(from: DataType, target: DecimalType): Any => Any = from match {
     case StringType =>
       buildCast[UTF8String](_, s => try {
@@ -326,14 +335,14 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression w
         case _: NumberFormatException => null
       })
     case BooleanType =>
-      buildCast[Boolean](_, b => changePrecision(if (b) Decimal.ONE else Decimal.ZERO, target))
+      buildCast[Boolean](_, b => toPrecision(if (b) Decimal.ONE else Decimal.ZERO, target))
     case DateType =>
       buildCast[Int](_, d => null) // date can't cast to decimal in Hive
     case TimestampType =>
       // Note that we lose precision here.
       buildCast[Long](_, t => changePrecision(Decimal(timestampToDouble(t)), target))
     case dt: DecimalType =>
-      b => changePrecision(b.asInstanceOf[Decimal].clone(), target)
+      b => toPrecision(b.asInstanceOf[Decimal], target)
     case t: IntegralType =>
       b => changePrecision(Decimal(t.integral.asInstanceOf[Integral[Any]].toLong(b)), target)
     case x: FractionalType =>
