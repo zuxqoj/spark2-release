@@ -60,7 +60,8 @@ private[hive] object IsolatedClientLoader extends Logging {
     } else {
       val (downloadedFiles, actualHadoopVersion) =
         try {
-          (downloadVersion(resolvedVersion, hadoopVersion, remoteRepositories, ivyPath), hadoopVersion)
+          (downloadVersion(resolvedVersion, hadoopVersion, remoteRepositories, ivyPath),
+            hadoopVersion)
         } catch {
           case e: RuntimeException if e.getMessage.contains("hadoop") =>
             // If the error message contains hadoop, it is probably because the hadoop
@@ -114,8 +115,8 @@ private[hive] object IsolatedClientLoader extends Logging {
     val classpath = quietly {
       SparkSubmitUtils.resolveMavenCoordinates(
         hiveArtifacts.mkString(","),
-        Some(List(Some("http://www.datanucleus.org/downloads/maven2"), remoteRepositories).flatten.mkString(",")),
-        ivyPath,
+        Some(List(Some("http://www.datanucleus.org/downloads/maven2"),
+          remoteRepositories).flatten.mkString(",")), ivyPath,
         exclusions = version.exclusions)
     }
     val allFiles = classpath.split(",").map(new File(_)).toSet
