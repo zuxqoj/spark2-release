@@ -860,7 +860,8 @@ private[spark] class Client(
 
     // Include driver-specific java options if we are launching a driver
     if (isClusterMode) {
-      sparkConf.get(DRIVER_JAVA_OPTIONS).foreach { opts =>
+      val driverOpts = sparkConf.get(DRIVER_JAVA_OPTIONS)
+      driverOpts.foreach { opts =>
         javaOpts ++= Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
       }
 
