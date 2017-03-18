@@ -188,6 +188,7 @@
     <paranamer.version>2.8</paranamer.version>
     <maven-antrun.version>1.8</maven-antrun.version>
     <commons-crypto.version>1.0.0</commons-crypto.version>
+    <adl.sdk.version>2.1.4</adl.sdk.version>
 
     <test.java.home>${java.home}</test.java.home>
     <test.exclude.tags />
@@ -2485,7 +2486,17 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-azure</artifactId>
             <version>${hadoop.version}</version>
-            </dependency>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-azure-datalake</artifactId>
+            <version>${hadoop.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>azure-data-lake-store-sdk</artifactId>
+            <version>${adl.sdk.version}</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
     </profile>

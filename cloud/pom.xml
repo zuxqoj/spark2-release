@@ -128,6 +128,14 @@
             <artifactId>hadoop-openstack</artifactId>
             <scope>${hadoop.deps.scope}</scope>
           </dependency>
+          <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-azure-datalake</artifactId>
+          </dependency>
+          <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>azure-data-lake-store-sdk</artifactId>
+          </dependency>
         </dependencies>
     </profile>
     
