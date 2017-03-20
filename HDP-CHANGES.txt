@@ -218,6 +218,8 @@ BUG FIXES
     [SPARK-19774] StreamExecution should call stop() on sources when a stream fails
     [SPARK-19797][DOC] ML pipeline document correction
     [SPARK-19779][SS] Delete needless tmp file after restart structured streaming job
+    (Backport from 2.1.2)
+    [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
