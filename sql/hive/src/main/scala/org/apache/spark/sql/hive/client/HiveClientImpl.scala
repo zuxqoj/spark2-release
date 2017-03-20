@@ -785,7 +785,7 @@ private[hive] class HiveClientImpl(
     hiveTable.setPartCols(partCols.asJava)
     // TODO: set sort columns here too
     hiveTable.setBucketCols(table.bucketColumnNames.asJava)
-    hiveTable.setOwner(conf.getUser)
+    hiveTable.setOwner(state.getAuthenticator().getUserName())
     hiveTable.setNumBuckets(table.numBuckets)
     hiveTable.setCreateTime((table.createTime / 1000).toInt)
     hiveTable.setLastAccessTime((table.lastAccessTime / 1000).toInt)
