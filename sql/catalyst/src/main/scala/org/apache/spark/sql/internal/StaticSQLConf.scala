@@ -52,7 +52,7 @@ object StaticSQLConf {
   val LLAP_ENABLED = buildConf("spark.sql.hive.llap")
     .internal()
     .booleanConf
-    .createWithDefault(false)  
+    .createWithDefault(false)
 
   val GLOBAL_TEMP_DATABASE = buildConf("spark.sql.globalTempDatabase")
     .internal()
