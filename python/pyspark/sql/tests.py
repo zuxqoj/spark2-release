@@ -433,6 +433,19 @@ class SQLTests(ReusedPySparkTestCase):
         res.explain(True)
         self.assertEqual(res.collect(), [Row(id=0, copy=0)])
 
+    def test_ignorewhitespace_csv(self):
+        tmpPath = tempfile.mkdtemp()
+        shutil.rmtree(tmpPath)
+        self.spark.createDataFrame([[" a", "b  ", " c "]]).write.csv(
+            tmpPath,
+            ignoreLeadingWhiteSpace=False,
+            ignoreTrailingWhiteSpace=False)
+
+        expected = [Row(value=u' a,b  , c ')]
+        readback = self.spark.read.text(tmpPath)
+        self.assertEqual(readback.collect(), expected)
+        shutil.rmtree(tmpPath)
+
     def test_udf_with_input_file_name(self):
         from pyspark.sql.functions import udf, input_file_name
         from pyspark.sql.types import StringType

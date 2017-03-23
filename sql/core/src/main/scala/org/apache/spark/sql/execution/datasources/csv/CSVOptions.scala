@@ -80,8 +80,13 @@ private[csv] class CSVOptions(@transient private val parameters: CaseInsensitive
 
   val headerFlag = getBool("header")
   val inferSchemaFlag = getBool("inferSchema")
-  val ignoreLeadingWhiteSpaceFlag = getBool("ignoreLeadingWhiteSpace")
-  val ignoreTrailingWhiteSpaceFlag = getBool("ignoreTrailingWhiteSpace")
+  val ignoreLeadingWhiteSpaceInRead = getBool("ignoreLeadingWhiteSpace", default = false)
+  val ignoreTrailingWhiteSpaceInRead = getBool("ignoreTrailingWhiteSpace", default = false)
+
+  // For write, both options were `true` by default. We leave it as `true` for
+  // backwards compatibility.
+  val ignoreLeadingWhiteSpaceFlagInWrite = getBool("ignoreLeadingWhiteSpace", default = true)
+  val ignoreTrailingWhiteSpaceFlagInWrite = getBool("ignoreTrailingWhiteSpace", default = true)
 
   // Parse mode flags
   if (!ParseModes.isValidMode(parseMode)) {
