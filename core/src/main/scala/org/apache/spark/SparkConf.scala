@@ -262,7 +262,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   /**
    * Get a time parameter as seconds; throws a NoSuchElementException if it's not set. If no
    * suffix is provided then seconds are assumed.
-   * @throws java.util.NoSuchElementException
+   * @throws java.util.NoSuchElementException If the time parameter is not set
    */
   def getTimeAsSeconds(key: String): Long = {
     Utils.timeStringAsSeconds(get(key))
@@ -279,7 +279,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   /**
    * Get a time parameter as milliseconds; throws a NoSuchElementException if it's not set. If no
    * suffix is provided then milliseconds are assumed.
-   * @throws java.util.NoSuchElementException
+   * @throws java.util.NoSuchElementException If the time parameter is not set
    */
   def getTimeAsMs(key: String): Long = {
     Utils.timeStringAsMs(get(key))
@@ -296,7 +296,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   /**
    * Get a size parameter as bytes; throws a NoSuchElementException if it's not set. If no
    * suffix is provided then bytes are assumed.
-   * @throws java.util.NoSuchElementException
+   * @throws java.util.NoSuchElementException If the size parameter is not set
    */
   def getSizeAsBytes(key: String): Long = {
     Utils.byteStringAsBytes(get(key))
@@ -320,7 +320,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   /**
    * Get a size parameter as Kibibytes; throws a NoSuchElementException if it's not set. If no
    * suffix is provided then Kibibytes are assumed.
-   * @throws java.util.NoSuchElementException
+   * @throws java.util.NoSuchElementException If the size parameter is not set
    */
   def getSizeAsKb(key: String): Long = {
     Utils.byteStringAsKb(get(key))
@@ -337,7 +337,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   /**
    * Get a size parameter as Mebibytes; throws a NoSuchElementException if it's not set. If no
    * suffix is provided then Mebibytes are assumed.
-   * @throws java.util.NoSuchElementException
+   * @throws java.util.NoSuchElementException If the size parameter is not set
    */
   def getSizeAsMb(key: String): Long = {
     Utils.byteStringAsMb(get(key))
@@ -354,7 +354,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
   /**
    * Get a size parameter as Gibibytes; throws a NoSuchElementException if it's not set. If no
    * suffix is provided then Gibibytes are assumed.
-   * @throws java.util.NoSuchElementException
+   * @throws java.util.NoSuchElementException If the size parameter is not set
    */
   def getSizeAsGb(key: String): Long = {
     Utils.byteStringAsGb(get(key))
@@ -515,71 +515,6 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging with Seria
           "memory management are unified. All memory fractions used in the old model are " +
           "now deprecated and no longer read. If you wish to use the old memory management, " +
           s"you may explicitly enable `$legacyMemoryManagementKey` (not recommended).")
-      }
-    }
-
-    // Check for legacy configs
-    sys.env.get("SPARK_JAVA_OPTS").foreach { value =>
-      val warning =
-        s"""
-          |SPARK_JAVA_OPTS was detected (set to '$value').
-          |This is deprecated in Spark 1.0+.
-          |
-          |Please instead use:
-          | - ./spark-submit with conf/spark-defaults.conf to set defaults for an application
-          | - ./spark-submit with --driver-java-options to set -X options for a driver
-          | - spark.executor.extraJavaOptions to set -X options for executors
-          | - SPARK_DAEMON_JAVA_OPTS to set java options for standalone daemons (master or worker)
-        """.stripMargin
-      logWarning(warning)
-
-      for (key <- Seq(executorOptsKey, driverOptsKey)) {
-        if (getOption(key).isDefined) {
-          throw new SparkException(s"Found both $key and SPARK_JAVA_OPTS. Use only the former.")
-        } else {
-          logWarning(s"Setting '$key' to '$value' as a work-around.")
-          set(key, value)
-        }
-      }
-    }
-
-    sys.env.get("SPARK_CLASSPATH").foreach { value =>
-      val warning =
-        s"""
-          |SPARK_CLASSPATH was detected (set to '$value').
-          |This is deprecated in Spark 1.0+.
-          |
-          |Please instead use:
-          | - ./spark-submit with --driver-class-path to augment the driver classpath
-          | - spark.executor.extraClassPath to augment the executor classpath
-        """.stripMargin
-      logWarning(warning)
-
-      for (key <- Seq(executorClasspathKey, driverClassPathKey)) {
-        if (getOption(key).isDefined) {
-          throw new SparkException(s"Found both $key and SPARK_CLASSPATH. Use only the former.")
-        } else {
-          logWarning(s"Setting '$key' to '$value' as a work-around.")
-          set(key, value)
-        }
-      }
-    }
-
-    if (!contains(sparkExecutorInstances)) {
-      sys.env.get("SPARK_WORKER_INSTANCES").foreach { value =>
-        val warning =
-          s"""
-             |SPARK_WORKER_INSTANCES was detected (set to '$value').
-             |This is deprecated in Spark 1.0+.
-             |
-             |Please instead use:
-             | - ./spark-submit with --num-executors to specify the number of executors
-             | - Or set SPARK_EXECUTOR_INSTANCES
-             | - spark.executor.instances to configure the number of instances in the spark config.
-        """.stripMargin
-        logWarning(warning)
-
-        set("spark.executor.instances", value)
       }
     }
 
