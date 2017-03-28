@@ -218,6 +218,23 @@ BUG FIXES
     [SPARK-19774] StreamExecution should call stop() on sources when a stream fails
     [SPARK-19797][DOC] ML pipeline document correction
     [SPARK-19779][SS] Delete needless tmp file after restart structured streaming job
+    [SPARK-19980][SQL][BACKPORT-2.1] Add NULL checks in Bean serializer
+    clarify array_contains function description
+    [SPARK-19237][SPARKR][CORE] On Windows spark-submit should handle when java is not installed
+    [SPARK-20017][SQL] change the nullability of function 'StringToMap' from 'false' to 'true'
+    [SPARK-19912][SQL] String literals should be escaped for Hive metastore partition pruning
+    [SPARK-17204][CORE] Fix replicated off heap storage
+    [SPARK-19994][SQL] Wrong outputOrdering for right/full outer smj
+    [SPARK-18817][SPARKR][SQL] change derby log output to temp dir
+    [SQL][MINOR] Fix scaladoc for UDFRegistration
+    [SPARK-19986][TESTS] Make pyspark.streaming.tests.CheckpointTests more stable
+    [SPARK-19721][SS][BRANCH-2.1] Good error message for version mismatch in log files
+    [SPARK-19765][SPARK-18549][SPARK-19093][SPARK-19736][BACKPORT-2.1][SQL] Backport Three Cache-related PRs to Spark 2.1
+    [SPARK-19329][SQL][BRANCH-2.1] Reading from or writing to a datasource table with a non pre-existing location should succeed
+    [SPARK-19872] [PYTHON] Use the correct deserializer for RDD construction for coalesce/repartition
+    [SPARK-19944][SQL] Move SQLConf from sql/core to sql/catalyst (branch-2.1)
+    [SPARK-19887][SQL] dynamic partition keys can be null or empty string
+    
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
 
