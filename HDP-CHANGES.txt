@@ -29,3 +29,4 @@ BUG FIXES
     BUG-79168   Spark2 compilation failure because (1)LLAP related patches are missing (2) conflict between hdp-master and Apache/master in the Client.scala
     BUG-77776   Fix STS error handling logic on HiveSQLException
     BUG-81926   Issue with inserting data from Spark SQL using hivecontext
+    BUG-77400   Fix HiveServer2 delegation token acquisition
