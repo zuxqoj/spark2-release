@@ -48,37 +48,34 @@ private[security] class HiveServer2CredentialProvider extends ServiceCredentialP
     try {
       Utils.classForName("org.apache.hive.jdbc.HiveDriver")
 
-      val mirror = universe.runtimeMirror(Utils.getContextOrSparkClassLoader)
-      val hiveConfClass = mirror.classLoader.loadClass("org.apache.hadoop.hive.conf.HiveConf")
-      val ctor = hiveConfClass.getDeclaredConstructor(classOf[Configuration],
-        classOf[Object].getClass)
-      val hiveConf = ctor.newInstance(hadoopConf, hiveConfClass).asInstanceOf[Configuration]
+      val currentUser = UserGroupInformation.getCurrentUser()
+      val userName = if (sparkConf.getBoolean(
+          "spark.yarn.security.credentials.hiveserver2.useShortUserName", true)) {
+        currentUser.getShortUserName
+      } else {
+        currentUser.getUserName
+      }
 
-      val hs2HostKey = "hive.server2.thrift.bind.host"
-      val hs2PortKey = "hive.server2.thrift.port"
-      val hs2PrincKey = "hive.server2.authentication.kerberos.principal"
+      val hs2Url = sparkConf.get("spark.sql.hive.hiveserver2.jdbc.url")
+      val principal = sparkConf.get("spark.sql.hive.hiveserver2.jdbc.url.principal")
+      require(hs2Url != null, "spark.sql.hive.hiveserver2.jdbc.url is not configured.")
+      require(principal != null,
+        "spark.sql.hive.hiveserver2.jdbc.url.principal is not configured.")
 
-      require(hiveConf.get(hs2HostKey) != null, s"$hs2HostKey is not configured")
-      require(hiveConf.get(hs2PortKey) != null, s"$hs2PortKey is not configured")
-      require(hiveConf.get(hs2PrincKey) != null, s"$hs2PrincKey is not configured")
-
-      val jdbcUrl = s"jdbc:hive2://${hiveConf.get(hs2HostKey)}:${hiveConf.get(hs2PortKey)}/;" +
-        s"principal=${hiveConf.get(hs2PrincKey)}"
+      val jdbcUrl = s"$hs2Url;principal=$principal"
+      logInfo(s"Getting HS2 delegation token for $userName via $jdbcUrl")
 
       doAsRealUser {
         con = DriverManager.getConnection(jdbcUrl)
         val method = con.getClass.getMethod("getDelegationToken", classOf[String], classOf[String])
-        val currentUser = UserGroupInformation.getCurrentUser()
-        val realUser = Option(currentUser.getRealUser()).getOrElse(currentUser)
-        val tokenStr = method.invoke(con, realUser.getUserName, hiveConf.get(hs2PrincKey))
-          .asInstanceOf[String]
+        val tokenStr = method.invoke(con, userName, principal).asInstanceOf[String]
         val token = new Token[DelegationTokenIdentifier]()
         token.decodeFromUrlString(tokenStr)
         creds.addToken(new Text("hive.jdbc.delegation.token"), token)
-        logInfo(s"Add HiveServer2 token $token to credentials")
+        logInfo(s"Added HS2 delegation token for $userName via $jdbcUrl")
       }
     } catch {
-      case NonFatal(e) => logWarning(s"Failed to get HiveServer2 delegation token", e)
+      case NonFatal(e) => logWarning(s"Failed to get HS2 delegation token", e)
     } finally {
       if (con != null) {
         con.close()
