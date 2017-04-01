@@ -24,7 +24,6 @@ BUG FIXES
     BUG-71525   Support `spark.sql.hive.llap` configuration
     BUG-60788   Spark-LLAP should support CTAS.
     SPARK-207   Remove hardcode FS scheme from Spark archive.
-    BUG-77400   Fix HiveServer2 delegation token acquisition
     (Backport from 2.1.1)
     SPARK-18892 Alias percentile_approx approx_percentile
     SPARK-18850 Make StreamExecution and progress classes serializable
