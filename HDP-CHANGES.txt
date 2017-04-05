@@ -239,5 +239,8 @@ BUG FIXES
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
 
+    (Backport from 2.2)
+    [BUG-78776][SPARK-8617][WEBUI] HistoryServer: Include in-progress files during cleanup     
+
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
