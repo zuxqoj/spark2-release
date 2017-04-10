@@ -21,7 +21,7 @@ import java.io.{File, FileOutputStream, IOException, OutputStreamWriter}
 import java.net.{InetAddress, UnknownHostException, URI}
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
-import java.util.{Properties, UUID}
+import java.util.{Locale, Properties, UUID}
 import java.util.zip.{ZipEntry, ZipOutputStream}
 
 import scala.collection.JavaConverters._
@@ -532,23 +532,22 @@ private[spark] class Client(
               resType = LocalResourceType.ARCHIVE,
               destName = Some(LOCALIZED_LIB_DIR))
           } else {
-            // No configuration, so fall back to uploading local jar files.
-            logWarning(s"Neither ${SPARK_JARS.key} nor ${SPARK_ARCHIVE.key} is set, falling back " +
-              "to uploading libraries under SPARK_HOME.")
-            val jarsDir = new File(YarnCommandBuilderUtils.findJarsDir(
-              sparkConf.getenv("SPARK_HOME")))
-            val jarsArchive = File.createTempFile(LOCALIZED_LIB_DIR, ".zip",
-              new File(Utils.getLocalDir(sparkConf)))
-            val jarsStream = new ZipOutputStream(new FileOutputStream(jarsArchive))
+          // No configuration, so fall back to uploading local jar files.
+          logWarning(s"Neither ${SPARK_JARS.key} nor ${SPARK_ARCHIVE.key} is set, falling back " +
+            "to uploading libraries under SPARK_HOME.")
+          val jarsDir = new File(YarnCommandBuilderUtils.findJarsDir(
+            sparkConf.getenv("SPARK_HOME")))
+          val jarsArchive = File.createTempFile(LOCALIZED_LIB_DIR, ".zip",
+            new File(Utils.getLocalDir(sparkConf)))
+          val jarsStream = new ZipOutputStream(new FileOutputStream(jarsArchive))
 
-            try {
-              jarsStream.setLevel(0)
-              jarsDir.listFiles().foreach { f =>
-                if (f.isFile && f.getName.toLowerCase().endsWith(".jar") && f.canRead) {
-                  jarsStream.putNextEntry(new ZipEntry(f.getName))
-                  Files.copy(f, jarsStream)
-                  jarsStream.closeEntry()
-                }
+          try {
+            jarsStream.setLevel(0)
+            jarsDir.listFiles().foreach { f =>
+              if (f.isFile && f.getName.toLowerCase(Locale.ROOT).endsWith(".jar") && f.canRead) {
+                jarsStream.putNextEntry(new ZipEntry(f.getName))
+                Files.copy(f, jarsStream)
+                jarsStream.closeEntry()
               }
             } finally {
               jarsStream.close()
