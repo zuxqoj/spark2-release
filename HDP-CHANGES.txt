@@ -9,6 +9,7 @@ IMPROVEMENTS
     RMP-6448: hdp.version
     RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.1
     BUG-62302 Support HiveServer2 delegation token acquisition in Spark
+    BUG-77776 Fix STS error handling logic on HiveSQLException
 
 BUG FIXES
     BUG-73561  Virtualenv example fails in yarn-cluster mode with requirement.txt not found error
