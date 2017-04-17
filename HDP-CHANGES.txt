@@ -24,5 +24,7 @@ BUG FIXES
     BUG-71525   Support `spark.sql.hive.llap` configuration
     SPARK-207   Remove hardcode FS scheme from Spark archive
     BUG-77149   Spark2 build failure in atlantic because [SPARK-17979] SPARK_YARN_USER_ENV and SPARK_JAVA_OPTS depreciated. 
+    BUG-79168   Spark2 compilation failure because LLAP related patches are missing
+    
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
