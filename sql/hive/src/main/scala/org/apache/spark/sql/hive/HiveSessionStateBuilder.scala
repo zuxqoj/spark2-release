@@ -116,16 +116,6 @@ class HiveSessionStateBuilder(session: SparkSession, parentState: Option[Session
 
   override protected def newBuilder: NewBuilder = new HiveSessionStateBuilder(_, _)
 
-  private var userName = System.getProperty("user.name")
-
-  def setUser(user: String): Unit = {
-     userName = user
-  }
-
-  def getUser(): String = {
-    userName
-  }
-
 }
 
 class HiveSessionResourceLoader(
