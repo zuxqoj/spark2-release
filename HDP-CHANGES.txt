@@ -236,12 +236,13 @@ BUG FIXES
     [SPARK-19872] [PYTHON] Use the correct deserializer for RDD construction for coalesce/repartition
     [SPARK-19944][SQL] Move SQLConf from sql/core to sql/catalyst (branch-2.1)
     [SPARK-19887][SQL] dynamic partition keys can be null or empty string
-    
+
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
 
     (Backport from 2.2)
-    [BUG-78776][SPARK-8617][WEBUI] HistoryServer: Include in-progress files during cleanup     
+    [BUG-78776][SPARK-8617][WEBUI] HistoryServer: Include in-progress files during cleanup
+    [SPARK-20239][Core] Improve HistoryServer's ACL mechanism
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
