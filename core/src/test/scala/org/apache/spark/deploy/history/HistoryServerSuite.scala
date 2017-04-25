@@ -271,7 +271,7 @@ class HistoryServerSuite extends SparkFunSuite with BeforeAndAfter with Matchers
     getContentAndCode("foobar")._1 should be (HttpServletResponse.SC_NOT_FOUND)
   }
 
-  test("relative links are prefixed with uiRoot (spark.ui.proxyBase)") {
+  test("static relative links are prefixed with uiRoot (spark.ui.proxyBase)") {
     val uiRoot = Option(System.getenv("APPLICATION_WEB_PROXY_BASE")).getOrElse("/testwebproxybase")
     val page = new HistoryPage(server)
     val request = mock[HttpServletRequest]
@@ -390,7 +390,7 @@ class HistoryServerSuite extends SparkFunSuite with BeforeAndAfter with Matchers
       .set("spark.history.cache.window", "250ms")
       .remove("spark.testing")
     val provider = new FsHistoryProvider(myConf)
-    val securityManager = new SecurityManager(myConf)
+    val securityManager = HistoryServer.createSecurityManager(myConf)
 
     sc = new SparkContext("local", "test", myConf)
     val logDirUri = logDir.toURI
