@@ -297,7 +297,10 @@ object HistoryServer extends Logging {
    * @return the security manager for use in constructing the History Server.
    */
   private[history] def createSecurityManager(config: SparkConf): SecurityManager = {
-    patchSecuritySettings(config)
+    if (config.getBoolean(SecurityManager.SPARK_AUTH_CONF, false)) {
+      logDebug(s"Clearing ${SecurityManager.SPARK_AUTH_CONF}")
+      config.set(SecurityManager.SPARK_AUTH_CONF, "false")
+    }
     new SecurityManager(config)
   }
 
