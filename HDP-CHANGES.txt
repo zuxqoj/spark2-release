@@ -236,7 +236,63 @@ BUG FIXES
     [SPARK-19872] [PYTHON] Use the correct deserializer for RDD construction for coalesce/repartition
     [SPARK-19944][SQL] Move SQLConf from sql/core to sql/catalyst (branch-2.1)
     [SPARK-19887][SQL] dynamic partition keys can be null or empty string
-
+    [SPARK-20404][CORE] Using Option(name) instead of Some(name)
+    [SPARK-20455][DOCS] Fix Broken Docker IT Docs
+    [SPARK-20451] Filter out nested mapType datatypes from sort order in randomSplit
+    [SPARK-20450][SQL] Unexpected first-query schema inference cost with 2.1.1
+    [SPARK-20407][TESTS][BACKPORT-2.1] ParquetQuerySuite 'Enabling/disabling ignoreCorruptFiles' flaky test
+     Small rewording about history server use case
+    [SPARK-20409][SQL] fail early if aggregate function in GROUP BY
+    [MINOR][SS] Fix a missing space in UnsupportedOperationChecker error message
+    [SPARK-20359][SQL] Avoid unnecessary execution in EliminateOuterJoin optimization that can lead to NPE
+    [SPARK-17647][SQL][FOLLOWUP][MINOR] fix typo
+    [SPARK-20349][SQL][REVERT-BRANCH2.1] ListFunctions returns duplicate functions after using persistent functions
+    [HOTFIX] Fix compilation.
+    [SPARK-17647][SQL] Fix backslash escaping in 'LIKE' patterns.
+    [SPARK-20349][SQL] ListFunctions returns duplicate functions after using persistent functions
+    [SPARK-20335][SQL][BACKPORT-2.1] Children expressions of Hive UDF impacts the determinism of Hive UDF
+    [SPARK-20243][TESTS] DebugFilesystem.assertNoOpenStreams thread race
+    [SPARK-19946][TESTS][BACKPORT-2.1] DebugFilesystem.assertNoOpenStreams should report the open streams to help debugging
+    [SPARK-19924][SQL][BACKPORT-2.1] Handle InvocationTargetException for all Hive Shim
+    [SPARK-20131][CORE] Don't use `this` lock in StandaloneSchedulerBackend.stop
+    [SPARK-20304][SQL] AssertNotNull should not include path in string representation
+    [SPARK-20296][TRIVIAL][DOCS] Count distinct error message for streaming
+    [MINOR][DOCS] Fix spacings in Structured Streaming Programming Guide
+    [SPARK-20291][SQL] NaNvl(FloatType, NullType) should not be cast to NaNvl(DoubleType, DoubleType)
+    [SPARK-18555][MINOR][SQL] Fix the @since tag when backporting from 2.2 branch into 2.1 branch
+    [SPARK-17564][TESTS] Fix flaky RequestTimeoutIntegrationSuite.furtherRequestsDelay
+    [SPARK-20270][SQL] na.fill should not change the values in long or integer when the default value is in double
+    [SPARK-18555][SQL] DataFrameNaFunctions.fill miss up original values in long integers
+    [SPARK-20285][TESTS] Increase the pyspark streaming test timeout to 30 seconds
+    [SPARK-20280][CORE] FileStatusCache Weigher integer overflow
+    [SPARK-20264][SQL] asm should be non-test dependency in sql/core
+    [SPARK-20260][MLLIB] String interpolation required for error message
+    [SPARK-20262][SQL] AssertNotNull should throw NullPointerException
+    [SPARK-20246][SQL] should not push predicate down through aggregate with non-deterministic expressions
+    [SPARK-20218][DOC][APP-ID] applications//stages' in REST API,add description.
+    [SPARK-20214][ML] Make sure converted csc matrix has sorted indices
+    [SPARK-20223][SQL] Fix typo in tpcds q77.sql
+    [SPARK-20042][WEB UI] Fix log page buttons for reverse proxy mode
+    [SPARK-20191][YARN] Crate wrapper for RackResolver so tests can override it.
+    [SPARK-20190][APP-ID] applications//jobs' in rest api,status should be [running|s…
+    [MINOR][DOCS] Replace non-breaking space to normal spaces that breaks rendering markdown
+    [SPARK-20197][SPARKR][BRANCH-2.1] CRAN check fail with package installation
+    [SPARK-19999][BACKPORT-2.1][CORE] Workaround JDK-8165231 to identify PPC64 architectures as supporting unaligned access
+    [SPARK-20084][CORE] Remove internal.metrics.updatedBlockStatuses from history files.
+    [SPARK-20164][SQL] AnalysisException not tolerant of null query plan.
+    [SPARK-20059][YARN] Use the correct classloader for HBaseCredentialProvider
+    [SPARK-20134][SQL] SQLMetrics.postDriverMetricUpdates to simplify driver side metric updates
+    [SPARK-20043][ML] DecisionTreeModel: ImpurityCalculator builder fails for uppercase impurity type Gini
+    [SPARK-14536][SQL][BACKPORT-2.1] fix to handle null value in array type column for postgres.
+    [SPARK-20125][SQL] Dataset of type option of map does not work
+    [SPARK-19995][YARN] Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
+    [SPARK-20102] Fix nightly packaging and RC packaging scripts w/ two minor build fixes
+    [SPARK-20086][SQL] CollapseWindow should not collapse dependent adjacent windows
+    [SPARK-19674][SQL] Ignore driver accumulator updates don't belong to …
+    [SPARK-19959][SQL] Fix to throw NullPointerException in  df[java.lang.Long].collect
+    [SPARK-19970][SQL][BRANCH-2.1] Table owner should be USER instead of PRINCIPAL in kerberized clusters
+    [SPARK-20021][PYSPARK] Miss backslash in python code
+    
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
 
