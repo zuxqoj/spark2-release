@@ -243,6 +243,7 @@ BUG FIXES
     (Backport from 2.2)
     [SPARK-20239][Core] Improve HistoryServer's ACL mechanism
     [SPARK-19995][YARN] Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
-      
+
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
+    SPARK-20517 Fix broken history UI download link
