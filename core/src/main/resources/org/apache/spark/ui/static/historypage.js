@@ -115,8 +115,7 @@ $(document).ready(function() {
           attempt["endTime"] = formatDate(attempt["endTime"]);
           attempt["lastUpdated"] = formatDate(attempt["lastUpdated"]);
           attempt["log"] = uiRoot + "/api/v1/applications/" + id + "/" +
-            (attempt.hasOwnProperty("attemptId") ? attempt["attemptId"] + "/": "") + "logs";
-
+            (attempt.hasOwnProperty("attemptId") ? attempt["attemptId"] + "/" : "") + "logs";
           var app_clone = {"id" : id, "name" : name, "num" : num, "attempts" : [attempt]};
           array.push(app_clone);
         }
