@@ -1026,7 +1026,7 @@ private[spark] class HiveExternalCatalog(conf: SparkConf, hadoopConf: Configurat
             val index = partitionSchema.indexWhere(_.name == att.name)
             BoundReference(index, partitionSchema(index).dataType, nullable = true)
         })
-      clientPrunedPartitions.filter { p => boundPredicate(p.toRow(partitionSchema)) }
+      clientPrunedPartitions.filter { p => boundPredicate.eval(p.toRow(partitionSchema)) }
     } else {
       client.getPartitions(catalogTable).map { part =>
         part.copy(spec = restorePartitionSpec(part.spec, partColNameMap))
