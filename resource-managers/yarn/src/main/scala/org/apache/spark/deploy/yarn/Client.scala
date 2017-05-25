@@ -557,6 +557,7 @@ private[spark] class Client(
             distribute(jarsArchive.toURI.getPath,
               resType = LocalResourceType.ARCHIVE,
               destName = Some(LOCALIZED_LIB_DIR))
+            jarsArchive.delete()
           }
       }
     }
