@@ -293,7 +293,7 @@ BUG FIXES
     [SPARK-19959][SQL] Fix to throw NullPointerException in  df[java.lang.Long].collect
     [SPARK-19970][SQL][BRANCH-2.1] Table owner should be USER instead of PRINCIPAL in kerberized clusters
     [SPARK-20021][PYSPARK] Miss backslash in python code
-    
+
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
 
@@ -302,6 +302,9 @@ BUG FIXES
     [SPARK-20239][Core] Improve HistoryServer's ACL mechanism
     [SPARK-19995][YARN] Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
     [SPARK-19372][SQL] Fix throwing a Java exception at df.fliter() due to 64KB bytecode size limit
+
+    (Backport from 2.3)
+    [SPARK-20981][SPARKSUBMIT] Add new configuration spark.jars.repositories as equivalence of --repositories
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
