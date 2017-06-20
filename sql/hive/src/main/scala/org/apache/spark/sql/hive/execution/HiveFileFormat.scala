@@ -89,8 +89,11 @@ class HiveFileFormat(fileSinkConf: FileSinkDesc)
     val fileSinkConfSer = fileSinkConf
     new OutputWriterFactory {
       private val jobConf = new SerializableJobConf(new JobConf(conf))
-      @transient private lazy val outputFormat =
-        jobConf.value.getOutputFormat.asInstanceOf[HiveOutputFormat[AnyRef, Writable]]
+      @transient private lazy val outputFormat = jobConf.value.getOutputFormat match {
+        case format: HiveOutputFormat[AnyRef, Writable]
+          => format.asInstanceOf[HiveOutputFormat[AnyRef, Writable]]
+        case _ => null
+      }
 
       override def getFileExtension(context: TaskAttemptContext): String = {
         Utilities.getFileExtension(jobConf.value, fileSinkConfSer.getCompressed, outputFormat)
