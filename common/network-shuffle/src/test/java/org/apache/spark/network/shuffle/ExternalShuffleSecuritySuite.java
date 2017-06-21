@@ -90,7 +90,7 @@ public class ExternalShuffleSecuritySuite {
   private void validate(String appId, String secretKey, boolean encrypt)
         throws IOException, InterruptedException {
     ExternalShuffleClient client =
-      new ExternalShuffleClient(conf, new TestSecretKeyHolder(appId, secretKey), true, encrypt);
+      new ExternalShuffleClient(conf, new TestSecretKeyHolder(appId, secretKey), true, encrypt, 5000);
     client.init(appId);
     // Registration either succeeds or throws an exception.
     client.registerWithShuffleServer(TestUtils.getLocalHost(), server.getPort(), "exec0",

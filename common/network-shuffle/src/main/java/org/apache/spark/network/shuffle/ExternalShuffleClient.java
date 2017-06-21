@@ -50,6 +50,7 @@ public class ExternalShuffleClient extends ShuffleClient {
   private final boolean saslEnabled;
   private final boolean saslEncryptionEnabled;
   private final SecretKeyHolder secretKeyHolder;
+  private final long registrationTimeoutMs;
 
   protected TransportClientFactory clientFactory;
   protected String appId;
@@ -62,7 +63,8 @@ public class ExternalShuffleClient extends ShuffleClient {
       TransportConf conf,
       SecretKeyHolder secretKeyHolder,
       boolean saslEnabled,
-      boolean saslEncryptionEnabled) {
+      boolean saslEncryptionEnabled,
+      long registrationTimeoutMs) {
     Preconditions.checkArgument(
       !saslEncryptionEnabled || saslEnabled,
       "SASL encryption can only be enabled if SASL is also enabled.");
@@ -70,6 +72,7 @@ public class ExternalShuffleClient extends ShuffleClient {
     this.secretKeyHolder = secretKeyHolder;
     this.saslEnabled = saslEnabled;
     this.saslEncryptionEnabled = saslEncryptionEnabled;
+      this.registrationTimeoutMs = registrationTimeoutMs;
   }
 
   protected void checkInit() {
@@ -141,7 +144,7 @@ public class ExternalShuffleClient extends ShuffleClient {
     TransportClient client = clientFactory.createUnmanagedClient(host, port);
     try {
       ByteBuffer registerMessage = new RegisterExecutor(appId, execId, executorInfo).toByteBuffer();
-      client.sendRpcSync(registerMessage, 5000 /* timeoutMs */);
+      client.sendRpcSync(registerMessage, registrationTimeoutMs);
     } finally {
       client.close();
     }

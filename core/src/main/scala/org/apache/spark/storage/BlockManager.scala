@@ -32,7 +32,7 @@ import com.google.common.io.ByteStreams
 
 import org.apache.spark._
 import org.apache.spark.executor.{DataReadMethod, ShuffleWriteMetrics}
-import org.apache.spark.internal.Logging
+import org.apache.spark.internal.{config, Logging}
 import org.apache.spark.memory.{MemoryManager, MemoryMode}
 import org.apache.spark.network._
 import org.apache.spark.network.buffer.{ManagedBuffer, NettyManagedBuffer}
@@ -129,7 +129,7 @@ private[spark] class BlockManager(
   private[spark] val shuffleClient = if (externalShuffleServiceEnabled) {
     val transConf = SparkTransportConf.fromSparkConf(conf, "shuffle", numUsableCores)
     new ExternalShuffleClient(transConf, securityManager, securityManager.isAuthenticationEnabled(),
-      securityManager.isSaslEncryptionEnabled())
+      securityManager.isSaslEncryptionEnabled(), conf.get(config.SHUFFLE_REGISTRATION_TIMEOUT))
   } else {
     blockTransferService
   }
@@ -208,7 +208,7 @@ private[spark] class BlockManager(
       diskBlockManager.subDirsPerLocalDir,
       shuffleManager.getClass.getName)
 
-    val MAX_ATTEMPTS = 3
+    val MAX_ATTEMPTS = conf.get(config.SHUFFLE_REGISTRATION_MAX_ATTEMPTS)
     val SLEEP_TIME_SECS = 5
 
     for (i <- 1 to MAX_ATTEMPTS) {
