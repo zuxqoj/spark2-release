@@ -26,6 +26,7 @@ BUG FIXES
     BUG-60788   Spark-LLAP should support CTAS.
     SPARK-207   Remove hardcode FS scheme from Spark archive.
     BUG-77400   Fix HiveServer2 delegation token acquisition
+    BUG-81926   Issue with inserting data from Spark SQL using hivecontext
     (Backport from 2.1.1)
     SPARK-18892 Alias percentile_approx approx_percentile
     SPARK-18850 Make StreamExecution and progress classes serializable
