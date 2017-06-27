@@ -17,9 +17,23 @@
 
 package org.apache.spark.sql
 
+import scala.collection.immutable.Queue
+import scala.collection.mutable.ArrayBuffer
+
 import org.apache.spark.sql.test.SharedSQLContext
 
 case class IntClass(value: Int)
+
+case class SeqClass(s: Seq[Int])
+
+case class ListClass(l: List[Int])
+
+case class QueueClass(q: Queue[Int])
+
+case class ComplexClass(seq: SeqClass, list: ListClass, queue: QueueClass)
+
+case class InnerData(name: String, value: Int)
+case class NestedData(id: Int, param: Map[String, InnerData])
 
 package object packageobject {
   case class PackageClass(value: Int)
@@ -135,4 +149,9 @@ class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext {
     checkDataset(Seq(PackageClass(1)).toDS(), PackageClass(1))
   }
 
+  test("SPARK-19104: Lambda variables in ExternalMapToCatalyst should be global") {
+    val data = Seq.tabulate(10)(i => NestedData(1, Map("key" -> InnerData("name", i + 100))))
+    val ds = spark.createDataset(data)
+    checkDataset(ds, data: _*)
+  }
 }
