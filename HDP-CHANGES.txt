@@ -296,6 +296,7 @@ BUG FIXES
 
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
+    [SPARK-20256][SQL][BRANCH-2.1] SessionState should be created more lazily
 
     (Backport from 2.2)
     [BUG-78776][SPARK-8617][WEBUI] HistoryServer: Include in-progress files during cleanup
