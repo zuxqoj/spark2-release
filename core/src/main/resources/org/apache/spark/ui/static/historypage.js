@@ -115,8 +115,7 @@ $(document).ready(function() {
           attempt["endTime"] = formatDate(attempt["endTime"]);
           attempt["lastUpdated"] = formatDate(attempt["lastUpdated"]);
           attempt["log"] = uiRoot + "/api/v1/applications/" + id + "/" +
-            (attempt.hasOwnProperty("attemptId") ? attempt["attemptId"] + "/": "") + "logs";
-
+            (attempt.hasOwnProperty("attemptId") ? attempt["attemptId"] + "/" : "") + "logs";
           var app_clone = {"id" : id, "name" : name, "num" : num, "attempts" : [attempt]};
           array.push(app_clone);
         }
@@ -168,6 +167,13 @@ $(document).ready(function() {
           var attemptIDCells = document.getElementsByClassName("attemptIDSpan");
           for (i = 0; i < attemptIDCells.length; i++) {
             attemptIDCells[i].style.display='none';
+          }
+        }
+
+        if (requestedIncomplete) {
+          var completedCells = document.getElementsByClassName("completedColumn");
+          for (i = 0; i < completedCells.length; i++) {
+            completedCells[i].style.display='none';
           }
         }
 
