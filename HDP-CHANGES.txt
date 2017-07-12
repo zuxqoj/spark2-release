@@ -1,4 +1,4 @@
-Changes only in Hortonworks github and not in Apache SPARK-2.1.0 and hence not covered by CHANGES.txt.
+Changes only in Hortonworks github and not in Apache SPARK-2.1.1 and hence not covered by CHANGES.txt.
 
 INCOMPATIBLE CHANGES
 
@@ -9,7 +9,6 @@ IMPROVEMENTS
     RMP-6448: hdp.version
     RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.1
     BUG-62302 Support HiveServer2 delegation token acquisition in Spark
-    BUG-77776 Fix STS error handling logic on HiveSQLException
 
 BUG FIXES
     BUG-73561  Virtualenv example fails in yarn-cluster mode with requirement.txt not found error
@@ -27,286 +26,80 @@ BUG FIXES
     SPARK-207   Remove hardcode FS scheme from Spark archive.
     BUG-77400   Fix HiveServer2 delegation token acquisition
     BUG-81926   Issue with inserting data from Spark SQL using hivecontext
-    (Backport from 2.1.1)
-    SPARK-18892 Alias percentile_approx approx_percentile
-    SPARK-18850 Make StreamExecution and progress classes serializable
-    SPARK-18108 Fix a schema inconsistent bug that makes a parquet reader fail to read data
-    SPARK-18897 Fix SparkR SQL Test to drop test table
-    SPARK-18904 Merge two FileStreamSourceSuite files
-    SPARK-18849 vignettes final check reorg
-    SPARK-18918 Missing </td> in Configuration page
-    SPARK-18827 Fix cannot read broadcast on disk
-    SPARK-18703 CTAS for hive serde table should work for all hive versions AND Drop Staging Directories and Data Files
-    SPARK-18700 Add StripedLock for each table's relation in cache
-    SPARK-18921 check database existence with Hive.databaseExists instead of getDatabase
-    SPARK-18928 Check TaskContext.isInterrupted() in FileScanRDD, JDBCRDD & UnsafeSorter
-    SPARK-18761 Introduce "task reaper" to oversee task killing in executors
-    SPARK-18281 Remove timeout for reading data through socket for local iterator
-    SPARK-18927 MemorySink for StructuredStreaming can't recover from checkpoint if location is provided in SessionConf
-    SPARK-18900 StateStoreSuite.maintenance
-    SPARK-18947 SQLContext.tableNames should not call Catalog.listTables
-    SPARK-18894 Fix event time watermark delay threshold specified in months or years
-    SPARK-18031 Fix flaky test ExecutorAllocationManagerSuite.basic functionality
-    SPARK-18954 Fix flaky test: o.a.s.streaming.BasicOperationsSuite rdd cleanup - map and window
-    SPARK-18949 Add recoverPartitions API to Catalog
-    SPARK-18588 Create a new KafkaConsumer when error happens to fix the flaky test
-    SPARK-18234 Made update mode public
-    SPARK-18528 Fix a bug to initialise an iterator of aggregation buffer
-    SPARK-18908 Creating StreamingQueryException should check if logicalPlan is created
-    SPARK-18973 Remove SortPartitions and RedistributeData
-    SPARK-17807 split test-tags into test-JAR
-    SPARK-18985 Add missing @InterfaceStability.Evolving for Structured Streaming APIs
-    SPARK-18972 Fix the netty thread names for RPC
-    SPARK-18991 Change ContextCleaner.referenceBuffer to use ConcurrentHashMap to make it faster
-    SPARK-18837 Very long stage descriptions do not wrap in the UI
-    SPARK-18993 Unable to build/compile Spark in IntelliJ due to missing Scala deps in spark-tags
-    SPARK-18669 Update Apache docs for Structured Streaming regarding watermarking and status
-    SPARK-19003 Add Java example in Spark Streaming Guide, section Design Patterns for using foreachRDD
-    SPARK-19016 Document scalable partition handling
-    SPARK-19050 Fix EventTimeWatermarkSuite 'delay in months and years handled correctly'
-    SPARK-18379 Make the parallelism of parallelPartitionDiscovery configurable.
-    SPARK-19041 Fix code snippet compilation issues in Structured Streaming Programming Guide
-    SPARK-19028 Fixed non-thread-safe functions used in SessionCatalog
-    SPARK-19048 Delete Partition Location when Dropping Managed Partitioned Tables in InMemoryCatalog
-    SPARK-18877 CSVInferSchema.inferField` on DecimalType should find a common type with `typeSoFar`
-    SPARK-19033 Add admin acls for history server
-    SPARK-19083 sbin/start-history-server.sh script use of $@ without quotes
-    SPARK-19074 Updated Structured Streaming Programming Guide for update mode and source/sink options
-    SPARK-19110 DistributedLDAModel returns different logPrior for original and loaded model
-    SPARK-19106 Styling for the configuration docs is broken
-    SPARK-18941 Add a new behavior document on `CREATE/DROP TABLE` with `LOCATION`
-    SPARK-19127 Update Rank Function Documentation
-    SPARK-19126 Update Join Documentation Across Languages
-    SPARK-18903 Add API to get SparkUI URL
-    SPARK-18952 Regex strings not properly escaped in codegen for aggregations
-    SPARK-16845 `GeneratedClass$SpecificOrdering` grows beyond 64 KB
-    SPARK-19137 Fix `withSQLConf` to reset `OptionalConfigEntry` correctly
-    SPARK-19113 Set UncaughtExceptionHandler in onQueryStarted to ensure catching fatal errors during query initialization
-    SPARK-18997 Recommended upgrade libthrift to 0.9.3
-    SPARK-19140 Allow update mode for non-aggregation streaming queries
-    SPARK-19133 Fix glm for Gamma, clarify glm family supported
-    SPARK-19130 Support setting literal value as column implicitly
-    SPARK-19158 Fix ml.R example fails due to lack of e1071 package.
-    SPARK-18857 Don't use `Iterator.duplicate` for `incrementalCollect` in Thrift Server
-    SPARK-18969 Support grouping by nondeterministic expressions
-    SPARK-19055 Fix SparkSession initialization when SparkContext is stopped
-    SPARK-17237 Remove backticks in a pivot result schema
-    SPARK-18687 Backward compatibility - creating a Dataframe on a new SQLContext object fails with a Derby error
-    SPARK-19178 convert string of large numbers to int should return null
-    SPARK-18335 createDataFrame to support numPartitions parameter
-    SPARK-19180 the offset of short should be 2 in OffHeapColumn
-    SPARK-19120 Refresh Metadata Cache After Loading Hive Tables
-    SPARK-19092 Save() API of DataFrameWriter should not scan all the saved files #16481
-    SPARK-19082 Make ignoreCorruptFiles work for Parquet
-    SPARK-19232 Update Spark distribution download cache location on Windows
-    SPARK-18905 Fix the issue of removing a failed jobset from JobScheduler.jobSets
-    SPARK-19019 Fix hijacked `collections.namedtuple` and port cloudpickle changes for PySpark to work with Python 3.6.0
-    SPARK-19065 Don't inherit expression id in dropDuplicates
-    SPARK-19129 SessionCatalog: Disallow empty part col values in partition spec
-    SPARK-19066 LDA doesn't set optimizer correctly
-    SPARK-19231 add error handling for download and untar for Spark release
-    SPARK-19113 Ignore StreamingQueryException thrown from awaitInitialization to avoid breaking tests
-    SPARK-19168 StateStore should be aborted upon error
-    SPARK-18899 refactor the error checking when append data to an existing table
-    SPARK-19314 Do not allow sort before aggregation in Structured Streaming plan
-    SPARK-18589 Fix Python UDF accessing attributes from both side of join
-    SPARK-19267 Fix a race condition when stopping StateStore
-    SPARK-19155 MLlib GeneralizedLinearRegression family and link should case insensitive
-    SPARK-19155 Make family case insensitive in GLM
-    SPARK-19306 Fix inconsistent state in DiskBlockObject when expection occurred
-    SPARK-9435  Reuse function in Java UDF to correctly support expressions that require equality comparison between ScalaUDF
-    SPARK-19268 Disallow adaptive query execution for streaming queries
-    SPARK-18823 add support for assigning to column
-    SPARK-16473 Fix BisectingKMeans Algorithm failing in edge case
-    SPARK-19017 NOT IN subquery with more than one column may return incorrect results
-    SPARK-19330 Also show tooltip for successful batches
-    SPARK-16046 Aggregations in the Spark SQL programming guide
-    SPARK-18750 Avoid using "mapValues" when allocating containers.
-    SPARK-18863 Output non-aggregate expressions without GROUP BY in a subquery does not yield an error
-    SPARK-19307 Make sure user conf is propagated to SparkContext.
-    SPARK-18750 Follow up: move test to correct directory in 2.1 branch.
-    SPARK-19064 Fix pip installing of sub components
-    SPARK-14804 Fix checkpointing of VertexRDD/EdgeRDD
-    SPARK-19338 Add UDF names in explain
-    SPARK-19220 Make redirection to HTTPS apply to all URIs. (branch-2.1)
-    SPARK-18788 Add API for getNumPartitions
-    SPARK-19333 Add Apache License headers to R files
-    SPARK-19324 Spark VJM stdout output is getting dropped in SparkR
-    SPARK-19396 JDBC Options are Case In-sensitive
-    SPARK-19406 Fix function to_json to respect user-provided options
-    SPARK-19038 Avoid overwriting keytab configuration in yarn-client
-    SPARK-17874 Add SSL port configuration
-    [SPARK-19707][CORE] Improve the invalid path check for sc.addJar
-    [SPARK-19691][SQL][BRANCH-2.1] Fix ClassCastException when calculating percentile of decimal column
-    [SPARK-19459][SQL][BRANCH-2.1] Support for nested char/varchar fields in ORC
-    [SPARK-19682][SPARKR] Issue warning (or error) when subset method "[[" takes vector index
-    [SPARK-19652][UI] Do auth checks for REST API access (branch-2.1).
-    [SPARK-19617][SS] Fix the race condition when starting and stopping a query quickly (branch-2.1)
-    [SPARK-19626][YARN] Using the correct config to set credentials update time
-    [SPARK-19646][BUILD][HOTFIX] Fix compile error from cherry-pick of SPARK-19646 into branch 2.1
-    [SPARK-19646][CORE][STREAMING] binaryRecords replicates records in scala API
-    [SPARK-19517][SS] KafkaSource fails to initialize partition offsets
-    [SPARK-19500] [SQL] Fix off-by-one bug in BytesToBytesMap
-    [SPARK-19622][WEBUI] Fix a http error in a paged table when using a `Go` button to search.
-    [SPARK-19399][SPARKR][BACKPORT-2.1] fix tests broken by merge
-    [SPARK-19603][SS] Fix StreamingQuery explain command
-    [SPARK-19604][TESTS] Log the start of every Python test
-    [SPARK-19599][SS] Clean up HDFSMetadataLog
-    [SPARK-19399][SPARKR] Add R coalesce API for DataFrame and Column
-    [SPARK-19584][SS][DOCS] update structured streaming documentation around batch mode
-    [SPARK-19387][SPARKR] Tests do not run with SparkR source package in CRAN check
-    [SPARK-19501][YARN] Reduce the number of HDFS RPCs during YARN deployment
-    [SPARK-19585][DOC][SQL] Fix the cacheTable and uncacheTable api call in the doc
-    [SPARK-19520][STREAMING] Do not encrypt data written to the WAL.
-    [SPARK-19529] TransportClientFactory.createClient() shouldn't call awaitUninterruptibly()
-    [HOTFIX][SPARK-19542][SS]Fix the missing import in DataStreamReaderWriterSuite
-    [SPARK-17714][CORE][TEST-MAVEN][TEST-HADOOP2.6] Avoid using ExecutorClassLoader to load Netty generated classes
-    [SPARK-19542][SS] Delete the temp checkpoint if a query is stopped without errors
-    [SPARK-19506][ML][PYTHON] Import warnings in pyspark.ml.util
-    [SPARK-19574][ML][DOCUMENTATION] Fix Liquid Exception: Start indices amount is not equal to end indices amount
-    [SPARK-19564][SPARK-19559][SS][KAFKA] KafkaOffsetReader's consumers should not be in the same group
-    [SPARK-19319][BACKPORT-2.1][SPARKR] SparkR Kmeans summary returns error when the cluster size doesn't equal to k
-    [SPARK-19342][SPARKR] bug fixed in collect method for collecting timestamp column
-    [SPARK-18717][SQL] Make code generation for Scala Map work with immutable.Map also
-    [SPARK-19543] from_json fails when the input row is empty
-    [SPARK-19512][BACKPORT-2.1][SQL] codegen for compare structs fails #16852
-    [SPARK-19509][SQL] Grouping Sets do not respect nullable grouping columns
-    [SPARK-19481] [REPL] [MAVEN] Avoid to leak SparkContext in Signaling.cancelOnInterrupt
-    [SPARK-19413][SS] MapGroupsWithState for arbitrary stateful operations for branch-2.1
-    [SPARK-18609][SPARK-18841][SQL][BACKPORT-2.1] Fix redundant Alias removal in the optimizer
-    [MINOR][DOC] Remove parenthesis in readStream() on kafka structured streaming doc
-    [SPARK-19499][SS] Add more notes in the comments of Sink.addBatch()
-    [SPARK-18682][SS] Batch Source for Kafka
-    [SPARK-19444][ML][DOCUMENTATION] Fix imports not being present in documentation
-    [SPARK-19407][SS] defaultFS is used FileSystem.get instead of getting it from uri scheme
-    [SPARK-19472][SQL] Parser should not mistake CASE WHEN(...) for a function call
-    [SPARK-19432][CORE] Fix an unexpected failure when connecting timeout
-    [SPARK-19377][WEBUI][CORE] Killed tasks should have the status as KILLED
-    [SPARK-19410][DOC] Fix brokens links in ml-pipeline and ml-tuning
-    [SPARK-19378][SS] Ensure continuity of stateOperator and eventTime metrics even if there is no new data in trigger
-    [SPARK-19373][MESOS] Base spark.scheduler.minRegisteredResourceRatio …
-    [SPARK-19766][SQL] Constant alias columns in INNER JOIN should not be folded by FoldablePropagation rule
-    [SPARK-19572][SPARKR] Allow to disable hive in sparkR shell
-    [SPARK-19769][DOCS] Update quickstart instructions
-    [SPARK-19677][SS] Committing a delta file atop an existing one should not fail on HDFS
-    [SPARK-19748][SQL] refresh function has a wrong order to do cache invalidate and regenerate the inmemory var for InMemoryFileIndex with FileStatusCache
-    [SPARK-19594][STRUCTURED STREAMING] StreamingQueryListener fails to handle QueryTerminatedEvent if more then one listeners exists
-    [SPARK-14772][PYTHON][ML] Fixed Params.copy method to match Scala implementation
-    [MINOR][DOCS] Fixes two problems in the SQL programing guide page
-    [SPARK-19373][MESOS] Base spark.scheduler.minRegisteredResourceRatio …
-    [SPARK-19779][SS] Delete needless tmp file after restart structured streaming job
-    [SPARK-19933][SQL] Do not change output of a subquery
-    [SPARK-19853][SS] uppercase kafka topics fail when startingOffsets are SpecificOffsets
-    [DOCS][SS] fix structured streaming python example
-    [SPARK-19611][SQL] Introduce configurable table schema inference
-    [SPARK-19893][SQL] should not run DataFrame set oprations with map type
-    [SPARK-19891][SS] Await Batch Lock notified on stream execution exit
-    [SPARK-19886] Fix reportDataLoss if statement in SS KafkaSource
-    [SPARK-19861][SS] watermark should not be a negative time.
-    [SPARK-19561][SQL] add int case handling for TimestampType
-    [SPARK-19859][SS][FOLLOW-UP] The new watermark should override the old one.
-    [SPARK-19874][BUILD] Hide API docs for org.apache.spark.sql.internal
-    [MINOR][SQL] The analyzer rules are fired twice for cases when AnalysisException is raised from analyzer.
-    Revert "[SPARK-19413][SS] MapGroupsWithState for arbitrary stateful operations for branch-2.1"
-    [SPARK-19813] maxFilesPerTrigger combo latestFirst may miss old files in combination with maxFileAge in FileStreamSource
-    [SPARK-18055][SQL] Use correct mirror in ExpresionEncoder
-    [SPARK-19348][PYTHON] PySpark keyword_only decorator is not thread-safe
-    [SPARK-19859][SS] The new watermark should override the old one
-    Revert "[SPARK-19561] [PYTHON] cast TimestampType.toInternal output to long"
-    [SPARK-19857][YARN] Correctly calculate next credential update time.
-    [SPARK-19561] [PYTHON] cast TimestampType.toInternal output to long
-    [SPARK-19719][SS] Kafka writer for both structured streaming and batch queires
-    [SPARK-19822][TEST] CheckpointSuite.testCheckpointedOperation: should not filter checkpointFilesOfLatestTime with the PATH string.
-    [SPARK-19816][SQL][TESTS] Fix an issue that DataFrameCallbackSuite doesn't recover the log level
-    [SPARK-19774] StreamExecution should call stop() on sources when a stream fails
-    [SPARK-19797][DOC] ML pipeline document correction
-    [SPARK-19779][SS] Delete needless tmp file after restart structured streaming job
-    [SPARK-19980][SQL][BACKPORT-2.1] Add NULL checks in Bean serializer
-    clarify array_contains function description
-    [SPARK-19237][SPARKR][CORE] On Windows spark-submit should handle when java is not installed
-    [SPARK-20017][SQL] change the nullability of function 'StringToMap' from 'false' to 'true'
-    [SPARK-19912][SQL] String literals should be escaped for Hive metastore partition pruning
-    [SPARK-17204][CORE] Fix replicated off heap storage
-    [SPARK-19994][SQL] Wrong outputOrdering for right/full outer smj
-    [SPARK-18817][SPARKR][SQL] change derby log output to temp dir
-    [SQL][MINOR] Fix scaladoc for UDFRegistration
-    [SPARK-19986][TESTS] Make pyspark.streaming.tests.CheckpointTests more stable
-    [SPARK-19721][SS][BRANCH-2.1] Good error message for version mismatch in log files
-    [SPARK-19765][SPARK-18549][SPARK-19093][SPARK-19736][BACKPORT-2.1][SQL] Backport Three Cache-related PRs to Spark 2.1
-    [SPARK-19329][SQL][BRANCH-2.1] Reading from or writing to a datasource table with a non pre-existing location should succeed
-    [SPARK-19872] [PYTHON] Use the correct deserializer for RDD construction for coalesce/repartition
-    [SPARK-19944][SQL] Move SQLConf from sql/core to sql/catalyst (branch-2.1)
-    [SPARK-19887][SQL] dynamic partition keys can be null or empty string
-    [SPARK-20404][CORE] Using Option(name) instead of Some(name)
-    [SPARK-20455][DOCS] Fix Broken Docker IT Docs
-    [SPARK-20451] Filter out nested mapType datatypes from sort order in randomSplit
-    [SPARK-20450][SQL] Unexpected first-query schema inference cost with 2.1.1
-    [SPARK-20407][TESTS][BACKPORT-2.1] ParquetQuerySuite 'Enabling/disabling ignoreCorruptFiles' flaky test
-     Small rewording about history server use case
-    [SPARK-20409][SQL] fail early if aggregate function in GROUP BY
-    [MINOR][SS] Fix a missing space in UnsupportedOperationChecker error message
-    [SPARK-20359][SQL] Avoid unnecessary execution in EliminateOuterJoin optimization that can lead to NPE
-    [SPARK-17647][SQL][FOLLOWUP][MINOR] fix typo
-    [SPARK-20349][SQL][REVERT-BRANCH2.1] ListFunctions returns duplicate functions after using persistent functions
-    [HOTFIX] Fix compilation.
-    [SPARK-17647][SQL] Fix backslash escaping in 'LIKE' patterns.
-    [SPARK-20349][SQL] ListFunctions returns duplicate functions after using persistent functions
-    [SPARK-20335][SQL][BACKPORT-2.1] Children expressions of Hive UDF impacts the determinism of Hive UDF
-    [SPARK-20243][TESTS] DebugFilesystem.assertNoOpenStreams thread race
-    [SPARK-19946][TESTS][BACKPORT-2.1] DebugFilesystem.assertNoOpenStreams should report the open streams to help debugging
-    [SPARK-19924][SQL][BACKPORT-2.1] Handle InvocationTargetException for all Hive Shim
-    [SPARK-20131][CORE] Don't use `this` lock in StandaloneSchedulerBackend.stop
-    [SPARK-20304][SQL] AssertNotNull should not include path in string representation
-    [SPARK-20296][TRIVIAL][DOCS] Count distinct error message for streaming
-    [MINOR][DOCS] Fix spacings in Structured Streaming Programming Guide
-    [SPARK-20291][SQL] NaNvl(FloatType, NullType) should not be cast to NaNvl(DoubleType, DoubleType)
-    [SPARK-18555][MINOR][SQL] Fix the @since tag when backporting from 2.2 branch into 2.1 branch
-    [SPARK-17564][TESTS] Fix flaky RequestTimeoutIntegrationSuite.furtherRequestsDelay
-    [SPARK-20270][SQL] na.fill should not change the values in long or integer when the default value is in double
-    [SPARK-18555][SQL] DataFrameNaFunctions.fill miss up original values in long integers
-    [SPARK-20285][TESTS] Increase the pyspark streaming test timeout to 30 seconds
-    [SPARK-20280][CORE] FileStatusCache Weigher integer overflow
-    [SPARK-20264][SQL] asm should be non-test dependency in sql/core
-    [SPARK-20260][MLLIB] String interpolation required for error message
-    [SPARK-20262][SQL] AssertNotNull should throw NullPointerException
-    [SPARK-20246][SQL] should not push predicate down through aggregate with non-deterministic expressions
-    [SPARK-20218][DOC][APP-ID] applications//stages' in REST API,add description.
-    [SPARK-20214][ML] Make sure converted csc matrix has sorted indices
-    [SPARK-20223][SQL] Fix typo in tpcds q77.sql
-    [SPARK-20042][WEB UI] Fix log page buttons for reverse proxy mode
-    [SPARK-20191][YARN] Crate wrapper for RackResolver so tests can override it.
-    [SPARK-20190][APP-ID] applications//jobs' in rest api,status should be [running|s…
-    [MINOR][DOCS] Replace non-breaking space to normal spaces that breaks rendering markdown
-    [SPARK-20197][SPARKR][BRANCH-2.1] CRAN check fail with package installation
-    [SPARK-19999][BACKPORT-2.1][CORE] Workaround JDK-8165231 to identify PPC64 architectures as supporting unaligned access
-    [SPARK-20084][CORE] Remove internal.metrics.updatedBlockStatuses from history files.
-    [SPARK-20164][SQL] AnalysisException not tolerant of null query plan.
-    [SPARK-20059][YARN] Use the correct classloader for HBaseCredentialProvider
-    [SPARK-20134][SQL] SQLMetrics.postDriverMetricUpdates to simplify driver side metric updates
-    [SPARK-20043][ML] DecisionTreeModel: ImpurityCalculator builder fails for uppercase impurity type Gini
-    [SPARK-14536][SQL][BACKPORT-2.1] fix to handle null value in array type column for postgres.
-    [SPARK-20125][SQL] Dataset of type option of map does not work
-    [SPARK-19995][YARN] Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
-    [SPARK-20102] Fix nightly packaging and RC packaging scripts w/ two minor build fixes
-    [SPARK-20086][SQL] CollapseWindow should not collapse dependent adjacent windows
-    [SPARK-19674][SQL] Ignore driver accumulator updates don't belong to …
-    [SPARK-19959][SQL] Fix to throw NullPointerException in  df[java.lang.Long].collect
-    [SPARK-19970][SQL][BRANCH-2.1] Table owner should be USER instead of PRINCIPAL in kerberized clusters
-    [SPARK-20021][PYSPARK] Miss backslash in python code
 
     (Backport from 2.1.2)
-    [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
-    [SPARK-20256][SQL][BRANCH-2.1] SessionState should be created more lazily
+    SPARK-19970 Table owner should be USER instead of PRINCIPAL in kerberized clusters
+    SPARK-20256 SessionState should be created more lazily
+    SPARK-19372 Fix throwing a Java exception at df.fliter() due to 64KB bytecode size limit
+    SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
+    SPARK-20256 SessionState should be created more lazily
+    SPARK-20439 Fix Catalog API listTables and getTable when failed to fetch table metadata
+    SPARK-20496 Bug in KafkaWriter Looks at Unanalyzed Plans
+    SPARK-20517 Fix broken history UI download link
+    SPARK-20540 Fix unstable executor requests.
+    SPARK-20558 clear InheritableThreadLocal variables in SparkContext when stopping it
+    SPARK-20546 spark-class gets syntax error in posix mode
+    SPARK-20613 Remove excess quotes in Windows executable
+    SPARK-20603 Set default number of topic partitions to 1 to reduce the load
+    SPARK-20616 RuleExecutor logDebug of batch results should show diff to start of batch
+    SPARK-20615 SparseVector.argmax throws IndexOutOfBoundsException
+    SPARK-20627 Drop the hadoop distirbution name from the Python version
+    SPARK-17685 Make SortMergeJoinExec's currentVars is null when calling createJoinKey
+    SPARK-20686 PropagateEmptyRelation incorrectly handles aggregate without grouping
+    SPARK-20631 LogisticRegression._checkThresholdConsistency should use values not Params
+    SPARK-20688 correctly check analysis for scalar sub-queries
+    SPARK-20685 Fix BatchPythonEvaluation bug in case of single UDF w/ repeated arg.
+    SPARK-20665 Bround" and "Round" function return NULL
+    SPARK-17424 Fix unsound substitution bug in ScalaReflection.
+    SPARK-20705 The sort function can not be used in the master page when you use Firefox or Google Chrome.
+    SPARK-20735 Enable cross join in TPCDSQueryBenchmark
+    SPARK-20769 Incorrect documentation for using Jupyter notebook
+    SPARK-20796 the location of start-master.sh in spark-standalone.md is wrong
+    SPARK-20798 GenerateUnsafeProjection should check if a value is null before calling the getter
+    SPARK-20759 SCALA_VERSION in _config.yml should be consistent with pom.xml
+    SPARK-20781 the location of Dockerfile in docker.properties.templat is wrong
+    SPARK-20687 mllib.Matrices.fromBreeze may crash when converting from Breeze sparse matrix
+    SPARK-20756 yarn-shuffle jar references unshaded guava
+    SPARK-20763 The function of `month` and `day` return the value which is not we expected.
+    SPARK-20862 Avoid passing float to ndarray.reshape in LogisticRegressionModel
+    SPARK-20848 Shutdown the pool after reading parquet files
+    SPARK-18406 Race between end-of-task and completion iterator read lock release
+    SPARK-20848 Shutdown the pool after reading parquet files
+    SPARK-20250 Improper OOM error when a task been killed while spilling data
+    SPARK-20874 Add Structured Streaming Kafka Source to examples project
+    SPARK-20868 UnsafeShuffleWriter should verify the position after FileChannel.transferTo
+    SPARK-20843 Add a config to set driver terminate timeout
+    SPARK-20393 Strengthen Spark to prevent XSS vulnerabilities
+    SPARK-20275 Do not display "Completed" column for in-progress applications
+    SPARK-20940 Replace IllegalAccessError with IllegalStateException
+    SPARK-20922 Add whitelist of classes that can be deserialized by the launcher.
+    SPARK-20922 Don't use Java 8 lambdas in older branches.
+    SPARK-20974 we should run REPL tests if SQL module has code changes
+    SPARK-20914 Javadoc contains code that is invalid
+    SPARK-20920 ForkJoinPool pools are leaked when writing hive tables with many partitions
+    SPARK-21064 Fix the default value bug in NettyBlockTransferServiceSuite
+    SPARK-20211 Fix the Precision and Scale of Decimal Values when the Input is BigDecimal between -1.0 and 1.0
+    SPARK-16251 Flaky test: org.apache.spark.rdd.LocalCheckpointSuite.missing checkpoint block fails with informative message
+    SPARK-21072 TreeNode.mapChildren should only apply to the children node.
+    SPARK-21114 Fix test failure in Spark 2.1/2.0 due to name mismatch
+    SPARK-19688 Not to read `spark.yarn.credentials.file` from checkpoint.
+    SPARK-21138 Cannot delete staging dir when the clusters of "spark.yarn.stagingDir" and "spark.hadoop.fs.defaultFS" are different
+    SPARK-21123 Options for file stream source are in a wrong table - version to fix 2.1
+    SPARK-21167 Decode the path generated by File sink to handle special characters
+    SPARK-21181 Release byteBuffers to suppress netty error messages
+    SPARK-20555 Fix mapping of Oracle DECIMAL types to Spark types in read path
+    SPARK-21159 Don't try to connect to launcher in standalone cluster mode.
+    SPARK-21203 Fix wrong results of insertion of Array of Struct
+    SPARK-21176 Limit number of selector threads for admin ui proxy servlets to 8
+    SPARK-21312 correct offsetInBytes in UnsafeRow.writeToStream
+    SPARK-21345 SparkSessionBuilderSuite should clean up stopped sessions.
+    SPARK-21083 Store zero size and row count when analyzing empty table
 
     (Backport from 2.2)
-    [BUG-78776][SPARK-8617][WEBUI] HistoryServer: Include in-progress files during cleanup
-    [SPARK-20239][Core] Improve HistoryServer's ACL mechanism
-    [SPARK-19995][YARN] Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
-    [SPARK-19372][SQL] Fix throwing a Java exception at df.fliter() due to 64KB bytecode size limit
-
-    (Backport from 2.3)
-    [SPARK-20981][SPARKSUBMIT] Add new configuration spark.jars.repositories as equivalence of --repositories
+    SPARK-8617  HistoryServer: Include in-progress files during cleanup
+    SPARK-20239 Improve HistoryServer's ACL mechanism
+    SPARK-19995 Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
+    SPARK-20345 Fix STS error handling logic on HiveSQLException
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
-    SPARK-20517 Fix broken history UI download link
