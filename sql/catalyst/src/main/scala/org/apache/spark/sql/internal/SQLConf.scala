@@ -889,6 +889,27 @@ object SQLConf {
       .intConf
       .createWithDefault(10000)
 
+  // ------------------------------------------------------
+  //  Configuration for HDP Ranger with LLAP
+  // ------------------------------------------------------
+  val HIVESERVER2_JDBC_URL =
+  buildConf("spark.sql.hive.hiveserver2.jdbc.url")
+    .doc("HiveServer2 JDBC URL.")
+    .stringConf
+    .createWithDefault("")
+
+  val HIVESERVER2_JDBC_URL_PRINCIPAL =
+    buildConf("spark.sql.hive.hiveserver2.jdbc.url.principal")
+      .doc("HiveServer2 JDBC Principal.")
+      .stringConf
+      .createWithDefault("")
+
+  val HIVESERVER2_CREDENTIAL_ENABLED =
+    buildConf("spark.yarn.security.credentials.hiveserver2.enabled")
+      .doc("When true, HiveServer2 credential provider is enabled.")
+      .booleanConf
+      .createWithDefault(false)
+
   object Deprecated {
     val MAPRED_REDUCE_TASKS = "mapred.reduce.tasks"
   }
