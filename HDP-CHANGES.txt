@@ -100,6 +100,30 @@ BUG FIXES
     SPARK-20239 Improve HistoryServer's ACL mechanism
     SPARK-19995 Register tokens to current UGI to avoid re-issuing of tokens in yarn client mode
     SPARK-20345 Fix STS error handling logic on HiveSQLException
+    SPARK-18629 Fix numPartition of JDBCSuite Testcase
+    SPARK-4105  retry the fetch or stage if shuffle block is corrupt
+    SPARK-19219 Fix Parquet log output defaults
+    SPARK-18113 Use ask to replace askWithRetry in canCommit and make receiver idempotent.
+    SPARK-19059 Unable to retrieve data from parquet table whose name startswith underscore
+    SPARK-19218 Fix SET command to show a result correctly and in a sorted order
+    SPARK-17663 SchedulableBuilder should handle invalid data access via scheduler.allocation.file
+    SPARK-19263 Fix race in SchedulerIntegrationSuite.
+    SPARK-19263 DAGScheduler should avoid sending conflicting task set.
+    SPARK-19539 Block duplicate temp table during creation
+    SPARK-18986 ExternalAppendOnlyMap shouldn't fail when forced to spill before calling its iterator
+    SPARK-19775 Remove an obsolete `partitionBy().insertInto()` test case
+    SPARK-19631 OutputCommitCoordinator should not allow commits for already failed tasks
+    SPARK-19727 Fix for round function that modifies original column
+    SPARK-18579 Use ignoreLeadingWhiteSpace and ignoreTrailingWhiteSpace options in CSV writing
+    SPARK-19868 conflict TasksetManager lead to spark stopped
+    SPARK-19570 Allow to disable hive in pyspark shell
+    SPARK-20405 Dataset.withNewExecutionId should be private
+    SPARK-20412 Throw ParseException from visitNonOptionalPartitionSpec instead of returning null values.
+    SPARK-19812 YARN shuffle service fails to relocate recovery DB acro…
+    SPARK-20459 JdbcUtils throws IllegalStateException: Cause already initialized after getting SQLException
+    SPARK-19104 Lambda variables in ExternalMapToCatalyst should be global
+    SPARK-20342 Update task accumulators before sending task end event.
+    SPARK-20566 ColumnVector should support `appendFloats` for array
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
