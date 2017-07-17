@@ -123,7 +123,11 @@ BUG FIXES
     SPARK-20459 JdbcUtils throws IllegalStateException: Cause already initialized after getting SQLException
     SPARK-19104 Lambda variables in ExternalMapToCatalyst should be global
     SPARK-20342 Update task accumulators before sending task end event.
-    SPARK-20566 ColumnVector should support `appendFloats` for array
+    SPARK-20566 ColumnVector should support `appendFloats` for Array
+
+    (Backport from 2.3)
+    SPARK-21376 Fix yarn client token expire issue when cleaning the staging files in long running scenario
+    SPARK-21377 Make jars specify with --jars/--packages load-able in AM's credential renwer
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
