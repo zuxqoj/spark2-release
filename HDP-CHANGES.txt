@@ -304,3 +304,4 @@ BUG FIXES
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
     SPARK-20517 Fix broken history UI download link
+  SPARK-21377   Make jars specify with --jars/--packages load-able in AM's credential renwer
