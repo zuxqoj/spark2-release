@@ -1047,7 +1047,7 @@ object SparkSession {
         else {
           HIVE_SESSION_STATE_BUILDER_CLASS_NAME
         }
-      case "in-memory" => classOf[SessionState].getCanonicalName
+      case "in-memory" => classOf[SessionStateBuilder].getCanonicalName
     }
   }
 
