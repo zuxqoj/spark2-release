@@ -310,7 +310,11 @@ object CatalystTypeConverters {
         case d: JavaBigInteger => Decimal(d)
         case d: Decimal => d
       }
-      decimal.toPrecision(dataType.precision, dataType.scale).orNull
+      if (decimal.changePrecision(dataType.precision, dataType.scale)) {
+        decimal
+      } else {
+        null
+      }
     }
     override def toScala(catalystValue: Decimal): JavaBigDecimal = {
       if (catalystValue == null) null
