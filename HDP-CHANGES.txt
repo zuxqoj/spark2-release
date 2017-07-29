@@ -121,7 +121,6 @@ BUG FIXES
     SPARK-19812 YARN shuffle service fails to relocate recovery DB acro…
     SPARK-20459 JdbcUtils throws IllegalStateException: Cause already initialized after getting SQLException
     SPARK-19104 Lambda variables in ExternalMapToCatalyst should be global
-    SPARK-20342 Update task accumulators before sending task end event.
     SPARK-20566 ColumnVector should support `appendFloats` for Array
 
     (Backport from 2.3)
