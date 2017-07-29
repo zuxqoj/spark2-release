@@ -107,7 +107,6 @@ BUG FIXES
     SPARK-19059 Unable to retrieve data from parquet table whose name startswith underscore
     SPARK-19218 Fix SET command to show a result correctly and in a sorted order
     SPARK-17663 SchedulableBuilder should handle invalid data access via scheduler.allocation.file
-    SPARK-19263 Fix race in SchedulerIntegrationSuite.
     SPARK-19263 DAGScheduler should avoid sending conflicting task set.
     SPARK-19539 Block duplicate temp table during creation
     SPARK-18986 ExternalAppendOnlyMap shouldn't fail when forced to spill before calling its iterator
