@@ -267,8 +267,8 @@ private[spark] class ApplicationMaster(
           setContextClassLoader(userClassLoader)
 
           override def run(): Unit = {
-            // If a principal and keytab have been set, use that to create new credentials for executors
-            // periodically
+            // If a principal and keytab have been set, use that to create new
+            // credentials for executors periodically
             credentialRenewer =
               new ConfigurableCredentialManager(sparkConf, yarnConf).credentialRenewer()
             credentialRenewer.scheduleLoginFromKeytab()
