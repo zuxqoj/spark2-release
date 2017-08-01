@@ -31,7 +31,6 @@ BUG FIXES
     SPARK-19970 Table owner should be USER instead of PRINCIPAL in kerberized clusters
     SPARK-20256 SessionState should be created more lazily
     SPARK-19372 Fix throwing a Java exception at df.fliter() due to 64KB bytecode size limit
-    SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
     SPARK-20256 SessionState should be created more lazily
     SPARK-20439 Fix Catalog API listTables and getTable when failed to fetch table metadata
     SPARK-20496 Bug in KafkaWriter Looks at Unanalyzed Plans
@@ -123,6 +122,7 @@ BUG FIXES
     SPARK-20566 ColumnVector should support `appendFloats` for Array
 
     (Backport from 2.3)
+    SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
     SPARK-21376 Fix yarn client token expire issue when cleaning the staging files in long running scenario
     SPARK-21377 Make jars specify with --jars/--packages load-able in AM's credential renwer
 
