@@ -22,6 +22,7 @@ import java.security.PrivilegedExceptionAction
 import java.sql.{Connection, DriverManager}
 
 import scala.reflect.runtime.universe
+import scala.util.control.NonFatal
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier
