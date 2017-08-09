@@ -120,6 +120,7 @@ BUG FIXES
     SPARK-20459 JdbcUtils throws IllegalStateException: Cause already initialized after getting SQLException
     SPARK-19104 Lambda variables in ExternalMapToCatalyst should be global
     SPARK-20566 ColumnVector should support `appendFloats` for Array
+    SPARK-19846 Add a flag to disable constraint propagation
 
     (Backport from 2.3)
     SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
