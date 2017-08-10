@@ -29,70 +29,64 @@ BUG FIXES
     BUG-77400   Fix HiveServer2 delegation token acquisition
 
     (Backport from 2.2.1)
-    [SPARK-21663][TESTS] test("remote fetch below max RPC message size") should call masterTracker.stop() in MapOutputTrackerSuite
-    [SPARK-21596][SS] Ensure places calling HDFSMetadataLog.get check the return value
-    [SPARK-21523][ML] update breeze to 0.13.2 for an emergency bugfix in strong wolfe line search
-    [SPARK-21503][UI] Spark UI shows incorrect task status for a killed Executor Process
-    Revert "[SPARK-21567][SQL] Dataset should work with type alias"
-    [SPARK-21567][SQL] Dataset should work with type alias
-    [SPARK-21648][SQL] Fix confusing assert failure in JDBC source when parallel fetching parameters are not properly provided.
-    [SPARK-21565][SS] Propagate metadata in attribute replacement.
-    [SPARK-21374][CORE] Fix reading globbed paths from S3 into DF with disabled FS cache
-    [SPARK-21647][SQL] Fix SortMergeJoin when using CROSS
-    [SPARK-21621][CORE] Reset numRecordsWritten after DiskBlockObjectWriter.commitAndGet called
-    [SPARK-21588][SQL] SQLContext.getConf(key, null) should return null
-    [SPARK-21580][SQL] Integers in aggregation expressions are wrongly taken as group-by ordinal
-    [SPARK-21330][SQL] Bad partitioning does not allow to read a JDBC table with extreme values on the partition column
+    SPARK-21663   test("remote fetch below max RPC message size") should call masterTracker.stop() in MapOutputTrackerSuite
+    SPARK-21596   Ensure places calling HDFSMetadataLog.get check the return value
+    SPARK-21523   update breeze to 0.13.2 for an emergency bugfix in strong wolfe line search
+    SPARK-21503   Spark UI shows incorrect task status for a killed Executor Process
+    SPARK-21648   Fix confusing assert failure in JDBC source when parallel fetching parameters are not properly provided.
+    SPARK-21565   Propagate metadata in attribute replacement.
+    SPARK-21374   Fix reading globbed paths from S3 into DF with disabled FS cache
+    SPARK-21647   Fix SortMergeJoin when using CROSS
+    SPARK-21621   Reset numRecordsWritten after DiskBlockObjectWriter.commitAndGet called
+    SPARK-21588   SQLContext.getConf(key, null) should return null
+    SPARK-21580   Integers in aggregation expressions are wrongly taken as group-by ordinal
+    SPARK-21330   Bad partitioning does not allow to read a JDBC table with extreme values on the partition column
     Fix Java SimpleApp spark application
-    [SPARK-12717][PYTHON][BRANCH-2.2] Adding thread-safe broadcast pickle registry
-    [SPARK-21546][SS] dropDuplicates should ignore watermark when it's not a key
-    [SPARK-21597][SS] Fix a potential overflow issue in EventTimeStats
-    [SPARK-21339][CORE] spark-shell --packages option does not add jars to classpath on windows
-    [SPARK-21593][DOCS] Fix 2 rendering errors on configuration page
-    [SPARK-21522][CORE] Fix flakiness in LauncherServerSuite.
-    Revert "[SPARK-19451][SQL] rangeBetween method should accept Long value as boundary"
-    [SPARK-19451][SQL] rangeBetween method should accept Long value as boundary
-    [SPARK-21555][SQL] RuntimeReplaceable should be compared semantically by its canonicalized child
-    [SPARK-21508][DOC] Fix example code provided in Spark Streaming Documentation
-    [SPARK-21306][ML] OneVsRest should support setWeightCol
-    [SPARK-21538][SQL] Attribute resolution inconsistency in the Dataset API
-    [SPARK-21494][NETWORK] Use correct app id when authenticating to external service.
-    [SPARK-21447][WEB UI] Spark history server fails to render compressed
-    [SPARK-21383][YARN] Fix the YarnAllocator allocates more Resource
-    [SPARK-20904][CORE] Don't report task failures to driver during shutdown.
-    [SPARK-21434][PYTHON][DOCS] Add pyspark pip documentation.
-    [SPARK-21243][CORE] Limit no. of map outputs in a shuffle fetch
-    [SPARK-21333][DOCS] Removed invalid joinTypes from javadoc of Dataset#joinWith
-    [SPARK-21446][SQL] Fix setAutoCommit never executed
-    [SPARK-21464][SS] Minimize deprecation warnings caused by ProcessingTime class
-    [SPARK-21441][SQL] Incorrect Codegen in SortMergeJoinExec results failures in some cases
-    [SPARK-21414] Refine SlidingWindowFunctionFrame to avoid OOM.
-    [SPARK-21457][SQL] ExternalCatalog.listPartitions should correctly handle partition values with dot
-    [SPARK-21445] Make IntWrapper and LongWrapper in UTF8String Serializable
-    [SPARK-21332][SQL] Incorrect result type inferred for some decimal expressions
-    [SPARK-21321][SPARK CORE] Spark very verbose on shutdown
-    [SPARK-21267][DOCS][MINOR] Follow up to avoid referencing programming-guide redirector
-    [SPARK-21344][SQL] BinaryType comparison does signed byte array comparison
-    [SPARK-21376][YARN] Fix yarn client token expire issue when cleaning the staging files in long running scenario
-    Revert "[SPARK-18646][REPL] Set parent classloader as null for ExecutorClassLoader"
-    [SPARK-18646][REPL] Set parent classloader as null for ExecutorClassLoader
-    [SPARK-21219][CORE] Task retry occurs on same executor due to race co…
-    [SPARK-21366][SQL][TEST] Add sql test for window functions
-    [SPARK-21369][CORE] Don't use Scala Tuple2 in common/network-*
-    [SPARK-21272] SortMergeJoin LeftAnti does not update numOutputRows
-    [SPARK-21342] Fix DownloadCallback to work well with RetryingBlockFetcher.
-    [SPARK-21083][SQL][BRANCH-2.2] Store zero size and row count when analyzing empty table
-    [SPARK-21343] Refine the document for spark.reducer.maxReqSizeShuffleToMem.
-    [SPARK-20342][CORE] Update task accumulators before sending task end event.
-    [SPARK-21345][SQL][TEST][TEST-MAVEN] SparkSessionBuilderSuite should clean up stopped sessions.
-    [SPARK-21228][SQL][BRANCH-2.2] InSet incorrect handling of structs
-    [SPARK-21069][SS][DOCS] Add rate source to programming guide.
-    [SPARK-21267][SS][DOCS] Update Structured Streaming Documentation
-    [SS][MINOR] Fix flaky test in DatastreamReaderWriterSuite. temp checkpoint dir should be deleted
-    [SPARK-21312][SQL] correct offsetInBytes in UnsafeRow.writeToStream
-    [SPARK-21300][SQL] ExternalMapToCatalyst should null-check map key prior to converting to internal value.
-    [SPARK-20256][SQL] SessionState should be created more lazily
-    [SPARK-21170][CORE] Utils.tryWithSafeFinallyAndFailureCallbacks throws IllegalArgumentException: Self-suppression not permitted
+    SPARK-12717   Adding thread-safe broadcast pickle registry
+    SPARK-21546   dropDuplicates should ignore watermark when it's not a key
+    SPARK-21597   Fix a potential overflow issue in EventTimeStats
+    SPARK-21339   spark-shell --packages option does not add jars to classpath on windows
+    SPARK-21593   Fix 2 rendering errors on configuration page
+    SPARK-21522   Fix flakiness in LauncherServerSuite.
+    SPARK-21555   RuntimeReplaceable should be compared semantically by its canonicalized child
+    SPARK-21508   Fix example code provided in Spark Streaming Documentation
+    SPARK-21306   OneVsRest should support setWeightCol
+    SPARK-21538   Attribute resolution inconsistency in the Dataset API
+    SPARK-21494   Use correct app id when authenticating to external service.
+    SPARK-21447   Spark history server fails to render compressed
+    SPARK-21383   Fix the YarnAllocator allocates more Resource
+    SPARK-20904   Don't report task failures to driver during shutdown.
+    SPARK-21434   Add pyspark pip documentation.
+    SPARK-21243   Limit no. of map outputs in a shuffle fetch
+    SPARK-21333   Removed invalid joinTypes from javadoc of Dataset#joinWith
+    SPARK-21446   Fix setAutoCommit never executed
+    SPARK-21464   Minimize deprecation warnings caused by ProcessingTime class
+    SPARK-21441   Incorrect Codegen in SortMergeJoinExec results failures in some cases
+    SPARK-21414   Refine SlidingWindowFunctionFrame to avoid OOM.
+    SPARK-21457   ExternalCatalog.listPartitions should correctly handle partition values with dot
+    SPARK-21445   Make IntWrapper and LongWrapper in UTF8String Serializable
+    SPARK-21332   Incorrect result type inferred for some decimal expressions
+    SPARK-21321   Spark very verbose on shutdown
+    SPARK-21267   Follow up to avoid referencing programming-guide redirector
+    SPARK-21344   BinaryType comparison does signed byte array comparison
+    SPARK-21376   Fix yarn client token expire issue when cleaning the staging files in long running scenario
+    SPARK-21219   Task retry occurs on same executor due to race co…
+    SPARK-21366   Add sql test for window functions
+    SPARK-21369   Don't use Scala Tuple2 in common/network-*
+    SPARK-21272   SortMergeJoin LeftAnti does not update numOutputRows
+    SPARK-21342   Fix DownloadCallback to work well with RetryingBlockFetcher.
+    SPARK-21083   Store zero size and row count when analyzing empty table
+    SPARK-21343   Refine the document for spark.reducer.maxReqSizeShuffleToMem.
+    SPARK-20342   Update task accumulators before sending task end event.
+    SPARK-21345   SparkSessionBuilderSuite should clean up stopped sessions.
+    SPARK-21228   InSet incorrect handling of structs
+    SPARK-21069   Add rate source to programming guide.
+    SPARK-21267   Update Structured Streaming Documentation
+    MINOR         Fix flaky test in DatastreamReaderWriterSuite. temp checkpoint dir should be deleted
+    SPARK-21312   correct offsetInBytes in UnsafeRow.writeToStream
+    SPARK-21300   ExternalMapToCatalyst should null-check map key prior to converting to internal value.
+    SPARK-20256   SessionState should be created more lazily
+    SPARK-21170   Utils.tryWithSafeFinallyAndFailureCallbacks throws IllegalArgumentException: Self-suppression not permitted
 
     (Backport from 2.3)
     SPARK-21376 Fix yarn client token expire issue when cleaning the staging files in long running scenario
