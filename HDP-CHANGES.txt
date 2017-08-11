@@ -94,6 +94,16 @@ BUG FIXES
     SPARK-21312 correct offsetInBytes in UnsafeRow.writeToStream
     SPARK-21345 SparkSessionBuilderSuite should clean up stopped sessions.
     SPARK-21083 Store zero size and row count when analyzing empty table
+    SPARK-21332 Incorrect result type inferred for some decimal expressions
+    SPARK-21441 Incorrect Codegen in SortMergeJoinExec results failures in some cases
+    SPARK-21446 Fix setAutoCommit never executed
+    SPARK-21555 RuntimeReplaceable should be compared semantically by its canonicalized child
+    SPARK-21522 Fix flakiness in LauncherServerSuite.
+    SPARK-12717 Adding thread-safe broadcast pickle registry
+    SPARK-21330 Bad partitioning does not allow to read a JDBC table with extreme values on the partition column
+    SPARK-21588 SQLContext.getConf(key, null) should return null
+    SPARK-18535 Redact sensitive information
+    SPARK-21306 For branch 2.1, OneVsRest should support setWeightCol
 
     (Backport from 2.2)
     SPARK-8617  HistoryServer: Include in-progress files during cleanup
