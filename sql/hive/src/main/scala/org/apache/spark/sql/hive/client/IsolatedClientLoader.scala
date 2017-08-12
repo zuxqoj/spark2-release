@@ -107,11 +107,15 @@ private[hive] object IsolatedClientLoader extends Logging {
       Seq("com.google.guava:guava:14.0.1",
         s"org.apache.hadoop:hadoop-client:$hadoopVersion")
 
+    var remoteRepos = "http://www.datanucleus.org/downloads/maven2"
+    if (Utils.isTesting) {
+      remoteRepos += ",http://nexus-private.hortonworks.com/nexus/content/groups/public"
+    }
     val classpath = quietly {
       SparkSubmitUtils.resolveMavenCoordinates(
         hiveArtifacts.mkString(","),
         SparkSubmitUtils.buildIvySettings(
-          Some("http://www.datanucleus.org/downloads/maven2"),
+          Some(remoteRepos),
           ivyPath),
         exclusions = version.exclusions)
     }

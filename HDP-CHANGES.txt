@@ -30,3 +30,4 @@ BUG FIXES
     BUG-77776   Fix STS error handling logic on HiveSQLException
     BUG-81926   Issue with inserting data from Spark SQL using hivecontext
     BUG-77400   Fix HiveServer2 delegation token acquisition
+    BUG-84597   Fix VersionsSuite failures
