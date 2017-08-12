@@ -26,6 +26,7 @@ BUG FIXES
     SPARK-207   Remove hardcode FS scheme from Spark archive.
     BUG-77400   Fix HiveServer2 delegation token acquisition
     BUG-81926   Issue with inserting data from Spark SQL using hivecontext
+    BUG-84597   Fix VersionsSuite failures
 
     (Backport from 2.1.2)
     SPARK-19970 Table owner should be USER instead of PRINCIPAL in kerberized clusters
