@@ -27,6 +27,7 @@ BUG FIXES
     BUG-79168   Spark2 compilation failure because (1)LLAP related patches are missing (2) conflict between hdp-master and Apache/master in the Client.scala
     BUG-77776   Fix STS error handling logic on HiveSQLException
     BUG-77400   Fix HiveServer2 delegation token acquisition
+    BUG-84597   Fix VersionsSuite failures
 
     (Backport from 2.2.1)
     SPARK-21663   test("remote fetch below max RPC message size") should call masterTracker.stop() in MapOutputTrackerSuite
