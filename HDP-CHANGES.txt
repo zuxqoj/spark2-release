@@ -12,7 +12,7 @@ IMPROVEMENTS
     BUG-70581 Add hadoop-3.0 profile
     BUG-84628 HiveServer2Credential Provider is enabled by default
     RMP-9454: SparkSQL Ranger integration for fine grained access control in Spark 2.2
-       
+
 BUG FIXES
     BUG-63630	SPARK-14387. Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
@@ -32,3 +32,4 @@ BUG FIXES
     BUG-77400   Fix HiveServer2 delegation token acquisition
     BUG-84597   Fix VersionsSuite failures
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
+    BUG-86834   Add missing import package name in HiveServer2CredentialProvider
