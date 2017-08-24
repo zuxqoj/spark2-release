@@ -98,8 +98,7 @@ BUG FIXES
     SPARK-21377 Make jars specify with --jars/--packages load-able in AM's credential renwer
     SPARK-21475 Use NIO's Files API to replace FileInputStream/FileOutputStream in some critical paths
     SPARK-21738 Thriftserver doesn't cancel jobs when session is closed
-
+    SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-21407 Support spnego for ThriftServer thrift/http auth
-    SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
