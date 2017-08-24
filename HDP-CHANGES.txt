@@ -99,6 +99,7 @@ BUG FIXES
     SPARK-21475 Use NIO's Files API to replace FileInputStream/FileOutputStream in some critical paths
     SPARK-21738 Thriftserver doesn't cancel jobs when session is closed
 
+
     (Jira in Apache Spark is IN PROGRESS)
-    SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
     SPARK-21407 Support spnego for ThriftServer thrift/http auth
+    SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
