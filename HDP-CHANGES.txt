@@ -267,6 +267,7 @@ BUG FIXES
     SPARK-21247 Type comparison should respect case-sensitive SQL conf
     SPARK-22188 Adding security headers for preventing XSS, MitM and MIME sniffing
     SPARK-21807 Override ++ operation in ExpressionSet to reduce clone time
+    SPARK-17321 Avoid writing shuffle metadata to disk if NM recovery is disabled
 
     (Jira in Apache Spark is IN PROGRESS)
     BUG-88428 SPARK-21549 Spark fails to complete job correctly in case of OutputFormat which do not write into hdfs
