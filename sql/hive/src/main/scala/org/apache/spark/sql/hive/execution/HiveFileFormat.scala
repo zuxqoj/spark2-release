@@ -90,8 +90,9 @@ class HiveFileFormat(fileSinkConf: FileSinkDesc)
     new OutputWriterFactory {
       private val jobConf = new SerializableJobConf(new JobConf(conf))
       @transient private lazy val outputFormat = jobConf.value.getOutputFormat match {
-        case format: HiveOutputFormat[AnyRef, Writable]
-          => format.asInstanceOf[HiveOutputFormat[AnyRef, Writable]]
+        case format
+          if classOf[HiveOutputFormat[AnyRef, Writable]].isAssignableFrom(format.getClass)
+            => format.asInstanceOf[HiveOutputFormat[AnyRef, Writable]]
         case _ => null
       }
 
