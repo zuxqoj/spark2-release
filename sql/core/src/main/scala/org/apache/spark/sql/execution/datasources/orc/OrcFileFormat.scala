@@ -30,6 +30,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
 import org.apache.orc._
 import org.apache.orc.OrcFile.ReaderOptions
+import org.apache.orc.TypeDescription
 import org.apache.orc.TypeDescription.Category.CHAR
 import org.apache.orc.mapred.{OrcList, OrcMap, OrcStruct, OrcTimestamp}
 import org.apache.orc.mapreduce._
@@ -38,7 +39,7 @@ import org.apache.orc.storage.serde2.io.{DateWritable, HiveDecimalWritable}
 
 import org.apache.spark.TaskContext
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{AnalysisException, SparkSession}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.Resolver
 import org.apache.spark.sql.catalyst.expressions._
@@ -650,5 +651,22 @@ object OrcFileFormat extends Logging {
           throw new UnsupportedOperationException(s"$dataType is not supported yet.")
       }
     }
+  }
+
+  private def checkFieldName(name: String): Unit = {
+    try {
+      TypeDescription.fromString(s"struct<$name:int>")
+    } catch {
+      case _: IllegalArgumentException =>
+        throw new AnalysisException(
+          s"""Column name "$name" contains invalid character(s).
+             |Please use alias to rename it.
+           """.stripMargin.split("\n").mkString(" ").trim)
+    }
+  }
+
+  def checkFieldNames(schema: StructType): StructType = {
+    schema.fieldNames.foreach(checkFieldName)
+    schema
   }
 }

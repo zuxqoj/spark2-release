@@ -189,6 +189,7 @@ BUG FIXES
     SPARK-22300 Update ORC to 1.4.1
     SPARK-22188 Adding security headers for preventing XSS, MitM and MIME sniffing
     SPARK-21929 Support `ALTER TABLE table_name ADD COLUMNS(..)` for ORC data source
+    SPARK-21912 ORC/Parquet table should not create invalid column names
 
     (Jira in Apache Spark is IN PROGRESS)
     BUG-88428 SPARK-21549 Spark fails to complete job correctly in case of OutputFormat which do not write into hdfs
