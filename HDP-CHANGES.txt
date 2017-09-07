@@ -92,6 +92,31 @@ BUG FIXES
     SPARK-21300   ExternalMapToCatalyst should null-check map key prior to converting to internal value.
     SPARK-20256   SessionState should be created more lazily
     SPARK-21170   Utils.tryWithSafeFinallyAndFailureCallbacks throws IllegalArgumentException: Self-suppression not permitted
+    SPARK-21699   Remove unused getTableOption in ExternalCatalog
+    SPARK-21595   Separate thresholds for buffering and spilling in ExternalAppendOnlyUnsafeRowArray
+    SPARK-21563   Fix race condition when serializing TaskDescriptions and adding jars
+    SPARK-21696   Fix a potential issue that may generate partial snapshot files
+    SPARK-21721   Clear FileSystem deleteOnExit cache when paths are successfully removed
+    SPARK-21723   Fix writing LibSVM (key not found: numFeatures)
+    SPARK-21656   spark dynamic allocation should not idle timeout executors when tasks still to run
+    SPARK-18464   support old table which doesn't store schema in table properties
+    SPARK-21739   Cast expression should initialize timezoneId when it is called statically to convert something into TimestampType
+    SPARK-21721   Clear FileSystem deleteOnExit cache when paths are successfully removed
+    SPARK-21617   Store correct table metadata when altering schema in Hive metastore.
+    SPARK-21805   Disable R vignettes code on Windows
+    SPARK-21826   outer broadcast hash join should not throw NPE
+    SPARK-21681   fix bug of MLOR do not work correctly when featureStd contains zero (backport PR for 2.2)
+    SPARK-21818   Fix bug of MultivariateOnlineSummarizer.variance generate negative result
+    SPARK-21798   No config to replace deprecated SPARK_CLASSPATH config for launching daemons like History Server
+    SPARK-21714   Avoiding re-uploading remote resources in yarn client mode
+    SPARK-21254   History UI performance fixes
+    SPARK-21834   Incorrect executor request in case of dynamic allocation
+    SPARK-21477   Mark LocalTableScanExec's input data transient
+    SPARK-21418   NoSuchElementException: None.get in DataSourceScanExec with sun.io.serialization.extendedDebugInfo=true
+    SPARK-21925   Update trigger interval documentation in docs with behavior change in Spark 2.2
+    SPARK-21924   Update structured streaming programming guide doc
+    SPARK-21901   Define toString for StateOperatorProgress
+    SPARK-21890   Credentials not being passed to add the tokens
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
