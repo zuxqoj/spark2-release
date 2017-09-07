@@ -242,11 +242,6 @@ object SQLConf {
     .booleanConf
     .createWithDefault(false)
 
-  val PARQUET_CACHE_METADATA = buildConf("spark.sql.parquet.cacheMetadata")
-    .doc("Turns on caching of Parquet schema metadata. Can speed up querying of static data.")
-    .booleanConf
-    .createWithDefault(true)
-
   val PARQUET_COMPRESSION = buildConf("spark.sql.parquet.compression.codec")
     .doc("Sets the compression codec use when writing Parquet files. Acceptable values include: " +
       "uncompressed, snappy, gzip, lzo.")
@@ -936,8 +931,6 @@ class SQLConf extends Serializable with Logging {
   def useCompression: Boolean = getConf(COMPRESS_CACHED)
 
   def parquetCompressionCodec: String = getConf(PARQUET_COMPRESSION)
-
-  def parquetCacheMetadata: Boolean = getConf(PARQUET_CACHE_METADATA)
 
   def parquetVectorizedReaderEnabled: Boolean = getConf(PARQUET_VECTORIZED_READER_ENABLED)
 
