@@ -117,6 +117,11 @@ BUG FIXES
     SPARK-21924   Update structured streaming programming guide doc
     SPARK-21901   Define toString for StateOperatorProgress
     SPARK-21890   Credentials not being passed to add the tokens
+    SPARK-21128   Remove both "spark-warehouse" and "metastore_db" before listing files in R tests
+    SPARK-21946   fix flaky test: "alter table: rename cached table" in InMemoryCatalogedDDLSuite
+    SPARK-21936   backward compatibility test framework for HiveExternalCatalog
+    SPARK-21915   Model 1 and Model 2 ParamMaps Missing
+    SPARK-21950   pyspark.sql.tests.SQLTests2 should stop SparkContext.
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
