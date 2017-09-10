@@ -11,6 +11,7 @@ IMPROVEMENTS
     BUG-62302 Support HiveServer2 delegation token acquisition in Spark
     BUG-70581 Add hadoop-3.0 profile
     RMP-9454  Update the LLAP for Spark2.2 (SparkSQL Ranger integration for fine grained access control in Spark 2.2)
+    RMP-8827  ORC, Vectorization and Perf Improvements - Tech Preview
 
 BUG FIXES
     BUG-73561  Virtualenv example fails in yarn-cluster mode with requirement.txt not found error

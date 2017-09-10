@@ -190,7 +190,7 @@ case class AlterTableAddColumnsCommand(
     columns: Seq[StructField]) extends RunnableCommand {
   override def run(sparkSession: SparkSession): Seq[Row] = {
     val catalog = sparkSession.sessionState.catalog
-    val catalogTable = verifyAlterTableAddColumn(catalog, table)
+    val catalogTable = verifyAlterTableAddColumn(sparkSession, catalog, table)
 
     try {
       sparkSession.catalog.uncacheTable(table.quotedString)
@@ -214,6 +214,7 @@ case class AlterTableAddColumnsCommand(
    * For datasource table, it currently only supports parquet, json, csv.
    */
   private def verifyAlterTableAddColumn(
+      sparkSession: SparkSession,
       catalog: SessionCatalog,
       table: TableIdentifier): CatalogTable = {
     val catalogTable = catalog.getTempViewOrPermanentTableMetadata(table)
@@ -227,7 +228,7 @@ case class AlterTableAddColumnsCommand(
     }
 
     if (DDLUtils.isDatasourceTable(catalogTable)) {
-      DataSource.lookupDataSource(catalogTable.provider.get).newInstance() match {
+      DataSource.lookupDataSource(sparkSession, catalogTable.provider.get).newInstance() match {
         // For datasource table, this command can only support the following File format.
         // TextFileFormat only default to one column "value"
         // OrcFileFormat can not handle difference between user-specified schema and

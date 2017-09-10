@@ -31,6 +31,7 @@ import org.apache.spark.sql.catalyst.expressions.codegen.CodegenContext
 import org.apache.spark.sql.catalyst.plans.QueryPlan
 import org.apache.spark.sql.catalyst.plans.physical.{HashPartitioning, Partitioning, UnknownPartitioning}
 import org.apache.spark.sql.execution.datasources._
+import org.apache.spark.sql.execution.datasources.orc.OrcFileFormat
 import org.apache.spark.sql.execution.datasources.parquet.{ParquetFileFormat => ParquetSource}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 import org.apache.spark.sql.internal.SQLConf
@@ -88,6 +89,9 @@ case class RowDataSourceScanExec(
     case r: HadoopFsRelation if r.fileFormat.isInstanceOf[ParquetSource] =>
       !SparkSession.getActiveSession.get.sessionState.conf.getConf(
         SQLConf.PARQUET_VECTORIZED_READER_ENABLED)
+    case r: HadoopFsRelation if r.fileFormat.isInstanceOf[OrcFileFormat] =>
+      !SparkSession.getActiveSession.get.sessionState.conf.getConf(
+        SQLConf.ORC_VECTORIZED_READER_ENABLED)
     case _: HadoopFsRelation => true
     case _ => false
   }
@@ -166,6 +170,8 @@ case class FileSourceScanExec(
 
   val needsUnsafeRowConversion: Boolean = if (relation.fileFormat.isInstanceOf[ParquetSource]) {
     SparkSession.getActiveSession.get.sessionState.conf.parquetVectorizedReaderEnabled
+  } else if (relation.fileFormat.isInstanceOf[OrcFileFormat]) {
+    SparkSession.getActiveSession.get.sessionState.conf.orcVectorizedReaderEnabled
   } else {
     false
   }

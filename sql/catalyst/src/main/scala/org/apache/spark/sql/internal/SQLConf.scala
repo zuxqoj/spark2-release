@@ -280,10 +280,27 @@ object SQLConf {
       .booleanConf
       .createWithDefault(true)
 
+  val ORC_ENABLED = buildConf("spark.sql.orc.enabled")
+    .doc("When true, new ORCFileFormat in sql/core module is used instead of sql/hive module.")
+    .booleanConf
+    .createWithDefault(false)
+
+  val ORC_COLUMNAR_BATCH_READER_ENABLED =
+    buildConf("spark.sql.orc.columnarBatchReader.enabled")
+      .doc("Enables both vectorized orc decoding and columnar batch in whole-stage code gen.")
+      .booleanConf
+      .createWithDefault(true)
+
+  val ORC_VECTORIZED_READER_ENABLED =
+    buildConf("spark.sql.orc.vectorizedReader.enabled")
+      .doc("Enables vectorized orc decoding.")
+      .booleanConf
+      .createWithDefault(true)
+
   val ORC_FILTER_PUSHDOWN_ENABLED = buildConf("spark.sql.orc.filterPushdown")
     .doc("When true, enable filter pushdown for ORC files.")
     .booleanConf
-    .createWithDefault(false)
+    .createWithDefault(true)
 
   val HIVE_VERIFY_PARTITION_PATH = buildConf("spark.sql.hive.verifyPartitionPath")
     .doc("When true, check all the partition paths under the table\'s root directory " +
@@ -918,6 +935,10 @@ class SQLConf extends Serializable with Logging {
   def parquetCacheMetadata: Boolean = getConf(PARQUET_CACHE_METADATA)
 
   def parquetVectorizedReaderEnabled: Boolean = getConf(PARQUET_VECTORIZED_READER_ENABLED)
+
+  def orcColumnarBatchReaderEnabled: Boolean = getConf(ORC_COLUMNAR_BATCH_READER_ENABLED)
+
+  def orcVectorizedReaderEnabled: Boolean = getConf(ORC_VECTORIZED_READER_ENABLED)
 
   def columnBatchSize: Int = getConf(COLUMN_BATCH_SIZE)
 
