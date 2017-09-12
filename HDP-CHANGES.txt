@@ -145,3 +145,4 @@ BUG FIXES
     SPARK-21407 Support spnego for ThriftServer thrift/http auth
   SPARK-18356   Improve MLKmeans Performance
   SPARK-18356   KMeans should cache RDD before training
+  SPARK-18608   Fix double caching
