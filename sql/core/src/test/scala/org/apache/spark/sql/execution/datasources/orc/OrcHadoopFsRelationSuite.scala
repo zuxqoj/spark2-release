@@ -46,48 +46,54 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
   }
 
   test("save()/load() - partitioned table - simple queries - partition columns in data") {
-    Seq("false", "true").foreach { value =>
-      withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
-        withTempDir { file =>
-          for (p1 <- 1 to 2; p2 <- Seq("foo", "bar")) {
-            val partitionDir = new Path(
-              CatalogUtils.URIToString(makeQualifiedPath(file.getCanonicalPath)), s"p1=$p1/p2=$p2")
-            sparkContext
-              .parallelize(for (i <- 1 to 3) yield (i, s"val_$i", p1))
-              .toDF("a", "b", "p1")
-              .write
-              .orc(partitionDir.toString)
+    // scalastyle:off line.size.limit
+    withSQLConf(SQLConf.ORC_ENABLED.key -> "true") {
+      Seq("false", "true").foreach { value =>
+        withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
+          withTempDir { file =>
+            for (p1 <- 1 to 2; p2 <- Seq("foo", "bar")) {
+              val partitionDir = new Path(
+                CatalogUtils.URIToString(makeQualifiedPath(file.getCanonicalPath)), s"p1=$p1/p2=$p2")
+              sparkContext
+                .parallelize(for (i <- 1 to 3) yield (i, s"val_$i", p1))
+                .toDF("a", "b", "p1")
+                .write
+                .orc(partitionDir.toString)
+            }
+
+            val dataSchemaWithPartition =
+              StructType(dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
+
+            checkQueries(
+              spark.read.options(Map(
+                "path" -> file.getCanonicalPath,
+                "dataSchema" -> dataSchemaWithPartition.json)).format(dataSourceName).load())
           }
-
-          val dataSchemaWithPartition =
-            StructType(dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
-
-          checkQueries(
-            spark.read.options(Map(
-              "path" -> file.getCanonicalPath,
-              "dataSchema" -> dataSchemaWithPartition.json)).format(dataSourceName).load())
         }
       }
     }
+    // scalastyle:on line.size.limit
   }
 
   test("SPARK-12218: 'Not' is included in ORC filter pushdown") {
     import testImplicits._
 
-    Seq("false", "true").foreach { value =>
-      withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
-        withSQLConf(SQLConf.ORC_FILTER_PUSHDOWN_ENABLED.key -> "true") {
-          withTempPath { dir =>
-            val path = s"${dir.getCanonicalPath}/table1"
-            (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b").write.orc(path)
+    withSQLConf(SQLConf.ORC_ENABLED.key -> "true") {
+      Seq("false", "true").foreach { value =>
+        withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
+          withSQLConf(SQLConf.ORC_FILTER_PUSHDOWN_ENABLED.key -> "true") {
+            withTempPath { dir =>
+              val path = s"${dir.getCanonicalPath}/table1"
+              (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b").write.orc(path)
 
-            checkAnswer(
-              spark.read.orc(path).where("not (a = 2) or not(b in ('1'))"),
-              (1 to 5).map(i => Row(i, (i % 2).toString)))
+              checkAnswer(
+                spark.read.orc(path).where("not (a = 2) or not(b in ('1'))"),
+                (1 to 5).map(i => Row(i, (i % 2).toString)))
 
-            checkAnswer(
-              spark.read.orc(path).where("not (a = 2 and b in ('1'))"),
-              (1 to 5).map(i => Row(i, (i % 2).toString)))
+              checkAnswer(
+                spark.read.orc(path).where("not (a = 2 and b in ('1'))"),
+                (1 to 5).map(i => Row(i, (i % 2).toString)))
+            }
           }
         }
       }
@@ -95,45 +101,49 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
   }
 
   test("SPARK-13543: Support for specifying compression codec for ORC via option()") {
-    Seq("false", "true").foreach { value =>
-      withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
-        withTempPath { dir =>
-          val path = s"${dir.getCanonicalPath}/table1"
-          val df = (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b")
-          df.write
-            .option("compression", "ZlIb")
-            .orc(path)
+    withSQLConf(SQLConf.ORC_ENABLED.key -> "true") {
+      Seq("false", "true").foreach { value =>
+        withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
+          withTempPath { dir =>
+            val path = s"${dir.getCanonicalPath}/table1"
+            val df = (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b")
+            df.write
+              .option("compression", "ZlIb")
+              .orc(path)
 
-          val maybeOrcFile = new File(path).listFiles().find(_.getName.endsWith(".zlib.orc"))
-          assert(maybeOrcFile.isDefined)
+            val maybeOrcFile = new File(path).listFiles().find(_.getName.endsWith(".zlib.orc"))
+            assert(maybeOrcFile.isDefined)
 
-          val orcFilePath = new Path(maybeOrcFile.get.getAbsolutePath)
-          val conf = OrcFile.readerOptions(new Configuration())
-          assert("ZLIB" === OrcFile.createReader(orcFilePath, conf).getCompressionKind.name)
+            val orcFilePath = new Path(maybeOrcFile.get.getAbsolutePath)
+            val conf = OrcFile.readerOptions(new Configuration())
+            assert("ZLIB" === OrcFile.createReader(orcFilePath, conf).getCompressionKind.name)
 
-          val copyDf = spark
-            .read
-            .orc(path)
-          checkAnswer(df, copyDf)
+            val copyDf = spark
+              .read
+              .orc(path)
+            checkAnswer(df, copyDf)
+          }
         }
       }
     }
   }
 
   test("Default compression codec is snappy for ORC compression") {
-    Seq("false", "true").foreach { value =>
-      withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
-        withTempPath { path =>
-          spark.range(0, 10).write.orc(path.getAbsolutePath)
+    withSQLConf(SQLConf.ORC_ENABLED.key -> "true") {
+      Seq("false", "true").foreach { value =>
+        withSQLConf(SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> value) {
+          withTempPath { path =>
+            spark.range(0, 10).write.orc(path.getAbsolutePath)
 
-          assert(path.listFiles().exists(f => f.getAbsolutePath.endsWith(".snappy.orc")))
+            assert(path.listFiles().exists(f => f.getAbsolutePath.endsWith(".snappy.orc")))
 
-          val conf = OrcFile.readerOptions(new Configuration())
-          assert(path.listFiles().forall { f =>
-            val filePath = new Path(f.getAbsolutePath)
-            !f.getAbsolutePath.endsWith(".snappy.orc") ||
-              "SNAPPY" === OrcFile.createReader(filePath, conf).getCompressionKind.name
-          })
+            val conf = OrcFile.readerOptions(new Configuration())
+            assert(path.listFiles().forall { f =>
+              val filePath = new Path(f.getAbsolutePath)
+              !f.getAbsolutePath.endsWith(".snappy.orc") ||
+                "SNAPPY" === OrcFile.createReader(filePath, conf).getCompressionKind.name
+            })
+          }
         }
       }
     }
