@@ -33,3 +33,4 @@ BUG FIXES
     BUG-84597   Fix VersionsSuite failures
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
     BUG-86834   Add missing import package name in HiveServer2CredentialProvider
+    BUG-88046   Update TopicExistsException due to KAFKA-2945 (Kafka 0.10.1.0)
