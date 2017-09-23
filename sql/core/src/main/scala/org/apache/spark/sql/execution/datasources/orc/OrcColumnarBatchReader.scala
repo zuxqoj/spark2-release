@@ -29,6 +29,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.parser.CatalystSqlParser
 import org.apache.spark.sql.execution.vectorized.{ColumnarBatch, ColumnVectorUtils}
 import org.apache.spark.sql.types._
+import org.apache.spark.util.collection.BitSet
 
 
 /**
@@ -78,6 +79,11 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
   private[this] var fullSchema: StructType = _
 
   /**
+   * Flags for missing columns.
+   */
+  private[this] var missingBitSet: BitSet = _
+
+  /**
    * ColumnarBatch for vectorized execution by whole-stage codegen.
    */
   private[this] var columnarBatch: ColumnarBatch = _
@@ -119,6 +125,7 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
       start: Long,
       length: Long,
       orcSchema: TypeDescription,
+      missingSchema: StructType,
       requiredSchema: StructType,
       partitionColumns: StructType,
       partitionValues: InternalRow,
@@ -133,6 +140,7 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
     logDebug(s"totalRowCount = $totalRowCount")
 
     this.requiredSchema = requiredSchema
+    missingBitSet = new BitSet(requiredSchema.length)
     this.partitionColumns = partitionColumns
     this.useIndex = useIndex
     fullSchema = new StructType(requiredSchema.fields ++ partitionColumns.fields)
@@ -143,6 +151,14 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
       for (i <- partitionColumns.fields.indices) {
         ColumnVectorUtils.populate(columnarBatch.column(i + partitionIdx), partitionValues, i)
         columnarBatch.column(i + partitionIdx).setIsConstant()
+      }
+    }
+    // Initialize the missing columns once.
+    requiredSchema.zipWithIndex.foreach { case (field, index) =>
+      if (missingSchema.fieldNames.contains(field.name)) {
+        columnarBatch.column(index).putNulls(0, columnarBatch.capacity)
+        columnarBatch.column(index).setIsConstant()
+        missingBitSet.set(index)
       }
     }
   }
@@ -168,219 +184,157 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
     var i = 0
     val len = requiredSchema.length
     while (i < len) {
-      val field = requiredSchema(i)
-      val schemaIndex = if (useIndex) i else schema.getFieldNames.indexOf(field.name)
-      assert(schemaIndex >= 0)
+      if (!missingBitSet.get(i)) {
+        val field = requiredSchema(i)
+        val schemaIndex = if (useIndex) i else schema.getFieldNames.indexOf(field.name)
+        assert(schemaIndex >= 0)
 
-      val fromColumn = batch.cols(schemaIndex)
-      val toColumn = columnarBatch.column(i)
+        val fromColumn = batch.cols(schemaIndex)
+        val toColumn = columnarBatch.column(i)
 
-      if (fromColumn.isRepeating) {
-        if (fromColumn.isNull(0)) {
-          toColumn.appendNulls(batchSize)
-        } else {
+        if (fromColumn.isRepeating) {
+          if (fromColumn.isNull(0)) {
+            toColumn.appendNulls(batchSize)
+          } else {
+            field.dataType match {
+              case BooleanType =>
+                val data = fromColumn.asInstanceOf[LongColumnVector].vector(0) == 1
+                toColumn.appendBooleans(batchSize, data)
+
+              case ByteType =>
+                val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toByte
+                toColumn.appendBytes(batchSize, data)
+              case ShortType =>
+                val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toShort
+                toColumn.appendShorts(batchSize, data)
+              case IntegerType =>
+                val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toInt
+                toColumn.appendInts(batchSize, data)
+              case LongType =>
+                val data = fromColumn.asInstanceOf[LongColumnVector].vector(0)
+                toColumn.appendLongs(batchSize, data)
+
+              case DateType =>
+                val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toInt
+                toColumn.appendInts(batchSize, data)
+
+              case TimestampType =>
+                val data = fromColumn.asInstanceOf[TimestampColumnVector]
+                toColumn.appendLongs(batchSize, data.time(0) * 1000L + data.nanos(0) / 1000L)
+
+              case FloatType =>
+                val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(0).toFloat
+                toColumn.appendFloats(batchSize, data)
+              case DoubleType =>
+                val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(0)
+                toColumn.appendDoubles(batchSize, data)
+
+              case StringType =>
+                val data = fromColumn.asInstanceOf[BytesColumnVector]
+                for (index <- 0 until batchSize) {
+                  toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                }
+              case BinaryType =>
+                val data = fromColumn.asInstanceOf[BytesColumnVector]
+                for (index <- 0 until batchSize) {
+                  toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                }
+
+              case DecimalType.Fixed(precision, scale) =>
+                val d = fromColumn.asInstanceOf[DecimalColumnVector].vector(0)
+                val value = Decimal(d.getHiveDecimal.bigDecimalValue, d.precision(), d.scale)
+                value.changePrecision(precision, scale)
+                if (precision <= Decimal.MAX_INT_DIGITS) {
+                  toColumn.appendInts(batchSize, value.toUnscaledLong.toInt)
+                } else if (precision <= Decimal.MAX_LONG_DIGITS) {
+                  toColumn.appendLongs(batchSize, value.toUnscaledLong)
+                } else {
+                  val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
+                  for (index <- 0 until batchSize) {
+                    toColumn.appendByteArray(bytes, 0, bytes.length)
+                  }
+                }
+
+              case dt =>
+                throw new UnsupportedOperationException(s"Unsupported Data Type: $dt")
+            }
+          }
+        } else if (!field.nullable || fromColumn.noNulls) {
           field.dataType match {
             case BooleanType =>
-              val data = fromColumn.asInstanceOf[LongColumnVector].vector(0) == 1
-              toColumn.appendBooleans(batchSize, data)
+              val data = fromColumn.asInstanceOf[LongColumnVector].vector
+              data.foreach { x => toColumn.appendBoolean(x == 1) }
 
             case ByteType =>
-              val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toByte
-              toColumn.appendBytes(batchSize, data)
+              val data = fromColumn.asInstanceOf[LongColumnVector].vector
+              var index = 0
+              val len = data.length
+              while (index < len) {
+                toColumn.appendByte(data(index).toByte)
+                index += 1
+              }
             case ShortType =>
-              val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toShort
-              toColumn.appendShorts(batchSize, data)
+              val data = fromColumn.asInstanceOf[LongColumnVector].vector
+              var index = 0
+              val len = data.length
+              while (index < len) {
+                toColumn.appendShort(data(index).toShort)
+                index += 1
+              }
             case IntegerType =>
-              val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toInt
-              toColumn.appendInts(batchSize, data)
+              val data = fromColumn.asInstanceOf[LongColumnVector].vector
+              var index = 0
+              val len = data.length
+              while (index < len) {
+                toColumn.appendInt(data(index).toInt)
+                index += 1
+              }
             case LongType =>
-              val data = fromColumn.asInstanceOf[LongColumnVector].vector(0)
-              toColumn.appendLongs(batchSize, data)
+              val data = fromColumn.asInstanceOf[LongColumnVector].vector
+              toColumn.appendLongs(batchSize, data, 0)
 
             case DateType =>
-              val data = fromColumn.asInstanceOf[LongColumnVector].vector(0).toInt
-              toColumn.appendInts(batchSize, data)
+              val data = fromColumn.asInstanceOf[LongColumnVector].vector
+              var index = 0
+              val len = data.length
+              while (index < len) {
+                toColumn.appendInt(data(index).toInt)
+                index += 1
+              }
 
             case TimestampType =>
               val data = fromColumn.asInstanceOf[TimestampColumnVector]
-              toColumn.appendLongs(batchSize, data.time(0) * 1000L + data.nanos(0) / 1000L)
+              for (index <- 0 until batchSize) {
+                toColumn.appendLong(data.time(index) * 1000L + data.nanos(index) / 1000L)
+              }
 
             case FloatType =>
-              val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(0).toFloat
-              toColumn.appendFloats(batchSize, data)
+              val data = fromColumn.asInstanceOf[DoubleColumnVector].vector
+              var index = 0
+              val len = data.length
+              while (index < len) {
+                toColumn.appendFloat(data(index).toFloat)
+                index += 1
+              }
             case DoubleType =>
-              val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(0)
-              toColumn.appendDoubles(batchSize, data)
+              val data = fromColumn.asInstanceOf[DoubleColumnVector].vector
+              toColumn.appendDoubles(batchSize, data, 0)
 
             case StringType =>
               val data = fromColumn.asInstanceOf[BytesColumnVector]
               for (index <- 0 until batchSize) {
-                toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                toColumn.appendByteArray(data.vector(index), data.start(index), data.length(index))
               }
             case BinaryType =>
               val data = fromColumn.asInstanceOf[BytesColumnVector]
               for (index <- 0 until batchSize) {
-                toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                toColumn.appendByteArray(data.vector(index), data.start(index), data.length(index))
               }
 
             case DecimalType.Fixed(precision, scale) =>
-              val d = fromColumn.asInstanceOf[DecimalColumnVector].vector(0)
-              val value = Decimal(d.getHiveDecimal.bigDecimalValue, d.precision(), d.scale)
-              value.changePrecision(precision, scale)
-              if (precision <= Decimal.MAX_INT_DIGITS) {
-                toColumn.appendInts(batchSize, value.toUnscaledLong.toInt)
-              } else if (precision <= Decimal.MAX_LONG_DIGITS) {
-                toColumn.appendLongs(batchSize, value.toUnscaledLong)
-              } else {
-                val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
-                for (index <- 0 until batchSize) {
-                  toColumn.appendByteArray(bytes, 0, bytes.length)
-                }
-              }
-
-            case dt =>
-              throw new UnsupportedOperationException(s"Unsupported Data Type: $dt")
-          }
-        }
-      } else if (!field.nullable || fromColumn.noNulls) {
-        field.dataType match {
-          case BooleanType =>
-            val data = fromColumn.asInstanceOf[LongColumnVector].vector
-            data.foreach { x => toColumn.appendBoolean(x == 1) }
-
-          case ByteType =>
-            val data = fromColumn.asInstanceOf[LongColumnVector].vector
-            var index = 0
-            val len = data.length
-            while (index < len) {
-              toColumn.appendByte(data(index).toByte)
-              index += 1
-            }
-          case ShortType =>
-            val data = fromColumn.asInstanceOf[LongColumnVector].vector
-            var index = 0
-            val len = data.length
-            while (index < len) {
-              toColumn.appendShort(data(index).toShort)
-              index += 1
-            }
-          case IntegerType =>
-            val data = fromColumn.asInstanceOf[LongColumnVector].vector
-            var index = 0
-            val len = data.length
-            while (index < len) {
-              toColumn.appendInt(data(index).toInt)
-              index += 1
-            }
-          case LongType =>
-            val data = fromColumn.asInstanceOf[LongColumnVector].vector
-            toColumn.appendLongs(batchSize, data, 0)
-
-          case DateType =>
-            val data = fromColumn.asInstanceOf[LongColumnVector].vector
-            var index = 0
-            val len = data.length
-            while (index < len) {
-              toColumn.appendInt(data(index).toInt)
-              index += 1
-            }
-
-          case TimestampType =>
-            val data = fromColumn.asInstanceOf[TimestampColumnVector]
-            for (index <- 0 until batchSize) {
-              toColumn.appendLong(data.time(index) * 1000L + data.nanos(index) / 1000L)
-            }
-
-          case FloatType =>
-            val data = fromColumn.asInstanceOf[DoubleColumnVector].vector
-            var index = 0
-            val len = data.length
-            while (index < len) {
-              toColumn.appendFloat(data(index).toFloat)
-              index += 1
-            }
-          case DoubleType =>
-            val data = fromColumn.asInstanceOf[DoubleColumnVector].vector
-            toColumn.appendDoubles(batchSize, data, 0)
-
-          case StringType =>
-            val data = fromColumn.asInstanceOf[BytesColumnVector]
-            for (index <- 0 until batchSize) {
-              toColumn.appendByteArray(data.vector(index), data.start(index), data.length(index))
-            }
-          case BinaryType =>
-            val data = fromColumn.asInstanceOf[BytesColumnVector]
-            for (index <- 0 until batchSize) {
-              toColumn.appendByteArray(data.vector(index), data.start(index), data.length(index))
-            }
-
-          case DecimalType.Fixed(precision, scale) =>
-            val data = fromColumn.asInstanceOf[DecimalColumnVector]
-            for (index <- 0 until batchSize) {
-              val d = data.vector(index)
-              val value = Decimal(d.getHiveDecimal.bigDecimalValue, d.precision(), d.scale)
-              value.changePrecision(precision, scale)
-              if (precision <= Decimal.MAX_INT_DIGITS) {
-                toColumn.appendInt(value.toUnscaledLong.toInt)
-              } else if (precision <= Decimal.MAX_LONG_DIGITS) {
-                toColumn.appendLong(value.toUnscaledLong)
-              } else {
-                val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
-                toColumn.appendByteArray(bytes, 0, bytes.length)
-              }
-            }
-
-          case dt =>
-            throw new UnsupportedOperationException(s"Unsupported Data Type: $dt")
-        }
-      } else {
-        var index = 0
-        while (index < batchSize) {
-          if (fromColumn.isNull(index)) {
-            toColumn.appendNull()
-          } else {
-            field.dataType match {
-              case BooleanType =>
-                val data = fromColumn.asInstanceOf[LongColumnVector].vector(index) == 1
-                toColumn.appendBoolean(data)
-              case ByteType =>
-                val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toByte
-                toColumn.appendByte(data)
-              case ShortType =>
-                val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toShort
-                toColumn.appendShort(data)
-              case IntegerType =>
-                val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toInt
-                toColumn.appendInt(data)
-              case LongType =>
-                val data = fromColumn.asInstanceOf[LongColumnVector].vector(index)
-                toColumn.appendLong(data)
-
-              case DateType =>
-                val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toInt
-                toColumn.appendInt(data)
-
-              case TimestampType =>
-                val data = fromColumn.asInstanceOf[TimestampColumnVector]
-                toColumn.appendLong(data.time(index) * 1000L + data.nanos(index) / 1000L)
-
-              case FloatType =>
-                val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(index).toFloat
-                toColumn.appendFloat(data)
-              case DoubleType =>
-                val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(index)
-                toColumn.appendDouble(data)
-
-              case StringType =>
-                val v = fromColumn.asInstanceOf[BytesColumnVector]
-                toColumn.appendByteArray(v.vector(index), v.start(index), v.length(index))
-
-              case BinaryType =>
-                val v = fromColumn.asInstanceOf[BytesColumnVector]
-                toColumn.appendByteArray(v.vector(index), v.start(index), v.length(index))
-
-              case DecimalType.Fixed(precision, scale) =>
-                val d = fromColumn.asInstanceOf[DecimalColumnVector].vector(index)
+              val data = fromColumn.asInstanceOf[DecimalColumnVector]
+              for (index <- 0 until batchSize) {
+                val d = data.vector(index)
                 val value = Decimal(d.getHiveDecimal.bigDecimalValue, d.precision(), d.scale)
                 value.changePrecision(precision, scale)
                 if (precision <= Decimal.MAX_INT_DIGITS) {
@@ -391,12 +345,76 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
                   val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
                   toColumn.appendByteArray(bytes, 0, bytes.length)
                 }
+              }
 
-              case dt =>
-                throw new UnsupportedOperationException(s"Unsupported Data Type: $dt")
-            }
+            case dt =>
+              throw new UnsupportedOperationException(s"Unsupported Data Type: $dt")
           }
-          index += 1
+        } else {
+          var index = 0
+          while (index < batchSize) {
+            if (fromColumn.isNull(index)) {
+              toColumn.appendNull()
+            } else {
+              field.dataType match {
+                case BooleanType =>
+                  val data = fromColumn.asInstanceOf[LongColumnVector].vector(index) == 1
+                  toColumn.appendBoolean(data)
+                case ByteType =>
+                  val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toByte
+                  toColumn.appendByte(data)
+                case ShortType =>
+                  val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toShort
+                  toColumn.appendShort(data)
+                case IntegerType =>
+                  val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toInt
+                  toColumn.appendInt(data)
+                case LongType =>
+                  val data = fromColumn.asInstanceOf[LongColumnVector].vector(index)
+                  toColumn.appendLong(data)
+
+                case DateType =>
+                  val data = fromColumn.asInstanceOf[LongColumnVector].vector(index).toInt
+                  toColumn.appendInt(data)
+
+                case TimestampType =>
+                  val data = fromColumn.asInstanceOf[TimestampColumnVector]
+                  toColumn.appendLong(data.time(index) * 1000L + data.nanos(index) / 1000L)
+
+                case FloatType =>
+                  val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(index).toFloat
+                  toColumn.appendFloat(data)
+                case DoubleType =>
+                  val data = fromColumn.asInstanceOf[DoubleColumnVector].vector(index)
+                  toColumn.appendDouble(data)
+
+                case StringType =>
+                  val v = fromColumn.asInstanceOf[BytesColumnVector]
+                  toColumn.appendByteArray(v.vector(index), v.start(index), v.length(index))
+
+                case BinaryType =>
+                  val v = fromColumn.asInstanceOf[BytesColumnVector]
+                  toColumn.appendByteArray(v.vector(index), v.start(index), v.length(index))
+
+                case DecimalType.Fixed(precision, scale) =>
+                  val d = fromColumn.asInstanceOf[DecimalColumnVector].vector(index)
+                  val value = Decimal(d.getHiveDecimal.bigDecimalValue, d.precision(), d.scale)
+                  value.changePrecision(precision, scale)
+                  if (precision <= Decimal.MAX_INT_DIGITS) {
+                    toColumn.appendInt(value.toUnscaledLong.toInt)
+                  } else if (precision <= Decimal.MAX_LONG_DIGITS) {
+                    toColumn.appendLong(value.toUnscaledLong)
+                  } else {
+                    val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
+                    toColumn.appendByteArray(bytes, 0, bytes.length)
+                  }
+
+                case dt =>
+                  throw new UnsupportedOperationException(s"Unsupported Data Type: $dt")
+              }
+            }
+            index += 1
+          }
         }
       }
       i += 1

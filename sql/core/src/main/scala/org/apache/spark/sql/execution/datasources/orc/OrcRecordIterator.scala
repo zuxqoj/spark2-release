@@ -30,6 +30,7 @@ import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.catalyst.util.DateTimeUtils.SQLDate
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
+import org.apache.spark.util.collection.BitSet
 
 /**
  * A RecordIterator returns InternalRow from ORC data source.
@@ -50,6 +51,11 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
    * Spark Schema.
    */
   private[this] var sparkSchema: StructType = _
+
+  /**
+   * Missing Schema.
+   */
+  private[this] var missingSchema: StructType = _
 
   /**
    * Required Schema.
@@ -91,17 +97,24 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
    */
   private[this] var mutableRow: InternalRow = _
 
+  /**
+   * Flags for missing columns.
+   */
+  private[this] var missingBitSet: BitSet = _
+
   def initialize(
       reader: org.apache.orc.Reader,
       start: Long,
       length: Long,
       conf: Configuration,
       orcSchema: TypeDescription,
+      missingSchema: StructType,
       requiredSchema: StructType,
       partitionColumns: StructType,
       partitionValues: InternalRow,
       useIndex: Boolean): Unit = {
     schema = orcSchema
+    this.missingSchema = missingSchema
     sparkSchema = CatalystSqlParser.parseDataType(schema.toString).asInstanceOf[StructType]
     totalRowCount = reader.getNumberOfRows
 
@@ -116,6 +129,8 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
     // Create a mutableRow for the full schema which is
     // requiredSchema.toAttributes ++ partitionSchema.toAttributes
     this.requiredSchema = requiredSchema
+    missingBitSet = new BitSet(requiredSchema.length)
+
     val fullSchema = new StructType(this.requiredSchema.fields ++ partitionColumns)
     mutableRow = new SpecificInternalRow(fullSchema.map(_.dataType))
 
@@ -125,19 +140,32 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
     for (i <- requiredSchema.length until fullSchema.length) {
       mutableRow.update(i, partitionValues.get(i - requiredSchema.length, fullSchema(i).dataType))
     }
+
+    // Initialize the missing columns once.
+    requiredSchema.zipWithIndex.foreach { case (field, index) =>
+      if (missingSchema.fieldNames.contains(field.name)) {
+        mutableRow.setNullAt(index)
+        missingBitSet.set(index)
+      }
+    }
   }
 
   private def updateRow(): Unit = {
     // Fill the required fields into mutableRow.
-    for (index <- 0 until requiredSchema.length) {
-      val field = requiredSchema(index)
-      val fieldType = field.dataType
-      val vector = if (useIndex) {
-        batch.cols(index)
-      } else {
-        batch.cols(sparkSchema.fieldIndex(field.name))
+    var index = 0
+    val length = requiredSchema.length
+    while (index < length) {
+      if (!missingBitSet.get(index)) {
+        val field = requiredSchema(index)
+        val fieldType = field.dataType
+        val vector = if (useIndex) {
+          batch.cols(index)
+        } else {
+          batch.cols(sparkSchema.fieldIndex(field.name))
+        }
+        updateField(fieldType, vector, mutableRow, index)
       }
-      updateField(fieldType, vector, mutableRow, index)
+      index += 1
     }
   }
 

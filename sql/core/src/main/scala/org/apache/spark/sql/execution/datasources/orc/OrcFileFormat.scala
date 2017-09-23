@@ -155,15 +155,6 @@ class OrcFileFormat
       }
     }
 
-    // Column Selection: we need to set at least one column due to ORC-233
-    val columns = if (requiredSchema.isEmpty) {
-      "0"
-    } else {
-      requiredSchema.map(f => dataSchema.fieldIndex(f.name)).mkString(",")
-    }
-    hadoopConf.set(OrcConf.INCLUDE_COLUMNS.getAttribute, columns)
-    logDebug(s"${OrcConf.INCLUDE_COLUMNS.getAttribute}=$columns")
-
     val resultSchema = StructType(requiredSchema.fields ++ partitionSchema.fields)
     val useColumnarBatchReader =
       sparkSession.sessionState.conf.orcColumnarBatchReaderEnabled &&
@@ -179,10 +170,21 @@ class OrcFileFormat
       assert(file.partitionValues.numFields == partitionSchema.size)
 
       val conf = broadcastedConf.value.value
-      val (reader, orcSchema) =
-        OrcFileFormat.getReaderAndSchema(dataSchema, file.filePath, conf)
-      val useIndex = requiredSchema.fieldNames.zipWithIndex.forall { case (name, index) =>
-        name.equals(orcSchema.getFieldNames.get(index))
+      val (reader, orcSchema, missingSchema) =
+        OrcFileFormat.getReaderAndSchema(dataSchema, partitionSchema, file.filePath, conf)
+      // Column Selection: we need to set at least one column due to ORC-233
+      val columns = if (requiredSchema.isEmpty) {
+        "0"
+      } else {
+        requiredSchema
+          .filter(f => missingSchema.getFieldIndex(f.name).isEmpty)
+          .map(f => dataSchema.fieldIndex(f.name)).mkString(",")
+      }
+      conf.set(OrcConf.INCLUDE_COLUMNS.getAttribute, columns)
+      logDebug(s"${OrcConf.INCLUDE_COLUMNS.getAttribute}=$columns")
+
+      val useIndex = requiredSchema.fieldNames.zipWithIndex.forall { case (name, i) =>
+        if (i < orcSchema.getFieldNames.size) name == orcSchema.getFieldNames.get(i) else true
       }
 
       if (orcSchema.getFieldNames.isEmpty) {
@@ -199,6 +201,7 @@ class OrcFileFormat
           split,
           taskAttemptContext,
           orcSchema,
+          missingSchema,
           requiredSchema,
           partitionSchema,
           partitionValues,
@@ -224,17 +227,20 @@ class OrcFileFormat
    * - An iterator with InternalRow based on ORC OrcMapreduceRecordReader.
    *   This is the default iterator for the other cases.
    */
+  // scalastyle:off
   private def createIterator(
       reader: org.apache.orc.Reader,
       split: FileSplit,
       context: TaskAttemptContext,
       orcSchema: TypeDescription,
+      missingSchema: StructType,
       requiredSchema: StructType,
       partitionSchema: StructType,
       partitionValues: InternalRow,
       useIndex: Boolean,
       columnarBatch: Boolean,
       enableVectorizedReader: Boolean): Iterator[InternalRow] = {
+  // scalastyle:on
     val resultSchema = StructType(requiredSchema.fields ++ partitionSchema.fields)
 
     if (columnarBatch) {
@@ -245,6 +251,7 @@ class OrcFileFormat
         split.getStart,
         split.getLength,
         orcSchema,
+        missingSchema,
         requiredSchema,
         partitionSchema,
         partitionValues,
@@ -260,6 +267,7 @@ class OrcFileFormat
         split.getLength,
         context.getConfiguration,
         orcSchema,
+        missingSchema,
         requiredSchema,
         partitionSchema,
         partitionValues,
@@ -282,10 +290,18 @@ class OrcFileFormat
         val value = partitionValues.get(i - requiredSchema.length, resultSchema(i).dataType)
         mutableRow.update(i, value)
       }
+      // Initialize the missing columns once.
+      resultSchema.zipWithIndex.foreach { case (field, index) =>
+        if (missingSchema.fieldNames.contains(field.name)) {
+          mutableRow.setNullAt(index)
+        }
+      }
 
+      val convertSchema = StructType(
+        requiredSchema.filter(f => missingSchema.getFieldIndex(f.name).isEmpty))
       iter.map { value =>
         unsafeProjection(OrcFileFormat.convertOrcStructToInternalRow(
-          value, requiredSchema, useIndex, Some(mutableRow)))
+          value, Some(orcSchema), convertSchema, useIndex, Some(mutableRow)))
       }
     }
   }
@@ -315,6 +331,7 @@ object OrcFileFormat extends Logging {
    */
   private[orc] def getReaderAndSchema(
       dataSchema: StructType,
+      partitionSchema: StructType,
       filePath: String,
       conf: Configuration) = {
     val hdfsPath = new Path(filePath)
@@ -331,7 +348,17 @@ object OrcFileFormat extends Logging {
     } else {
       rawSchema
     }
-    (reader, orcSchema)
+
+    // Append missing columns
+    var missingSchema = new StructType
+    if (dataSchema.length > orcSchema.getFieldNames.size) {
+      dataSchema.filter(x => partitionSchema.getFieldIndex(x.name).isEmpty).foreach { f =>
+        if (!orcSchema.getFieldNames.contains(f.name.toLowerCase)) {
+          missingSchema = missingSchema.add(f)
+        }
+      }
+    }
+    (reader, orcSchema, missingSchema)
   }
 
   /**
@@ -340,6 +367,7 @@ object OrcFileFormat extends Logging {
    */
   private[orc] def convertOrcStructToInternalRow(
       orcStruct: OrcStruct,
+      orcSchema: Option[TypeDescription],
       schema: StructType,
       useIndex: Boolean = false,
       internalRow: Option[InternalRow] = None): InternalRow = {
@@ -351,8 +379,10 @@ object OrcFileFormat extends Logging {
     while (i < len) {
       val writable = if (useIndex) {
         orcStruct.getFieldValue(i)
-      } else {
+      } else if (orcSchema.isEmpty) {
         orcStruct.getFieldValue(schema(i).name)
+      } else {
+        orcStruct.getFieldValue(orcSchema.get.getFieldNames.indexOf(schema(i).name))
       }
       if (writable == null) {
         mutableRow.setNullAt(i)
@@ -523,6 +553,7 @@ object OrcFileFormat extends Logging {
         case _: StructType =>
           val structValue = convertOrcStructToInternalRow(
             value.asInstanceOf[OrcStruct],
+            None,
             dataType.asInstanceOf[StructType])
           structValue
 
