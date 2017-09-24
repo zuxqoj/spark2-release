@@ -35,7 +35,6 @@ import kafka.utils.ZkUtils
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer._
 import org.apache.kafka.common.TopicPartition
-import org.apache.kafka.common.errors.TopicExistsException
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.apache.zookeeper.server.{NIOServerCnxnFactory, ZooKeeperServer}
 import org.scalatest.concurrent.Eventually._
@@ -174,7 +173,10 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
         AdminUtils.createTopic(zkUtils, topic, partitions, 1)
         created = true
       } catch {
-        case e: TopicExistsException if overwrite => deleteTopic(topic)
+        // Workaround fact that TopicExistsException is in kafka.common in 0.10.0 and
+        // org.apache.kafka.common.errors in 0.10.1 (!)
+        case e: Exception if (e.getClass.getSimpleName == "TopicExistsException") && overwrite =>
+          deleteTopic(topic)
       }
     }
     // wait until metadata is propagated
