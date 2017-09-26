@@ -22,6 +22,7 @@ import org.apache.spark.sql.hive._
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
+import org.apache.spark.util.Utils
 
 /**
  * This test suite is designed to be used internally and to reduce the chance of conflicts.
@@ -30,6 +31,99 @@ class HDPQuerySuite
   extends QueryTest
   with SQLTestUtils
   with TestHiveSingleton {
+
+  private val client = spark.sharedState.externalCatalog.asInstanceOf[HiveExternalCatalog].client
+
+  // To control explicitly, this test uses atomic types. ORC_COLUMNAR_BATCH_READER_ENABLED and
+  // ORC_VECTORIZED_READER_ENABLED are automatically disabled in complex types.
+  private def testAtomicTypes(result: Row): Unit = {
+    val location = Utils.createTempDir()
+    val uri = location.toURI
+    try {
+      client.runSqlHive("USE default")
+      client.runSqlHive(
+        """
+          |CREATE EXTERNAL TABLE hive_orc(
+          |  a STRING,
+          |  b CHAR(10),
+          |  c VARCHAR(10))
+          |STORED AS orc""".
+          stripMargin)
+      // Hive throws an exception if I assign the location in the create table statement.
+      client.runSqlHive(s"ALTER TABLE hive_orc SET LOCATION '$uri'")
+      client.runSqlHive(
+        """
+          |INSERT INTO TABLE hive_orc
+          |SELECT 'a', 'b', 'c'
+          |FROM (SELECT 1) t""".stripMargin)
+      // We create a different table in Spark using the same schema which points to
+      // the same location.
+      spark.sql(
+        s"""
+           |CREATE EXTERNAL TABLE spark_orc(
+           |  a STRING,
+           |  b CHAR(10),
+           |  c VARCHAR(10))
+           |STORED AS orc
+           |LOCATION '$uri'""".stripMargin)
+      checkAnswer(spark.table("hive_orc"), result)
+      checkAnswer(spark.table("spark_orc"), result)
+    } finally {
+      client.runSqlHive("DROP TABLE IF EXISTS hive_orc")
+      client.runSqlHive("DROP TABLE IF EXISTS spark_orc")
+      Utils.deleteRecursively(location)
+    }
+  }
+
+  private def testComplexTypes(result: Row): Unit = {
+    val location = Utils.createTempDir()
+    val uri = location.toURI
+    try {
+      client.runSqlHive("USE default")
+      client.runSqlHive(
+        """
+          |CREATE EXTERNAL TABLE hive_orc(
+          |  a STRING,
+          |  b CHAR(8),
+          |  c VARCHAR(10),
+          |  d STRUCT<x:CHAR(4), y:CHAR(3)>,
+          |  e ARRAY<CHAR(3)>,
+          |  f MAP<CHAR(3),CHAR(4)>)
+          |STORED AS orc""".stripMargin)
+      // Hive throws an exception if I assign the location in the create table statement.
+      client.runSqlHive(s"ALTER TABLE hive_orc SET LOCATION '$uri'")
+      client.runSqlHive(
+        """
+          |INSERT INTO TABLE hive_orc
+          |SELECT
+          |  'a',
+          |  'b',
+          |  'c',
+          |  NAMED_STRUCT('x', CAST('s' AS CHAR(4)), 'y', CAST('t' AS CHAR(3))),
+          |  ARRAY(CAST('a' AS CHAR(3))),
+          |  MAP(CAST('k1' AS CHAR(3)), CAST('v1' AS CHAR(4)))
+          |FROM (SELECT 1) t""".stripMargin)
+      // We create a different table in Spark using the same schema which points to
+      // the same location.
+      spark.sql(
+        s"""
+           |CREATE EXTERNAL TABLE spark_orc(
+           |  a STRING,
+           |  b CHAR(10),
+           |  c VARCHAR(10),
+           |  d STRUCT<x:CHAR(4), y:CHAR(3)>,
+           |  e ARRAY<CHAR(3)>,
+           |  f MAP<CHAR(3),CHAR(4)>)
+           |STORED AS orc
+           |LOCATION '$uri'""".stripMargin)
+      checkAnswer(spark.table("hive_orc"), result)
+      checkAnswer(spark.table("spark_orc"), result)
+    } finally {
+      client.runSqlHive("DROP TABLE IF EXISTS hive_orc")
+      client.runSqlHive("DROP TABLE IF EXISTS spark_orc")
+      Utils.deleteRecursively(location)
+    }
+  }
 
   for (isNewOrc <- Seq("false", "true"); isConverted <- Seq("false", "true");
       isColumnarBatch <- Seq("false", "true"); isVectorized <- Seq("false", "true")) {
@@ -42,7 +136,6 @@ class HDPQuerySuite
         SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> isVectorized,
         HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
         withTempDatabase { db =>
-          val client = spark.sharedState.externalCatalog.asInstanceOf[HiveExternalCatalog].client
           client.runSqlHive(
             s"""
                |CREATE TABLE $db.t(
@@ -90,6 +183,93 @@ class HDPQuerySuite
               sql(s"SELECT dummy, click_id FROM $db.t"),
               Row(null, "12"))
           }
+        }
+      }
+    }
+  }
+
+  for (isNewOrc <- Seq("false", "true"); isConverted <- Seq("false", "true");
+      isColumnarBatch <- Seq("false", "true"); isVectorized <- Seq("false", "true")) {
+    test("converted ORC table supports resolving mixed case field" +
+      s"(isNewOrc=$isNewOrc, isColumnar=$isColumnarBatch, " +
+      s"isVectorized=$isVectorized, isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        SQLConf.ORC_COLUMNAR_BATCH_READER_ENABLED.key -> isColumnarBatch,
+        SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> isVectorized,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        withTable("dummy_orc") {
+          withTempPath { dir =>
+            val df = spark.range(5).selectExpr("id", "id as valueField", "id as partitionValue")
+            df.write
+              .partitionBy("partitionValue")
+              .mode("overwrite")
+              .orc(dir.getAbsolutePath)
+
+            spark.sql(
+              s"""
+                 |CREATE EXTERNAL TABLE dummy_orc (id LONG, valueField LONG)
+                 |PARTITIONED BY (partitionValue INT)
+                 |STORED AS ORC
+                 |LOCATION "${dir.toURI}"""".stripMargin)
+            spark.sql(s"MSCK REPAIR TABLE dummy_orc")
+            checkAnswer(spark.sql("SELECT * FROM dummy_orc"), df)
+          }
+        }
+      }
+    }
+  }
+
+  for (isNewOrc <- Seq("false"); isConverted <- Seq("false", "true")) {
+    test(s"Read char/varchar column written by Hive " +
+      s"(isNewOrc=$isNewOrc, isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        testAtomicTypes(Row("a", "b         ", "c"))
+        testComplexTypes(
+          Row("a", "b       ", "c", Row("s   ", "t  "), Seq("a  "), Map("k1 " -> "v1  ")))
+      }
+    }
+  }
+
+  for (isNewOrc <- Seq("true");
+      isChar <- Seq("false", "true");
+      isConverted <- Seq("false", "true");
+      isColumnarBatch <- Seq("false", "true");
+      isVectorized <- Seq("false", "true")) {
+    test("Read char/varchar column written by Hive " +
+      s"(isNewOrc=$isNewOrc, isChar=$isChar, isColumnar=$isColumnarBatch, " +
+      s"isVectorized=$isVectorized, isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        SQLConf.ORC_CHAR_ENABLED.key -> isChar,
+        SQLConf.ORC_COLUMNAR_BATCH_READER_ENABLED.key -> isColumnarBatch,
+        SQLConf.ORC_VECTORIZED_READER_ENABLED.key -> isVectorized,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        if (isConverted == "false" || isChar == "true") {
+          testAtomicTypes(Row("a", "b         ", "c"))
+        } else {
+          testAtomicTypes(Row("a", "b", "c"))
+        }
+      }
+    }
+  }
+
+  for (isNewOrc <- Seq("true");
+      isChar <- Seq("false", "true");
+      isConverted <- Seq("false", "true")) {
+    test(s"Read char in complex types (isNewOrc=$isNewOrc, isChar=$isChar, " +
+      s"isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        SQLConf.ORC_CHAR_ENABLED.key -> isChar,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        if (isConverted == "false" || isChar == "true") {
+          testComplexTypes(
+            Row("a", "b       ", "c", Row("s   ", "t  "), Seq("a  "), Map("k1 " -> "v1  ")))
+        } else {
+          testComplexTypes(Row("a", "b", "c", Row("s", "t"), Seq("a"), Map("k1" -> "v1")))
         }
       }
     }

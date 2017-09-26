@@ -19,6 +19,7 @@ package org.apache.spark.sql.execution.datasources.orc
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.orc._
+import org.apache.orc.TypeDescription.Category.CHAR
 import org.apache.orc.mapred.OrcInputFormat
 import org.apache.orc.storage.ql.exec.vector._
 
@@ -41,6 +42,11 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
    * ORC Data Schema.
    */
   private[this] var schema: TypeDescription = _
+
+  /**
+   * Use CHAR instead of STRING.
+   */
+  private[this] var useChar: Boolean = false
 
   /**
    * Use index to find corresponding fields.
@@ -102,6 +108,7 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
    */
   private[this] var missingBitSet: BitSet = _
 
+  // scalastyle:off
   def initialize(
       reader: org.apache.orc.Reader,
       start: Long,
@@ -112,7 +119,9 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
       requiredSchema: StructType,
       partitionColumns: StructType,
       partitionValues: InternalRow,
-      useIndex: Boolean): Unit = {
+      useIndex: Boolean,
+      useChar: Boolean): Unit = {
+  // scalastyle:on
     schema = orcSchema
     this.missingSchema = missingSchema
     sparkSchema = CatalystSqlParser.parseDataType(schema.toString).asInstanceOf[StructType]
@@ -135,6 +144,7 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
     mutableRow = new SpecificInternalRow(fullSchema.map(_.dataType))
 
     this.useIndex = useIndex
+    this.useChar = useChar
 
     // Initialize the partition column values once.
     for (i <- requiredSchema.length until fullSchema.length) {
@@ -158,12 +168,20 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
       if (!missingBitSet.get(index)) {
         val field = requiredSchema(index)
         val fieldType = field.dataType
+        val schemaIndex = sparkSchema.fieldIndex(field.name)
         val vector = if (useIndex) {
           batch.cols(index)
         } else {
-          batch.cols(sparkSchema.fieldIndex(field.name))
+          batch.cols(schemaIndex)
         }
-        updateField(fieldType, vector, mutableRow, index)
+        if (useChar) {
+          val orcType = schema.getChildren.get(schemaIndex)
+          val isPadding = orcType.getCategory == CHAR
+          val maxLen = if (isPadding) orcType.getMaxLength else -1
+          updateField(fieldType, vector, mutableRow, index, isPadding, maxLen)
+        } else {
+          updateField(fieldType, vector, mutableRow, index)
+        }
       }
       index += 1
     }
@@ -173,7 +191,9 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
       fieldType: DataType,
       vector: ColumnVector,
       mutableRow: InternalRow,
-      index: Int) = {
+      index: Int,
+      isPadding: Boolean = false,
+      maxLength: Int = -1): Unit = {
     val dataIndex = if (vector.isRepeating) 0 else batchIdx
     if (vector.noNulls || !vector.isNull(dataIndex)) {
       fieldType match {
@@ -216,7 +236,18 @@ private[orc] class OrcRecordIterator extends Iterator[InternalRow] with Logging 
           val v = vector.asInstanceOf[BytesColumnVector]
           val fieldValue =
             UTF8String.fromBytes(v.vector(dataIndex), v.start(dataIndex), v.length(dataIndex))
-          mutableRow.update(index, fieldValue)
+          if (isPadding) {
+            val numChars = fieldValue.numChars
+            if (numChars < maxLength) {
+              mutableRow.update(
+                index,
+                UTF8String.concat(fieldValue, UTF8String.fromString(" " * (maxLength - numChars))))
+            } else {
+              mutableRow.update(index, fieldValue)
+            }
+          } else {
+            mutableRow.update(index, fieldValue)
+          }
 
         case BinaryType =>
           val fieldVector = vector.asInstanceOf[BytesColumnVector]

@@ -20,6 +20,7 @@ package org.apache.spark.sql.execution.datasources.orc
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapreduce.{InputSplit, RecordReader, TaskAttemptContext}
 import org.apache.orc._
+import org.apache.orc.TypeDescription.Category.CHAR
 import org.apache.orc.mapred.OrcInputFormat
 import org.apache.orc.storage.ql.exec.vector._
 
@@ -29,6 +30,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.parser.CatalystSqlParser
 import org.apache.spark.sql.execution.vectorized.{ColumnarBatch, ColumnVectorUtils}
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.collection.BitSet
 
 
@@ -72,6 +74,11 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
    * Use index for field lookup.
    */
   private[this] var useIndex: Boolean = false
+
+  /**
+   * Use CHAR instead of STRING.
+   */
+  private[this] var useChar: Boolean = false
 
   /**
    * Full Schema: requiredSchema + partition schema.
@@ -119,6 +126,7 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
 
   override def initialize(inputSplit: InputSplit, taskAttemptContext: TaskAttemptContext): Unit = {}
 
+  // scalastyle:off
   def initialize(
       reader: Reader,
       conf: Configuration,
@@ -129,7 +137,9 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
       requiredSchema: StructType,
       partitionColumns: StructType,
       partitionValues: InternalRow,
-      useIndex: Boolean): Unit = {
+      useIndex: Boolean,
+      useChar: Boolean): Unit = {
+  // scalastyle:on
     rows = reader.rows(OrcInputFormat.buildOptions(conf, reader, start, length))
     totalRowCount = reader.getNumberOfRows
 
@@ -143,6 +153,7 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
     missingBitSet = new BitSet(requiredSchema.length)
     this.partitionColumns = partitionColumns
     this.useIndex = useIndex
+    this.useChar = useChar
     fullSchema = new StructType(requiredSchema.fields ++ partitionColumns.fields)
 
     columnarBatch = ColumnarBatch.allocate(fullSchema, DEFAULT_MEMORY_MODE, DEFAULT_SIZE)
@@ -188,6 +199,9 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
         val field = requiredSchema(i)
         val schemaIndex = if (useIndex) i else schema.getFieldNames.indexOf(field.name)
         assert(schemaIndex >= 0)
+        val orcType = schema.getChildren.get(schemaIndex)
+        val isPadding = useChar && orcType.getCategory == CHAR
+        val maxLen = if (isPadding) orcType.getMaxLength else -1
 
         val fromColumn = batch.cols(schemaIndex)
         val toColumn = columnarBatch.column(i)
@@ -231,13 +245,25 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
 
               case StringType =>
                 val data = fromColumn.asInstanceOf[BytesColumnVector]
-                for (index <- 0 until batchSize) {
-                  toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                var index = 0
+                if (useChar) {
+                  while (index < batchSize) {
+                    copyString(0, data, toColumn, isPadding, maxLen)
+                    index += 1
+                  }
+                } else {
+                  while (index < batchSize) {
+                    toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                    index += 1
+                  }
                 }
+
               case BinaryType =>
                 val data = fromColumn.asInstanceOf[BytesColumnVector]
-                for (index <- 0 until batchSize) {
+                var index = 0
+                while (index < batchSize) {
                   toColumn.appendByteArray(data.vector(0), data.start(0), data.length(0))
+                  index += 1
                 }
 
               case DecimalType.Fixed(precision, scale) =>
@@ -250,8 +276,10 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
                   toColumn.appendLongs(batchSize, value.toUnscaledLong)
                 } else {
                   val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
-                  for (index <- 0 until batchSize) {
+                  var index = 0
+                  while (index < batchSize) {
                     toColumn.appendByteArray(bytes, 0, bytes.length)
+                    index += 1
                   }
                 }
 
@@ -263,29 +291,30 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
           field.dataType match {
             case BooleanType =>
               val data = fromColumn.asInstanceOf[LongColumnVector].vector
-              data.foreach { x => toColumn.appendBoolean(x == 1) }
+              var index = 0
+              while (index < batchSize) {
+                toColumn.appendBoolean(data(index) == 1)
+                index += 1
+              }
 
             case ByteType =>
               val data = fromColumn.asInstanceOf[LongColumnVector].vector
               var index = 0
-              val len = data.length
-              while (index < len) {
+              while (index < batchSize) {
                 toColumn.appendByte(data(index).toByte)
                 index += 1
               }
             case ShortType =>
               val data = fromColumn.asInstanceOf[LongColumnVector].vector
               var index = 0
-              val len = data.length
-              while (index < len) {
+              while (index < batchSize) {
                 toColumn.appendShort(data(index).toShort)
                 index += 1
               }
             case IntegerType =>
               val data = fromColumn.asInstanceOf[LongColumnVector].vector
               var index = 0
-              val len = data.length
-              while (index < len) {
+              while (index < batchSize) {
                 toColumn.appendInt(data(index).toInt)
                 index += 1
               }
@@ -296,23 +325,23 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
             case DateType =>
               val data = fromColumn.asInstanceOf[LongColumnVector].vector
               var index = 0
-              val len = data.length
-              while (index < len) {
+              while (index < batchSize) {
                 toColumn.appendInt(data(index).toInt)
                 index += 1
               }
 
             case TimestampType =>
               val data = fromColumn.asInstanceOf[TimestampColumnVector]
-              for (index <- 0 until batchSize) {
+              var index = 0
+              while (index < batchSize) {
                 toColumn.appendLong(data.time(index) * 1000L + data.nanos(index) / 1000L)
+                index += 1
               }
 
             case FloatType =>
               val data = fromColumn.asInstanceOf[DoubleColumnVector].vector
               var index = 0
-              val len = data.length
-              while (index < len) {
+              while (index < batchSize) {
                 toColumn.appendFloat(data(index).toFloat)
                 index += 1
               }
@@ -322,18 +351,32 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
 
             case StringType =>
               val data = fromColumn.asInstanceOf[BytesColumnVector]
-              for (index <- 0 until batchSize) {
-                toColumn.appendByteArray(data.vector(index), data.start(index), data.length(index))
+              var index = 0
+              if (useChar) {
+                while (index < batchSize) {
+                  copyString(index, data, toColumn, isPadding, maxLen)
+                  index += 1
+                }
+              } else {
+                while (index < batchSize) {
+                  toColumn.appendByteArray(
+                    data.vector(index), data.start(index), data.length(index))
+                  index += 1
+                }
               }
+
             case BinaryType =>
               val data = fromColumn.asInstanceOf[BytesColumnVector]
-              for (index <- 0 until batchSize) {
+              var index = 0
+              while (index < batchSize) {
                 toColumn.appendByteArray(data.vector(index), data.start(index), data.length(index))
+                index += 1
               }
 
             case DecimalType.Fixed(precision, scale) =>
               val data = fromColumn.asInstanceOf[DecimalColumnVector]
-              for (index <- 0 until batchSize) {
+              var index = 0
+              while (index < batchSize) {
                 val d = data.vector(index)
                 val value = Decimal(d.getHiveDecimal.bigDecimalValue, d.precision(), d.scale)
                 value.changePrecision(precision, scale)
@@ -345,6 +388,7 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
                   val bytes = value.toJavaBigDecimal.unscaledValue.toByteArray
                   toColumn.appendByteArray(bytes, 0, bytes.length)
                 }
+                index += 1
               }
 
             case dt =>
@@ -390,7 +434,11 @@ private[orc] class OrcColumnarBatchReader extends RecordReader[Void, ColumnarBat
 
                 case StringType =>
                   val v = fromColumn.asInstanceOf[BytesColumnVector]
-                  toColumn.appendByteArray(v.vector(index), v.start(index), v.length(index))
+                  if (useChar) {
+                    copyString(index, v, toColumn, isPadding, maxLen)
+                  } else {
+                    toColumn.appendByteArray(v.vector(index), v.start(index), v.length(index))
+                  }
 
                 case BinaryType =>
                   val v = fromColumn.asInstanceOf[BytesColumnVector]
@@ -440,5 +488,28 @@ object OrcColumnarBatchReader {
    * - Spark's ColumnarBatch.DEFAULT_BATCH_SIZE = 4 * 1024
    */
   val DEFAULT_SIZE: Int = 4 * 1024
+
+  def copyString(
+      i: Int,
+      data: BytesColumnVector,
+      toColumn: org.apache.spark.sql.execution.vectorized.ColumnVector,
+      isPadding: Boolean,
+      maxLength: Int): Unit = {
+    if (isPadding) {
+      assert(maxLength > 0)
+      val str = UTF8String.fromBytes(data.vector(i), data.start(i), data.length(i))
+      val numChars = str.numChars
+      if (numChars < maxLength) {
+        val padded = UTF8String.concat(str, UTF8String.fromString(" " * (maxLength - numChars)))
+        val bytes = padded.getBytes
+        toColumn.appendByteArray(bytes, 0, bytes.length)
+      } else {
+        toColumn.appendByteArray(data.vector(i), data.start(i), data.length(i))
+      }
+    } else {
+      assert(maxLength == -1)
+      toColumn.appendByteArray(data.vector(i), data.start(i), data.length(i))
+    }
+  }
 }
 

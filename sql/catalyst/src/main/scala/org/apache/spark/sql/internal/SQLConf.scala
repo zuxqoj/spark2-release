@@ -285,6 +285,11 @@ object SQLConf {
     .booleanConf
     .createWithDefault(false)
 
+  val ORC_CHAR_ENABLED = buildConf("spark.sql.orc.char.enabled")
+    .doc("When true, CHAR type is used instead of STRING in ORC data sources.")
+    .booleanConf
+    .createWithDefault(false)
+
   val ORC_COLUMNAR_BATCH_READER_ENABLED =
     buildConf("spark.sql.orc.columnarBatchReader.enabled")
       .doc("Enables both vectorized orc decoding and columnar batch in whole-stage code gen.")
@@ -935,6 +940,8 @@ class SQLConf extends Serializable with Logging {
   def parquetCacheMetadata: Boolean = getConf(PARQUET_CACHE_METADATA)
 
   def parquetVectorizedReaderEnabled: Boolean = getConf(PARQUET_VECTORIZED_READER_ENABLED)
+
+  def orcCharEnabled: Boolean = getConf(ORC_CHAR_ENABLED)
 
   def orcColumnarBatchReaderEnabled: Boolean = getConf(ORC_COLUMNAR_BATCH_READER_ENABLED)
 

@@ -30,6 +30,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
 import org.apache.orc._
 import org.apache.orc.OrcFile.ReaderOptions
+import org.apache.orc.TypeDescription.Category.CHAR
 import org.apache.orc.mapred.{OrcList, OrcMap, OrcStruct, OrcTimestamp}
 import org.apache.orc.mapreduce._
 import org.apache.orc.storage.common.`type`.HiveDecimal
@@ -39,6 +40,7 @@ import org.apache.spark.TaskContext
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.analysis.Resolver
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.parser.CatalystSqlParser
 import org.apache.spark.sql.catalyst.util._
@@ -156,6 +158,7 @@ class OrcFileFormat
     }
 
     val resultSchema = StructType(requiredSchema.fields ++ partitionSchema.fields)
+    val useChar = sparkSession.sessionState.conf.orcCharEnabled
     val useColumnarBatchReader =
       sparkSession.sessionState.conf.orcColumnarBatchReaderEnabled &&
       supportBatch(sparkSession, resultSchema)
@@ -165,13 +168,14 @@ class OrcFileFormat
 
     val broadcastedConf =
       sparkSession.sparkContext.broadcast(new SerializableConfiguration(hadoopConf))
+    val resolver = sparkSession.sessionState.conf.resolver
 
     (file: PartitionedFile) => {
       assert(file.partitionValues.numFields == partitionSchema.size)
 
       val conf = broadcastedConf.value.value
       val (reader, orcSchema, missingSchema) =
-        OrcFileFormat.getReaderAndSchema(dataSchema, partitionSchema, file.filePath, conf)
+        OrcFileFormat.getReaderAndSchema(resolver, dataSchema, partitionSchema, file.filePath, conf)
       // Column Selection: we need to set at least one column due to ORC-233
       val columns = if (requiredSchema.isEmpty) {
         "0"
@@ -206,6 +210,7 @@ class OrcFileFormat
           partitionSchema,
           partitionValues,
           useIndex,
+          useChar,
           useColumnarBatchReader,
           enableVectorizedReader)
       }
@@ -238,6 +243,7 @@ class OrcFileFormat
       partitionSchema: StructType,
       partitionValues: InternalRow,
       useIndex: Boolean,
+      useChar: Boolean,
       columnarBatch: Boolean,
       enableVectorizedReader: Boolean): Iterator[InternalRow] = {
   // scalastyle:on
@@ -255,7 +261,8 @@ class OrcFileFormat
         requiredSchema,
         partitionSchema,
         partitionValues,
-        useIndex)
+        useIndex,
+        useChar)
       val iter = new RecordReaderIterator(batchReader)
       Option(TaskContext.get()).foreach(_.addTaskCompletionListener(_ => iter.close()))
       iter.asInstanceOf[Iterator[InternalRow]]
@@ -271,7 +278,8 @@ class OrcFileFormat
         requiredSchema,
         partitionSchema,
         partitionValues,
-        useIndex)
+        useIndex,
+        useChar)
       Option(TaskContext.get()).foreach(_.addTaskCompletionListener(_ => iter.close()))
 
       val unsafeProjection = UnsafeProjection.create(resultSchema)
@@ -301,7 +309,7 @@ class OrcFileFormat
         requiredSchema.filter(f => missingSchema.getFieldIndex(f.name).isEmpty))
       iter.map { value =>
         unsafeProjection(OrcFileFormat.convertOrcStructToInternalRow(
-          value, Some(orcSchema), convertSchema, useIndex, Some(mutableRow)))
+          value, Some(orcSchema), convertSchema, useIndex, useChar, Some(mutableRow)))
       }
     }
   }
@@ -330,6 +338,7 @@ object OrcFileFormat extends Logging {
    * Return ORC reader and schema with name correction.
    */
   private[orc] def getReaderAndSchema(
+      resolver: Resolver,
       dataSchema: StructType,
       partitionSchema: StructType,
       filePath: String,
@@ -353,7 +362,7 @@ object OrcFileFormat extends Logging {
     var missingSchema = new StructType
     if (dataSchema.length > orcSchema.getFieldNames.size) {
       dataSchema.filter(x => partitionSchema.getFieldIndex(x.name).isEmpty).foreach { f =>
-        if (!orcSchema.getFieldNames.contains(f.name.toLowerCase)) {
+        if (!orcSchema.getFieldNames.asScala.exists(resolver(_, f.name))) {
           missingSchema = missingSchema.add(f)
         }
       }
@@ -370,6 +379,7 @@ object OrcFileFormat extends Logging {
       orcSchema: Option[TypeDescription],
       schema: StructType,
       useIndex: Boolean = false,
+      useChar: Boolean = false,
       internalRow: Option[InternalRow] = None): InternalRow = {
 
     val mutableRow = internalRow.getOrElse(new SpecificInternalRow(schema.map(_.dataType)))
@@ -377,17 +387,34 @@ object OrcFileFormat extends Logging {
     var i = 0
     val len = schema.length
     while (i < len) {
+      var orcType: TypeDescription = null
+      var isPadding = false
+      var maxLen = -1
+
       val writable = if (useIndex) {
+        if (useChar && orcSchema.isDefined) {
+          orcType = orcSchema.get.getChildren.get(i)
+          isPadding = orcType.getCategory == CHAR
+          if (isPadding) maxLen = orcType.getMaxLength
+        }
         orcStruct.getFieldValue(i)
-      } else if (orcSchema.isEmpty) {
-        orcStruct.getFieldValue(schema(i).name)
+      } else if (orcSchema.isDefined) {
+        val schemaIndex = orcSchema.get.getFieldNames.indexOf(schema(i).name)
+        if (useChar) {
+          orcType = orcSchema.get.getChildren.get(schemaIndex)
+          isPadding = orcType.getCategory == CHAR
+          if (isPadding) maxLen = orcType.getMaxLength
+        }
+        orcStruct.getFieldValue(schemaIndex)
       } else {
-        orcStruct.getFieldValue(orcSchema.get.getFieldNames.indexOf(schema(i).name))
+        orcStruct.getFieldValue(schema(i).name)
       }
+
       if (writable == null) {
         mutableRow.setNullAt(i)
       } else {
-        mutableRow(i) = getCatalystValue(writable, schema(i).dataType)
+        mutableRow(i) = getCatalystValue(
+          writable, schema(i).dataType, useChar, Option(orcType), isPadding, maxLen)
       }
       i += 1
     }
@@ -516,7 +543,13 @@ object OrcFileFormat extends Logging {
   /**
    * Return Spark Catalyst value from WritableComparable object.
    */
-  private[orc] def getCatalystValue(value: WritableComparable[_], dataType: DataType): Any = {
+  private[orc] def getCatalystValue(
+      value: WritableComparable[_],
+      dataType: DataType,
+      useChar: Boolean = false,
+      orcType: Option[TypeDescription] = None,
+      isPadding: Boolean = false,
+      maxLength: Int = -1): Any = {
     if (value == null) {
       null
     } else {
@@ -533,7 +566,18 @@ object OrcFileFormat extends Logging {
         case FloatType => value.asInstanceOf[FloatWritable].get
         case DoubleType => value.asInstanceOf[DoubleWritable].get
 
-        case StringType => UTF8String.fromBytes(value.asInstanceOf[Text].getBytes)
+        case StringType =>
+          val str = UTF8String.fromBytes(value.asInstanceOf[Text].getBytes)
+          if (isPadding) {
+            val numChars = str.numChars
+            if (numChars < maxLength) {
+              UTF8String.concat(str, UTF8String.fromString(" " * (maxLength - numChars)))
+            } else {
+              str
+            }
+          } else {
+            str
+          }
 
         case BinaryType =>
           val binary = value.asInstanceOf[BytesWritable]
@@ -553,25 +597,53 @@ object OrcFileFormat extends Logging {
         case _: StructType =>
           val structValue = convertOrcStructToInternalRow(
             value.asInstanceOf[OrcStruct],
-            None,
-            dataType.asInstanceOf[StructType])
+            orcType,
+            dataType.asInstanceOf[StructType],
+            useIndex = false,
+            useChar)
           structValue
 
         case ArrayType(elementType, _) =>
           val data = new scala.collection.mutable.ArrayBuffer[Any]
-          value.asInstanceOf[OrcList[WritableComparable[_]]].asScala.foreach { x =>
-            data += getCatalystValue(x, elementType)
+          if (useChar && orcType.isDefined) {
+            val et = orcType.get.getChildren.get(0)
+            val isPadding = et.getCategory == CHAR
+            val maxLen = et.getMaxLength
+            value.asInstanceOf[OrcList[WritableComparable[_]]].asScala.foreach { x =>
+              data += getCatalystValue(x, elementType, useChar, Some(et), isPadding, maxLen)
+            }
+          } else {
+            value.asInstanceOf[OrcList[WritableComparable[_]]].asScala.foreach { x =>
+              data += getCatalystValue(x, elementType)
+            }
           }
           new GenericArrayData(data.toArray)
 
         case MapType(keyType, valueType, _) =>
           val map = new java.util.TreeMap[Any, Any]
-          value
-            .asInstanceOf[OrcMap[WritableComparable[_], WritableComparable[_]]]
-            .entrySet().asScala.foreach { entry =>
-            val k = getCatalystValue(entry.getKey, keyType)
-            val v = getCatalystValue(entry.getValue, valueType)
-            map.put(k, v)
+          if (useChar && orcType.isDefined) {
+            val children = orcType.get.getChildren
+            val kt = children.get(0)
+            val vt = children.get(1)
+            val kPadding = kt.getCategory == CHAR
+            val vPadding = vt.getCategory == CHAR
+            value
+              .asInstanceOf[OrcMap[WritableComparable[_], WritableComparable[_]]]
+              .entrySet().asScala.foreach { entry =>
+              val k = getCatalystValue(
+                entry.getKey, keyType, useChar, Some(kt), kPadding, kt.getMaxLength)
+              val v = getCatalystValue(
+                entry.getValue, valueType, useChar, Some(vt), vPadding, vt.getMaxLength)
+              map.put(k, v)
+            }
+          } else {
+            value
+              .asInstanceOf[OrcMap[WritableComparable[_], WritableComparable[_]]]
+              .entrySet().asScala.foreach { entry =>
+              val k = getCatalystValue(entry.getKey, keyType)
+              val v = getCatalystValue(entry.getValue, valueType)
+              map.put(k, v)
+            }
           }
           ArrayBasedMapData(map.asScala)
 
