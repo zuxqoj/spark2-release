@@ -18,7 +18,10 @@
 package org.apache.spark.sql.hive.execution
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.catalyst.TableIdentifier
+import org.apache.spark.sql.execution.command.DDLUtils
 import org.apache.spark.sql.hive._
+import org.apache.spark.sql.hive.orc.OrcFileOperator
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
@@ -270,6 +273,52 @@ class HDPQuerySuite
             Row("a", "b       ", "c", Row("s   ", "t  "), Seq("a  "), Map("k1 " -> "v1  ")))
         } else {
           testComplexTypes(Row("a", "b", "c", Row("s", "t"), Seq("a"), Map("k1" -> "v1")))
+        }
+      }
+    }
+  }
+
+  for (isNewOrc <- Seq("false", "true");
+      isConverted <- Seq("false", "true")) {
+    test(s"create hive serde table with new syntax(isNewOrc=$isNewOrc, isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        withTable("t", "t2", "t3") {
+          withTempPath { path =>
+            sql(
+              s"""
+                 |CREATE TABLE t(id int) USING hive
+                 |OPTIONS(fileFormat 'orc', compression 'Zlib')
+                 |LOCATION '${path.toURI}'
+              """.stripMargin)
+            val table = spark.sessionState.catalog.getTableMetadata(TableIdentifier("t"))
+            assert(DDLUtils.isHiveTable(table))
+            assert(table.storage.serde == Some("org.apache.hadoop.hive.ql.io.orc.OrcSerde"))
+            assert(table.storage.properties.get("compression") == Some("Zlib"))
+            assert(spark.table("t").collect().isEmpty)
+
+            sql("INSERT INTO t SELECT 1")
+            checkAnswer(spark.table("t"), Row(1))
+            // Check if this is compressed as ZLIB.
+            val maybeOrcFile = path.listFiles().find(_.getName.startsWith("part"))
+            assert(maybeOrcFile.isDefined)
+            val orcFilePath = maybeOrcFile.get.toPath.toString
+            val expectedCompressionKind =
+              OrcFileOperator.getFileReader(orcFilePath).get.getCompression
+            assert("ZLIB" === expectedCompressionKind.name())
+
+            sql("CREATE TABLE t2 USING HIVE AS SELECT 1 AS c1, 'a' AS c2")
+            val table2 = spark.sessionState.catalog.getTableMetadata(TableIdentifier("t2"))
+            assert(DDLUtils.isHiveTable(table2))
+            assert(
+              table2.storage.serde == Some("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"))
+            checkAnswer(spark.table("t2"), Row(1, "a"))
+
+            sql("CREATE TABLE t3(a int, p int) USING hive PARTITIONED BY (p)")
+            sql("INSERT INTO t3 PARTITION(p=1) SELECT 0")
+            checkAnswer(spark.table("t3"), Row(0, 1))
+          }
         }
       }
     }

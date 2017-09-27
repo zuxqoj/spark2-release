@@ -1438,7 +1438,7 @@ class HiveDDLSuite
         sql("INSERT INTO t SELECT 1")
         checkAnswer(spark.table("t"), Row(1))
         // Check if this is compressed as ZLIB.
-        val maybeOrcFile = path.listFiles().find(!_.getName.endsWith(".crc"))
+        val maybeOrcFile = path.listFiles().find(_.getName.startsWith("part"))
         assert(maybeOrcFile.isDefined)
         val orcFilePath = maybeOrcFile.get.toPath.toString
         val expectedCompressionKind =
