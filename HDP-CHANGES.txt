@@ -19,6 +19,7 @@ BUG FIXES
     BUG-68632   Spark SQL fails to read data from a ORC hive table that has a new column added to it
     BUG-88481   Add spark.sql.orc.char.enabled
     BUG-88924   Converted ORC tables should use table compression property
+    BUG-88498   Enable spark.sql.orc, spark.sql.orc.char, spark.sql.hive.convertMetastoreOrc
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
     BUG-48982   Add hadoop lzo jar to the classpath
     BUG-52253   Support configuring YARN correctly for multiple Spark versions and their aux-services
