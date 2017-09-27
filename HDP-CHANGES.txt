@@ -126,6 +126,30 @@ BUG FIXES
     SPARK-21936   backward compatibility test framework for HiveExternalCatalog
     SPARK-21915   Model 1 and Model 2 ParamMaps Missing
     SPARK-21950   pyspark.sql.tests.SQLTests2 should stop SparkContext.
+    SPARK-21954   JacksonUtils should verify MapType's value type instead of key type
+    SPARK-20098   dataType's typeName fix
+    SPARK-21976   Fix wrong documentation for Mean Absolute Error.
+    SPARK-18608   Fix double caching
+    SPARK-21980   References in grouping functions should be indexed with semanticEquals
+    SPARK-18608   Fix double caching for PySpark OneVsRest.
+    SPARK-21985   PairDeserializer is broken for double-zipped RDDs
+    SPARK-21953   Show both memory and disk bytes spilled if either is present
+    SPARK-22043   Improves error message for show_profiles and dump_profiles
+    SPARK-22047   ignore HiveExternalCatalogVersionsSuite
+    SPARK-22047   HiveExternalCatalogVersionsSuite
+    SPARK-22052   Incorrect Metric assigned in MetricsReporter.scala
+    SPARK-22076   Expand.projections should not be a Stream
+    SPARK-21384   Spark + YARN fails with LocalFileSystem as default FS
+    SPARK-21928   Set classloader on SerializerManager's private kryo
+    SPARK-22094   processAllAvailable should check the query state
+    SPARK-22072   Improve release build scripts
+    SPARK-18136   Fix SPARK_JARS_DIR for Python pip install on Windows
+    SPARK-22092   Reallocation in OffHeapColumnVector.reserveInternal corrupts struct and array data
+    SPARK-22109   Resolves type conflicts between strings and timestamps in partition column
+    SPARK-22107   Change as to alias in python quickstart
+    SPARK-22083   Release locks in MemoryStore.evictBlocksToFreeSpace
+    SPARK-22120   TestHiveSparkSession.reset() should clean out Hive warehouse directory
+    SPARK-22141   Propagate empty relation before checking Cartesian products
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
@@ -135,6 +159,8 @@ BUG FIXES
     SPARK-21738 Thriftserver doesn't cancel jobs when session is closed
     SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
     SPARK-20079 Fix client AM not allocating executors after restart
+    SPARK-21831 Remove `spark.sql.hive.convertMetastoreOrc` config in HiveCompatibilitySuite
+    SPARK-13656 Delete spark.sql.parquet.cacheMetadata from SQLConf and docs
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-21407 Support spnego for ThriftServer thrift/http auth
