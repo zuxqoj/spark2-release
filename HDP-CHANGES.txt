@@ -150,6 +150,12 @@ BUG FIXES
     SPARK-22083   Release locks in MemoryStore.evictBlocksToFreeSpace
     SPARK-22120   TestHiveSparkSession.reset() should clean out Hive warehouse directory
     SPARK-22141   Propagate empty relation before checking Cartesian products
+    SPARK-22140   Add TPCDSQuerySuite
+    SPARK-22135   metrics in spark-dispatcher not being registered properly
+    SPARK-22143   Fix memory leak in OffHeapColumnVector
+    SPARK-22129   Release script improvements
+    SPARK-22161   Add Impala-modified TPC-DS queries
+    SPARK-22146   FileNotFoundException while reading ORC files containing special characters
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
