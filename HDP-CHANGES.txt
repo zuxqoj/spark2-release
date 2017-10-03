@@ -159,6 +159,7 @@ BUG FIXES
     SPARK-22146   FileNotFoundException while reading ORC files containing special characters
     SPARK-22167   sparkr packaging issue allow zinc
     SPARK-22158   convertMetastore should not ignore table property
+    SPARK-22178   Refresh Persistent Views by REFRESH TABLE Command
     SPARK-20466   HadoopRDD#addLocalConfiguration throws NPE
     SPARK-22206   gapply in R can't work on empty grouping columns
     SPARK-21549   Respect OutputFormats with no output directory provided
