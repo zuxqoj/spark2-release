@@ -158,6 +158,7 @@ BUG FIXES
     SPARK-22161   Add Impala-modified TPC-DS queries
     SPARK-22146   FileNotFoundException while reading ORC files containing special characters
     SPARK-22167   sparkr packaging issue allow zinc
+    SPARK-22158   convertMetastore should not ignore table property
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
