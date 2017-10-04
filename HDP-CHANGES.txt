@@ -170,6 +170,7 @@ BUG FIXES
     SPARK-20079 Fix client AM not allocating executors after restart
     SPARK-21831 Remove `spark.sql.hive.convertMetastoreOrc` config in HiveCompatibilitySuite
     SPARK-13656 Delete spark.sql.parquet.cacheMetadata from SQLConf and docs
+    SPARK-18061 Support spnego for ThriftServer thrift/http auth
 
     (Jira in Apache Spark is IN PROGRESS)
-    SPARK-21407 Support spnego for ThriftServer thrift/http auth
+    SPARK-21783 Turn on ORC filter push-down by default
