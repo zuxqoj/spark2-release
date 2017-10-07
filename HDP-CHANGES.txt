@@ -159,6 +159,7 @@ BUG FIXES
     SPARK-22146   FileNotFoundException while reading ORC files containing special characters
     SPARK-22167   sparkr packaging issue allow zinc
     SPARK-22158   convertMetastore should not ignore table property
+    SPARK-21549   Respect OutputFormats with no output directory provided
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
