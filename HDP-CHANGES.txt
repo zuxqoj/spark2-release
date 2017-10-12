@@ -164,6 +164,7 @@ BUG FIXES
     SPARK-22206   gapply in R can't work on empty grouping columns
     SPARK-21549   Respect OutputFormats with no output directory provided
     SPARK-22218   spark shuffle services fails to update secret on app re-attempts
+    SPARK-21907   NullPointerException in UnsafeExternalSorter.spill()
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
