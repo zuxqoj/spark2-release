@@ -131,14 +131,17 @@ class TypeCoercionSuite extends PlanTest {
       widenFunc: (DataType, DataType) => Option[DataType],
       t1: DataType,
       t2: DataType,
-      expected: Option[DataType]): Unit = {
+      expected: Option[DataType],
+      isSymmetric: Boolean = true): Unit = {
     var found = widenFunc(t1, t2)
     assert(found == expected,
       s"Expected $expected as wider common type for $t1 and $t2, found $found")
     // Test both directions to make sure the widening is symmetric.
-    found = widenFunc(t2, t1)
-    assert(found == expected,
-      s"Expected $expected as wider common type for $t2 and $t1, found $found")
+    if (isSymmetric) {
+      found = widenFunc(t2, t1)
+      assert(found == expected,
+        s"Expected $expected as wider common type for $t2 and $t1, found $found")
+    }
   }
 
   test("implicit type cast - ByteType") {
@@ -385,6 +388,53 @@ class TypeCoercionSuite extends PlanTest {
     widenTest(NullType, StructType(Seq()), Some(StructType(Seq())))
     widenTest(StringType, MapType(IntegerType, StringType, true), None)
     widenTest(ArrayType(IntegerType), StructType(Seq()), None)
+
+    widenTest(
+      StructType(Seq(StructField("a", IntegerType))),
+      StructType(Seq(StructField("b", IntegerType))),
+      None)
+    widenTest(
+      StructType(Seq(StructField("a", IntegerType, nullable = false))),
+      StructType(Seq(StructField("a", DoubleType, nullable = false))),
+      None)
+
+    widenTest(
+      StructType(Seq(StructField("a", IntegerType, nullable = false))),
+      StructType(Seq(StructField("a", IntegerType, nullable = false))),
+      Some(StructType(Seq(StructField("a", IntegerType, nullable = false)))))
+    widenTest(
+      StructType(Seq(StructField("a", IntegerType, nullable = false))),
+      StructType(Seq(StructField("a", IntegerType, nullable = true))),
+      Some(StructType(Seq(StructField("a", IntegerType, nullable = true)))))
+    widenTest(
+      StructType(Seq(StructField("a", IntegerType, nullable = true))),
+      StructType(Seq(StructField("a", IntegerType, nullable = false))),
+      Some(StructType(Seq(StructField("a", IntegerType, nullable = true)))))
+    widenTest(
+      StructType(Seq(StructField("a", IntegerType, nullable = true))),
+      StructType(Seq(StructField("a", IntegerType, nullable = true))),
+      Some(StructType(Seq(StructField("a", IntegerType, nullable = true)))))
+
+    try {
+      SQLConf.get.setConf(SQLConf.CASE_SENSITIVE, true)
+      widenTest(
+        StructType(Seq(StructField("a", IntegerType))),
+        StructType(Seq(StructField("A", IntegerType))),
+        None)
+    } finally {
+      SQLConf.get.unsetConf(SQLConf.CASE_SENSITIVE)
+    }
+    try {
+      SQLConf.get.setConf(SQLConf.CASE_SENSITIVE, false)
+      checkWidenType(
+        TypeCoercion.findTightestCommonType,
+        StructType(Seq(StructField("a", IntegerType), StructField("B", IntegerType))),
+        StructType(Seq(StructField("A", IntegerType), StructField("b", IntegerType))),
+        Some(StructType(Seq(StructField("a", IntegerType), StructField("B", IntegerType)))),
+        isSymmetric = false)
+    } finally {
+      SQLConf.get.unsetConf(SQLConf.CASE_SENSITIVE)
+    }
   }
 
   test("wider common type for decimal and array") {
