@@ -168,6 +168,7 @@ BUG FIXES
     SPARK-14387   Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
     SPARK-16628   OrcConversions should not convert an ORC table represented by MetastoreRelation to HadoopFsRelation if metastore schema does not match schema stored in ORC files
     SPARK-18355   Spark SQL fails to read data from a ORC hive table that has a new column added to it
+    SPARK-22252   FileFormatWriter should respect the input query schema
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
