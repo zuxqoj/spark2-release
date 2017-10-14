@@ -15,7 +15,6 @@ IMPROVEMENTS
 
 BUG FIXES
     BUG-73561  Virtualenv example fails in yarn-cluster mode with requirement.txt not found error
-    BUG-63630	SPARK-14387. Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
     BUG-68632   Spark SQL fails to read data from a ORC hive table that has a new column added to it
     BUG-88481   Add spark.sql.orc.char.enabled
     BUG-88924   Converted ORC tables should use table compression property
