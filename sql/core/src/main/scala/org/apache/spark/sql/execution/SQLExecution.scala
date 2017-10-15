@@ -22,8 +22,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd,
-  SparkListenerSQLExecutionStart}
+import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd, SparkListenerSQLExecutionStart}
 
 object SQLExecution {
 
@@ -68,6 +67,7 @@ object SQLExecution {
             executionId, System.currentTimeMillis()))
         }
       } finally {
+        LLAPExecution.closeLlapRelation(sparkSession, executionId)
         executionIdToQueryExecution.remove(executionId)
         sc.setLocalProperty(EXECUTION_ID_KEY, null)
       }
