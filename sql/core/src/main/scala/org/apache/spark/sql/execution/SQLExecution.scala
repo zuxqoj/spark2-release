@@ -68,6 +68,7 @@ object SQLExecution {
             executionId, System.currentTimeMillis()))
         }
       } finally {
+        LLAPExecution.closeLlapRelation(sparkSession, executionId)
         executionIdToQueryExecution.remove(executionId)
         sc.setLocalProperty(EXECUTION_ID_KEY, null)
       }
