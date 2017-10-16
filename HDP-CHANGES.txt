@@ -169,6 +169,7 @@ BUG FIXES
     SPARK-18355   Spark SQL fails to read data from a ORC hive table that has a new column added to it
     SPARK-22252   FileFormatWriter should respect the input query schema
     SPARK-22273   Fix key/value schema field names in HashMapGenerators.
+    SPARK-22223   ObjectHashAggregate should not introduce unnecessary shuffle
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
