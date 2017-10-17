@@ -61,11 +61,6 @@ case class Person(name: String, age: Int, contacts: Seq[Contact])
 
 /**
  * This test suite is a port of org.apache.spark.sql.hive.orc.OrcQuerySuite.
- * Please note the following difference.
- *
- * - LZO test case is enabled
- * - "Empty schema does not read data from ORC file" is ignored due to ORC 1.3 bug.
- *
  * Since RelationConversions is inside HiveStrategies.scala,
  * the following test cases using CONVERT_METASTORE_ORC are omitted.
  *
@@ -642,7 +637,7 @@ class OrcQuerySuite extends QueryTest with OrcTest with BeforeAndAfterAll {
     }
   }
 
-  ignore("Empty schema does not read data from ORC file") {
+  test("Empty schema does not read data from ORC file") {
     val data = Seq((1, 1), (2, 2))
     withOrcFile(data) { path =>
       val conf = new Configuration()

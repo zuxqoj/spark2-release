@@ -176,14 +176,10 @@ class OrcFileFormat
       val conf = broadcastedConf.value.value
       val (reader, orcSchema, missingSchema) =
         OrcFileFormat.getReaderAndSchema(resolver, dataSchema, partitionSchema, file.filePath, conf)
-      // Column Selection: we need to set at least one column due to ORC-233
-      val columns = if (requiredSchema.isEmpty) {
-        "0"
-      } else {
-        requiredSchema
-          .filter(f => missingSchema.getFieldIndex(f.name).isEmpty)
-          .map(f => dataSchema.fieldIndex(f.name)).mkString(",")
-      }
+
+      val columns = requiredSchema
+        .filter(f => missingSchema.getFieldIndex(f.name).isEmpty)
+        .map(f => dataSchema.fieldIndex(f.name)).mkString(",")
       conf.set(OrcConf.INCLUDE_COLUMNS.getAttribute, columns)
       logDebug(s"${OrcConf.INCLUDE_COLUMNS.getAttribute}=$columns")
 
