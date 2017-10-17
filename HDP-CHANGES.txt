@@ -171,6 +171,7 @@ BUG FIXES
     SPARK-22252   FileFormatWriter should respect the input query schema
     SPARK-22273   Fix key/value schema field names in HashMapGenerators.
     SPARK-22223   ObjectHashAggregate should not introduce unnecessary shuffle
+    SPARK-22271   mean overflows and returns null for some decimal variables
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
