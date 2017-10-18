@@ -36,7 +36,6 @@ BUG FIXES
     BUG-77400   Fix HiveServer2 delegation token acquisition
     BUG-84597   Fix VersionsSuite failures
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
-    BUG-85326   spark-llap: Notify Hive on Spark query completions
     BUG-87397   Update Apache Spark dependency to use Apache ORC 1.4.1
 
     (Backport from 2.2.1)
