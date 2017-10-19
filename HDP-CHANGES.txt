@@ -36,7 +36,6 @@ BUG FIXES
     BUG-77400   Fix HiveServer2 delegation token acquisition
     BUG-84597   Fix VersionsSuite failures
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
-    BUG-87397   Update Apache Spark dependency to use Apache ORC 1.4.1
 
     (Backport from 2.2.1)
     SPARK-21663   test("remote fetch below max RPC message size") should call masterTracker.stop() in MapOutputTrackerSuite
@@ -184,6 +183,7 @@ BUG FIXES
     SPARK-13656 Delete spark.sql.parquet.cacheMetadata from SQLConf and docs
     SPARK-18061 Support spnego for ThriftServer thrift/http auth
     SPARK-21247 Type comparison should respect case-sensitive SQL conf
+    SPARK-22300 Update ORC to 1.4.1
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-21783 Turn on ORC filter push-down by default
