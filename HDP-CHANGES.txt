@@ -185,6 +185,7 @@ BUG FIXES
     SPARK-18061 Support spnego for ThriftServer thrift/http auth
     SPARK-21247 Type comparison should respect case-sensitive SQL conf
     SPARK-22300 Update ORC to 1.4.1
+    SPARK-22188 Adding security headers for preventing XSS, MitM and MIME sniffing
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-21783 Turn on ORC filter push-down by default

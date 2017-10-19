@@ -307,4 +307,22 @@ package object config {
         " service is disabled.")
       .bytesConf(ByteUnit.BYTE)
       .createWithDefault(Long.MaxValue)
+
+  private[spark] val UI_X_XSS_PROTECTION =
+    ConfigBuilder("spark.ui.xXssProtection")
+      .doc("Value for HTTP X-XSS-Protection response header")
+      .stringConf
+      .createWithDefaultString("1; mode=block")
+
+  private[spark] val UI_X_CONTENT_TYPE_OPTIONS =
+    ConfigBuilder("spark.ui.xContentTypeOptions.enabled")
+      .doc("Set to 'true' for setting X-Content-Type-Options HTTP response header to 'nosniff'")
+      .booleanConf
+      .createWithDefault(true)
+
+  private[spark] val UI_STRICT_TRANSPORT_SECURITY =
+    ConfigBuilder("spark.ui.strictTransportSecurity")
+      .doc("Value for HTTP Strict Transport Security Response Header")
+      .stringConf
+      .createOptional
 }
