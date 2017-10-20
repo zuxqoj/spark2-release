@@ -321,12 +321,12 @@ object SQLConf {
   val ORC_ENABLED = buildConf("spark.sql.orc.enabled")
     .doc("When true, new ORCFileFormat in sql/core module is used instead of sql/hive module.")
     .booleanConf
-    .createWithDefault(true)
+    .createWithDefault(false)
 
   val ORC_CHAR_ENABLED = buildConf("spark.sql.orc.char.enabled")
     .doc("When true, CHAR type is used instead of STRING in ORC data sources.")
     .booleanConf
-    .createWithDefault(true)
+    .createWithDefault(false)
 
   val ORC_COLUMNAR_BATCH_READER_ENABLED =
     buildConf("spark.sql.orc.columnarBatchReader.enabled")
@@ -343,7 +343,7 @@ object SQLConf {
   val ORC_FILTER_PUSHDOWN_ENABLED = buildConf("spark.sql.orc.filterPushdown")
     .doc("When true, enable filter pushdown for ORC files.")
     .booleanConf
-    .createWithDefault(true)
+    .createWithDefault(false)
 
   val HIVE_VERIFY_PARTITION_PATH = buildConf("spark.sql.hive.verifyPartitionPath")
     .doc("When true, check all the partition paths under the table\'s root directory " +
