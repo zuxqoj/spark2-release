@@ -323,4 +323,63 @@ class HDPQuerySuite
       }
     }
   }
+
+  for (isNewOrc <- Seq("true", "false"); isConverted <- Seq("true", "false")) {
+    test("alter datasource table add columns - orc " +
+      s"(isNewOrc=$isNewOrc, isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        withTable("t1") {
+          sql("CREATE TABLE t1 (c1 int) USING ORC")
+          sql("INSERT INTO t1 VALUES (1)")
+          sql("ALTER TABLE t1 ADD COLUMNS (c2 int)")
+          checkAnswer(
+            spark.table("t1"),
+            Seq(Row(1, null))
+          )
+          checkAnswer(
+            sql("SELECT * FROM t1 WHERE c2 is null"),
+            Seq(Row(1, null))
+          )
+
+          sql("INSERT INTO t1 VALUES (3, 2)")
+          checkAnswer(
+            sql("SELECT * FROM t1 WHERE c2 = 2"),
+            Seq(Row(3, 2))
+          )
+        }
+      }
+    }
+
+    test("alter datasource table add columns - partitioned - orc" +
+      s"(isNewOrc=$isNewOrc, isConverted=$isConverted)") {
+      withSQLConf(
+        SQLConf.ORC_ENABLED.key -> isNewOrc,
+        HiveUtils.CONVERT_METASTORE_ORC.key -> isConverted) {
+        withTable("t1") {
+          sql("CREATE TABLE t1 (c1 int, c2 int) USING ORC PARTITIONED BY (c2)")
+          sql("INSERT INTO t1 PARTITION(c2 = 2) VALUES (1)")
+          sql("ALTER TABLE t1 ADD COLUMNS (c3 int)")
+          checkAnswer(
+            spark.table("t1"),
+            Seq(Row(1, null, 2))
+          )
+          checkAnswer(
+            sql("SELECT * FROM t1 WHERE c3 is null"),
+            Seq(Row(1, null, 2))
+          )
+          sql("INSERT INTO t1 PARTITION(c2 =1) VALUES (2, 3)")
+          checkAnswer(
+            sql("SELECT * FROM t1 WHERE c3 = 3"),
+            Seq(Row(2, 3, 1))
+          )
+          checkAnswer(
+            sql("SELECT * FROM t1 WHERE c2 = 1"),
+            Seq(Row(2, 3, 1))
+          )
+        }
+      }
+    }
+  }
 }

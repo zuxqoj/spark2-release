@@ -187,6 +187,7 @@ BUG FIXES
     SPARK-21247 Type comparison should respect case-sensitive SQL conf
     SPARK-22300 Update ORC to 1.4.1
     SPARK-22188 Adding security headers for preventing XSS, MitM and MIME sniffing
+    SPARK-21929 Support `ALTER TABLE table_name ADD COLUMNS(..)` for ORC data source
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-21783 Turn on ORC filter push-down by default
