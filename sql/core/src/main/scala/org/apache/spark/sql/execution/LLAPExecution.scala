@@ -59,6 +59,7 @@ object LLAPExecution extends Logging {
             case _ => None
           }
          }
+        case _ =>
       }
     }
   }
