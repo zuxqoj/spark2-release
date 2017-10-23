@@ -4,6 +4,30 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES
     RMP-7559. Support virtualenv in PySpark (SPARK-13587)
+
+    (Apache ORC)
+    RMP-8827     ORC, Vectorization and Perf Improvements
+    BUG-88481    Add spark.sql.orc.char.enabled
+    SPARK-14387  Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
+    SPARK-16060  Vectorized Orc Reader
+    SPARK-16628  OrcConversions should not convert an ORC table represented by MetastoreRelation to HadoopFsRelation if metastore schema does not match schema stored in ORC files
+    SPARK-18355  Spark SQL fails to read data from a ORC hive table that has a new column added to it
+    SPARK-19809* NullPointerException on empty ORC file
+    SPARK-20682  Support a new faster ORC data source based on Apache ORC
+    SPARK-20728  Make ORCFileFormat configurable between sql/hive and sql/core
+    SPARK-21422  Depend on Apache ORC 1.4.0
+    SPARK-21477  Mark LocalTableScanExec's input data transient
+    SPARK-21791* ORC should support column names with dot
+    SPARK-21787* Support for pushing down filters for date types in ORC
+    SPARK-21831  Remove `spark.sql.hive.convertMetastoreOrc` config in HiveCompatibilitySuite
+    SPARK-21912  ORC/Parquet table should not create invalid column names
+    SPARK-21929  Support `ALTER TABLE table_name ADD COLUMNS(..)` for ORC data source
+    SPARK-22146  FileNotFoundException while reading ORC files containing special characters
+    SPARK-22158  convertMetastore should not ignore table property
+    SPARK-22300  Update ORC to 1.4.1
+
+    Note that '*' denotes a feature supported only with new ORC file formats.
+
 IMPROVEMENTS
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
     RMP-6448: hdp.version
@@ -11,13 +35,9 @@ IMPROVEMENTS
     BUG-62302 Support HiveServer2 delegation token acquisition in Spark
     BUG-70581 Add hadoop-3.0 profile
     RMP-9454  Update the LLAP for Spark2.2 (SparkSQL Ranger integration for fine grained access control in Spark 2.2)
-    RMP-8827  ORC, Vectorization and Perf Improvements - Tech Preview
 
 BUG FIXES
-    BUG-73561  Virtualenv example fails in yarn-cluster mode with requirement.txt not found error
-    BUG-68632   Spark SQL fails to read data from a ORC hive table that has a new column added to it
-    BUG-88481   Add spark.sql.orc.char.enabled
-    BUG-88924   Converted ORC tables should use table compression property
+    BUG-73561   Virtualenv example fails in yarn-cluster mode with requirement.txt not found error
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
     BUG-48982   Add hadoop lzo jar to the classpath
     BUG-52253   Support configuring YARN correctly for multiple Spark versions and their aux-services
@@ -116,7 +136,6 @@ BUG FIXES
     SPARK-21714   Avoiding re-uploading remote resources in yarn client mode
     SPARK-21254   History UI performance fixes
     SPARK-21834   Incorrect executor request in case of dynamic allocation
-    SPARK-21477   Mark LocalTableScanExec's input data transient
     SPARK-21418   NoSuchElementException: None.get in DataSourceScanExec with sun.io.serialization.extendedDebugInfo=true
     SPARK-21925   Update trigger interval documentation in docs with behavior change in Spark 2.2
     SPARK-21924   Update structured streaming programming guide doc
@@ -156,18 +175,13 @@ BUG FIXES
     SPARK-22143   Fix memory leak in OffHeapColumnVector
     SPARK-22129   Release script improvements
     SPARK-22161   Add Impala-modified TPC-DS queries
-    SPARK-22146   FileNotFoundException while reading ORC files containing special characters
     SPARK-22167   sparkr packaging issue allow zinc
-    SPARK-22158   convertMetastore should not ignore table property
     SPARK-22178   Refresh Persistent Views by REFRESH TABLE Command
     SPARK-20466   HadoopRDD#addLocalConfiguration throws NPE
     SPARK-22206   gapply in R can't work on empty grouping columns
     SPARK-21549   Respect OutputFormats with no output directory provided
     SPARK-22218   spark shuffle services fails to update secret on app re-attempts
     SPARK-21907   NullPointerException in UnsafeExternalSorter.spill()
-    SPARK-14387   Enable Hive-1.x ORC compatibility with spark.sql.hive.convertMetastoreOrc
-    SPARK-16628   OrcConversions should not convert an ORC table represented by MetastoreRelation to HadoopFsRelation if metastore schema does not match schema stored in ORC files
-    SPARK-18355   Spark SQL fails to read data from a ORC hive table that has a new column added to it
     SPARK-22252   FileFormatWriter should respect the input query schema
     SPARK-22273   Fix key/value schema field names in HashMapGenerators.
     SPARK-22223   ObjectHashAggregate should not introduce unnecessary shuffle
@@ -182,14 +196,10 @@ BUG FIXES
     SPARK-21738 Thriftserver doesn't cancel jobs when session is closed
     SPARK-20981 Add new configuration spark.jars.repositories as equivalence of --repositories
     SPARK-20079 Fix client AM not allocating executors after restart
-    SPARK-21831 Remove `spark.sql.hive.convertMetastoreOrc` config in HiveCompatibilitySuite
     SPARK-13656 Delete spark.sql.parquet.cacheMetadata from SQLConf and docs
     SPARK-18061 Support spnego for ThriftServer thrift/http auth
     SPARK-21247 Type comparison should respect case-sensitive SQL conf
-    SPARK-22300 Update ORC to 1.4.1
     SPARK-22188 Adding security headers for preventing XSS, MitM and MIME sniffing
-    SPARK-21929 Support `ALTER TABLE table_name ADD COLUMNS(..)` for ORC data source
-    SPARK-21912 ORC/Parquet table should not create invalid column names
 
     (Jira in Apache Spark is IN PROGRESS)
     BUG-88428 SPARK-21549 Spark fails to complete job correctly in case of OutputFormat which do not write into hdfs
