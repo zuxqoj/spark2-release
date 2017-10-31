@@ -57,6 +57,7 @@ BUG FIXES
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
     BUG-90501   Fix spark.sql.hive.caseSensitiveInferenceMode to NEVER_INFER
     BUG-85326   spark-llap: Notify Hive on Spark query completions
+    BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
 
     (Backport from 2.2.1)
     SPARK-21663   test("remote fetch below max RPC message size") should call masterTracker.stop() in MapOutputTrackerSuite
