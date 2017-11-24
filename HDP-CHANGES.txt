@@ -274,3 +274,4 @@ BUG FIXES
     BUG-88428 SPARK-21549 Spark fails to complete job correctly in case of OutputFormat which do not write into hdfs
   SPARK-22495   Fix setup of SPARK_HOME variable on Windows
   SPARK-22591   GenerateOrdering shouldn't change CodegenContext.INPUT_ROW
+  SPARK-22595   fix flaky test: CastSuite.SPARK-22500: cast for struct should not generate codes beyond 64KB
