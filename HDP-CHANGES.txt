@@ -188,6 +188,71 @@ BUG FIXES
     SPARK-22223   ObjectHashAggregate should not introduce unnecessary shuffle
     SPARK-22271   mean overflows and returns null for some decimal variables
     SPARK-21551   Increase timeout for PythonRDD.serveIterator
+    SPARK-17920   Support writing to Hive table which uses Avro schema url 'avro.schema.url'
+    SPARK-19580   Support for avro.schema.url while writing to hive table
+    SPARK-19878   Add hive configuration when initialize hive serde in InsertIntoHiveTable.scala
+    SPARK-22249   isin with empty list throws exception on cached DataFrame
+    SPARK-22319   call loginUserFromKeytab before accessing hdfs
+    SPARK-21936   backward compatibility test framework for HiveExternalCatalog
+    SPARK-21991   Fix race condition in LauncherServer#acceptConnections
+    SPARK-22227   DiskBlockManager.getAllBlocks now tolerates temp files
+    SPARK-22332   Fix NaiveBayes unit test occasionly fail (cause by test dataset not deterministic)
+    SPARK-21991   Fix java lint
+    SPARK-17902   Revive stringsAsFactors option for collect() in SparkR
+    SPARK-22328   ClosureCleaner should not miss referenced superclass fields
+    SPARK-22355   Dataset.collect is not threadsafe
+    SPARK-22356   data source table should support overlapped columns between data and partition schema
+    SPARK-19727   Fix for round function that modifies original column
+    SPARK-22344   Set java.io.tmpdir for SparkR tests
+    SPARK-22291   Conversion error when transforming array types of uuid, inet and cidr to StingType in PostgreSQL
+    SPARK-19611   set dataSchema correctly in HiveMetastoreCatalog.convertToLogicalRelation
+    SPARK-22333   timeFunctionCall(CURRENT_DATE, CURRENT_TIMESTAMP) has conflicts with columnReference
+    MINOR         automatic type inference supports also Date and Timestamp
+    SPARK-22306   alter table schema should not erase the bucketing metadata at hive side
+    SPARK-22211   Remove incorrect FOJ limit pushdown
+    SPARK-22429   Streaming checkpointing code does not retry after failure
+    SPARK-22315   Warn if SparkR package version doesn't match SparkContext
+    SPARK-22417   Fix for createDataFrame from pandas.DataFrame with timestamp
+    SPARK-22327   check for version warning
+    SPARK-22281   Handle R method breaking signature changes
+    SPARK-22417   Fix for createDataFrame from pandas.DataFrame with timestamp
+    SPARK-22403   Add optional checkpointLocation argument to StructuredKafkaWordCount example
+    SPARK-22287   SPARK_DAEMON_MEMORY not honored by MesosClusterD…
+    SPARK-22472   add null check for top-level primitive values
+    SPARK-22344   clean up install dir if running test as source package
+    SPARK-22243   spark.yarn.jars should reload from config when checkpoint recovery
+    SPARK-22294   Reset spark.driver.bindAddress when starting a Checkpoint
+    SPARK-22284   Fix 64KB JVM bytecode limit problem in calculating hash for nested structs
+    SPARK-19644   Clean up Scala reflection garbage after creating Encoder (branch-2.2)
+    SPARK-21667   ConsoleSink should not fail streaming query with checkpointLocation option
+    SPARK-19606   Support constraints in spark-dispatcher
+    SPARK-21720   Fix 64KB JVM bytecode limit problem with AND or OR
+    SPARK-22488   Fix the view resolution issue in the SparkSession internal table() API
+    SPARK-22464   No pushdown for Hive metastore partition predicates containing null-safe equality
+    SPARK-19606   fix mesos break
+    SPARK-21694   Reduce max iterations in Linear SVM test in R to speed up AppVeyor build
+    SPARK-22442   ScalaReflection should produce correct field names for special characters
+    SPARK-22442   ScalaReflection should produce correct field names for special characters
+    MINOR         Using bufferedInputStream for dataDeserializeStream
+    SPARK-22471   SQLListener consumes much memory causing OutOfMemoryError
+    SPARK-22377   Use /usr/sbin/lsof if lsof does not exists in release-build.sh
+    SPARK-22511   Update maven central repo address
+    SPARK-22490   Add PySpark doc for SparkSession.builder
+    SPARK-22469   Accuracy problem in comparison with string and numeric
+    SPARK-22479   Exclude credentials from SaveintoDataSourceCommand.simpleString
+    SPARK-22499   Fix 64KB JVM bytecode limit problem with least and greatest
+    SPARK-22494   Fix 64KB limit exception with Coalesce and AtleastNNonNulls
+    SPARK-22501   Fix 64KB JVM bytecode limit problem with in
+    SPARK-22535   Sleep before killing the python worker in PythRunner.MonitorThread (branch-2.2)
+    SPARK-22540   Ensure HighlyCompressedMapStatus calculates correct avgSize
+    SPARK-22538   SQLTransformer should not unpersist possibly cached input dataset
+    SPARK-22544   FileStreamSource should use its own hadoop conf to call globPathIfNecessary
+    SPARK-22498   Fix 64KB JVM bytecode limit problem with concat
+    SPARK-22549   Fix 64KB JVM bytecode limit problem with concat_ws
+    SPARK-22508   Fix 64KB JVM bytecode limit problem with GenerateUnsafeRowJoiner.create()
+    SPARK-22550   Fix 64KB JVM bytecode limit problem with elt
+    SPARK-22500   Fix 64KB JVM bytecode limit problem with cast
+    SPARK-22548   Incorrect nested AND expression pushed down to JDBC data source
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
@@ -202,6 +267,7 @@ BUG FIXES
     SPARK-21247 Type comparison should respect case-sensitive SQL conf
     SPARK-22188 Adding security headers for preventing XSS, MitM and MIME sniffing
     SPARK-21807 Override ++ operation in ExpressionSet to reduce clone time
+    SPARK-17321 Avoid writing shuffle metadata to disk if NM recovery is disabled
 
     (Jira in Apache Spark is IN PROGRESS)
     BUG-88428 SPARK-21549 Spark fails to complete job correctly in case of OutputFormat which do not write into hdfs

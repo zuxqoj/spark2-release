@@ -120,7 +120,7 @@ class HiveOutputWriter(
 
   private val serializer = {
     val serializer = tableDesc.getDeserializerClass.newInstance().asInstanceOf[Serializer]
-    serializer.initialize(null, tableDesc.getProperties)
+    serializer.initialize(jobConf, tableDesc.getProperties)
     serializer
   }
 
@@ -134,7 +134,7 @@ class HiveOutputWriter(
 
   private val standardOI = ObjectInspectorUtils
     .getStandardObjectInspector(
-      tableDesc.getDeserializer.getObjectInspector,
+      tableDesc.getDeserializer(jobConf).getObjectInspector,
       ObjectInspectorCopyOption.JAVA)
     .asInstanceOf[StructObjectInspector]
 
