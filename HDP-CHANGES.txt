@@ -21,6 +21,10 @@ BUG FIXES
     (Spark 2.0.2 backport)
     SPARK-17612 Support `DESCRIBE table PARTITION` SQL syntax
 
+    (Spark 2.1.0 backport)
+    SPARK-17433 YarnShuffleService doesn't handle moving credentials levelDb
+    SPARK-14963 Using recoveryPath if NM recovery is enabled
+
     (Backport from 2.3)
     SPARK-17321 Avoid writing shuffle metadata to disk if NM recovery is disabled
 
