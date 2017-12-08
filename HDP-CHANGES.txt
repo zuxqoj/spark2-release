@@ -186,7 +186,10 @@ BUG FIXES
     SPARK-22273   Fix key/value schema field names in HashMapGenerators.
     SPARK-22223   ObjectHashAggregate should not introduce unnecessary shuffle
     SPARK-22271   mean overflows and returns null for some decimal variables
-    SPARK-21551   Increase timeout for PythonRDD.serveIterator
+    SPARK-21551   Increase timeout for PythonRDD.serveIteratori
+    SPARK-19580   Backport PR 19779 to branch-2.2 - Support writing to Hive table which uses Avro schema url 'avro.schema.url'
+    SPARK-19878   -
+    SPARK-17920   -
 
     (Backport from 2.3)
     SPARK-15648 Add TeradataDialect
