@@ -1073,6 +1073,12 @@ object SQLConf {
     .booleanConf
     .createWithDefault(false)
 
+  val ELT_OUTPUT_AS_STRING = buildConf("spark.sql.function.eltOutputAsString")
+    .doc("When this option is set to false and all inputs are binary, `elt` returns " +
+      "an output as binary. Otherwise, it returns as a string. ")
+    .booleanConf
+    .createWithDefault(false)
+
   val CONTINUOUS_STREAMING_EXECUTOR_QUEUE_SIZE =
     buildConf("spark.sql.streaming.continuous.executorQueueSize")
     .internal()
@@ -1432,6 +1438,8 @@ class SQLConf extends Serializable with Logging {
     getConf(CONTINUOUS_STREAMING_EXECUTOR_POLL_INTERVAL_MS)
 
   def concatBinaryAsString: Boolean = getConf(CONCAT_BINARY_AS_STRING)
+
+  def eltOutputAsString: Boolean = getConf(ELT_OUTPUT_AS_STRING)
 
   def partitionOverwriteMode: PartitionOverwriteMode.Value =
     PartitionOverwriteMode.withName(getConf(PARTITION_OVERWRITE_MODE))
