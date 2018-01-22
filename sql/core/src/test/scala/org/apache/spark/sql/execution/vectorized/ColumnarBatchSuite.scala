@@ -33,6 +33,7 @@ import org.apache.spark.sql.{RandomDataGenerator, Row}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.arrow.ArrowUtils
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch, ColumnVector}
 import org.apache.spark.unsafe.Platform
 import org.apache.spark.unsafe.types.CalendarInterval
 
@@ -731,8 +732,8 @@ class ColumnarBatchSuite extends SparkFunSuite {
     "Struct Column",
     10,
     new StructType().add("int", IntegerType).add("double", DoubleType)) { column =>
-      val c1 = column.getChildColumn(0)
-      val c2 = column.getChildColumn(1)
+      val c1 = column.getChild(0)
+      val c2 = column.getChild(1)
       assert(c1.dataType() == IntegerType)
       assert(c2.dataType() == DoubleType)
 
@@ -786,8 +787,8 @@ class ColumnarBatchSuite extends SparkFunSuite {
     10,
     new ArrayType(structType, true)) { column =>
       val data = column.arrayData()
-      val c0 = data.getChildColumn(0)
-      val c1 = data.getChildColumn(1)
+      val c0 = data.getChild(0)
+      val c1 = data.getChild(1)
       // Structs in child column: (0, 0), (1, 10), (2, 20), (3, 30), (4, 40), (5, 50)
       (0 until 6).foreach { i =>
         c0.putInt(i, i)
@@ -814,8 +815,8 @@ class ColumnarBatchSuite extends SparkFunSuite {
     new StructType()
       .add("int", IntegerType)
       .add("array", new ArrayType(IntegerType, true))) { column =>
-      val c0 = column.getChildColumn(0)
-      val c1 = column.getChildColumn(1)
+      val c0 = column.getChild(0)
+      val c1 = column.getChild(1)
       c0.putInt(0, 0)
       c0.putInt(1, 1)
       c0.putInt(2, 2)
@@ -843,13 +844,13 @@ class ColumnarBatchSuite extends SparkFunSuite {
     "Nest Struct in Struct",
     10,
     new StructType().add("int", IntegerType).add("struct", subSchema)) { column =>
-      val c0 = column.getChildColumn(0)
-      val c1 = column.getChildColumn(1)
+      val c0 = column.getChild(0)
+      val c1 = column.getChild(1)
       c0.putInt(0, 0)
       c0.putInt(1, 1)
       c0.putInt(2, 2)
-      val c1c0 = c1.getChildColumn(0)
-      val c1c1 = c1.getChildColumn(1)
+      val c1c0 = c1.getChild(0)
+      val c1c1 = c1.getChild(1)
       // Structs in c1: (7, 70), (8, 80), (9, 90)
       c1c0.putInt(0, 7)
       c1c0.putInt(1, 8)
@@ -874,14 +875,13 @@ class ColumnarBatchSuite extends SparkFunSuite {
         .add("intCol2", IntegerType)
         .add("string", BinaryType)
 
-      val capacity = ColumnarBatch.DEFAULT_BATCH_SIZE
+      val capacity = 4 * 1024
       val columns = schema.fields.map { field =>
         allocate(capacity, field.dataType, memMode)
       }
-      val batch = new ColumnarBatch(schema, columns.toArray, ColumnarBatch.DEFAULT_BATCH_SIZE)
+      val batch = new ColumnarBatch(columns.toArray)
       assert(batch.numCols() == 4)
       assert(batch.numRows() == 0)
-      assert(batch.capacity() > 0)
       assert(batch.rowIterator().hasNext == false)
 
       // Add a row [1, 1.1, NULL]
@@ -918,10 +918,7 @@ class ColumnarBatchSuite extends SparkFunSuite {
       assert(it.hasNext == false)
 
       // Reset and add 3 rows
-      batch.reset()
-      assert(batch.numRows() == 0)
-      assert(batch.rowIterator().hasNext == false)
-
+      columns.foreach(_.reset())
       // Add rows [NULL, 2.2, 2, "abc"], [3, NULL, 3, ""], [4, 4.4, 4, "world]
       columns(0).putNull(0)
       columns(1).putDouble(0, 2.2)
@@ -1155,7 +1152,7 @@ class ColumnarBatchSuite extends SparkFunSuite {
     val columnVectors = Seq(new ArrowColumnVector(vector1), new ArrowColumnVector(vector2))
 
     val schema = StructType(Seq(StructField("int1", IntegerType), StructField("int2", IntegerType)))
-    val batch = new ColumnarBatch(schema, columnVectors.toArray[ColumnVector], 11)
+    val batch = new ColumnarBatch(columnVectors.toArray)
     batch.setNumRows(11)
 
     assert(batch.numCols() == 2)

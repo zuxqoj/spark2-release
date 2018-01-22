@@ -17,7 +17,7 @@
 
 package org.apache.spark.sql.streaming
 
-import java.util.Locale
+import java.util.{Locale, Optional}
 
 import scala.collection.JavaConverters._
 
@@ -27,8 +27,9 @@ import org.apache.spark.sql.{AnalysisException, DataFrame, Dataset, SparkSession
 import org.apache.spark.sql.execution.command.DDLUtils
 import org.apache.spark.sql.execution.datasources.DataSource
 import org.apache.spark.sql.execution.streaming.{StreamingRelation, StreamingRelationV2}
+import org.apache.spark.sql.sources.StreamSourceProvider
 import org.apache.spark.sql.sources.v2.DataSourceV2Options
-import org.apache.spark.sql.sources.v2.streaming.ContinuousReadSupport
+import org.apache.spark.sql.sources.v2.streaming.{ContinuousReadSupport, MicroBatchReadSupport}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.util.Utils
 
@@ -117,7 +118,7 @@ final class DataStreamReader private[sql](sparkSession: SparkSession) extends Lo
    * You can set the following option(s):
    * <ul>
    * <li>`timeZone` (default session local timezone): sets the string that indicates a timezone
-   * to be used to parse timestamps in the JSON/CSV datasources or partition values.</li>
+   * to be used to parse timestamps in the JSON/CSV data sources or partition values.</li>
    * </ul>
    *
    * @since 2.0.0
@@ -128,12 +129,12 @@ final class DataStreamReader private[sql](sparkSession: SparkSession) extends Lo
   }
 
   /**
-   * Adds input options for the underlying data source.
+   * (Java-specific) Adds input options for the underlying data source.
    *
    * You can set the following option(s):
    * <ul>
    * <li>`timeZone` (default session local timezone): sets the string that indicates a timezone
-   * to be used to parse timestamps in the JSON/CSV datasources or partition values.</li>
+   * to be used to parse timestamps in the JSON/CSV data sources or partition values.</li>
    * </ul>
    *
    * @since 2.0.0
@@ -166,19 +167,31 @@ final class DataStreamReader private[sql](sparkSession: SparkSession) extends Lo
       userSpecifiedSchema = userSpecifiedSchema,
       className = source,
       options = extraOptions.toMap)
+    val v1Relation = ds match {
+      case _: StreamSourceProvider => Some(StreamingRelation(v1DataSource))
+      case _ => None
+    }
     ds match {
-      case s: ContinuousReadSupport =>
-        val tempReader = s.createContinuousReader(
-          java.util.Optional.ofNullable(userSpecifiedSchema.orNull),
+      case s: MicroBatchReadSupport =>
+        val tempReader = s.createMicroBatchReader(
+          Optional.ofNullable(userSpecifiedSchema.orNull),
           Utils.createTempDir(namePrefix = s"temporaryReader").getCanonicalPath,
           options)
-        // Generate the V1 node to catch errors thrown within generation.
-        StreamingRelation(v1DataSource)
         Dataset.ofRows(
           sparkSession,
           StreamingRelationV2(
             s, source, extraOptions.toMap,
-            tempReader.readSchema().toAttributes, v1DataSource)(sparkSession))
+            tempReader.readSchema().toAttributes, v1Relation)(sparkSession))
+      case s: ContinuousReadSupport =>
+        val tempReader = s.createContinuousReader(
+          Optional.ofNullable(userSpecifiedSchema.orNull),
+          Utils.createTempDir(namePrefix = s"temporaryReader").getCanonicalPath,
+          options)
+        Dataset.ofRows(
+          sparkSession,
+          StreamingRelationV2(
+            s, source, extraOptions.toMap,
+            tempReader.readSchema().toAttributes, v1Relation)(sparkSession))
       case _ =>
         // Code path for data source v1.
         Dataset.ofRows(sparkSession, StreamingRelation(v1DataSource))

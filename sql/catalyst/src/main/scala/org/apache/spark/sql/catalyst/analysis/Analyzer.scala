@@ -52,6 +52,7 @@ object SimpleAnalyzer extends Analyzer(
 /**
  * Provides a way to keep state during the analysis, this enables us to decouple the concerns
  * of analysis environment from the catalog.
+ * The state that is kept here is per-query.
  *
  * Note this is thread local.
  *
@@ -70,6 +71,8 @@ object AnalysisContext {
   }
 
   def get: AnalysisContext = value.get()
+  def reset(): Unit = value.remove()
+
   private def set(context: AnalysisContext): Unit = value.set(context)
 
   def withAnalysisContext[A](database: Option[String])(f: => A): A = {
@@ -94,6 +97,17 @@ class Analyzer(
   def this(catalog: SessionCatalog, conf: SQLConf) = {
     this(catalog, conf, conf.optimizerMaxIterations)
   }
+
+  override def execute(plan: LogicalPlan): LogicalPlan = {
+    AnalysisContext.reset()
+    try {
+      executeSameContext(plan)
+    } finally {
+      AnalysisContext.reset()
+    }
+  }
+
+  private def executeSameContext(plan: LogicalPlan): LogicalPlan = super.execute(plan)
 
   def resolver: Resolver = conf.resolver
 
@@ -176,7 +190,7 @@ class Analyzer(
       case With(child, relations) =>
         substituteCTE(child, relations.foldLeft(Seq.empty[(String, LogicalPlan)]) {
           case (resolved, (name, relation)) =>
-            resolved :+ name -> execute(substituteCTE(relation, resolved))
+            resolved :+ name -> executeSameContext(substituteCTE(relation, resolved))
         })
       case other => other
     }
@@ -597,10 +611,10 @@ class Analyzer(
           if (AnalysisContext.get.nestedViewDepth > conf.maxNestedViewDepth) {
             view.failAnalysis(s"The depth of view ${view.desc.identifier} exceeds the maximum " +
               s"view resolution depth (${conf.maxNestedViewDepth}). Analysis is aborted to " +
-              "avoid errors. Increase the value of spark.sql.view.maxNestedViewDepth to work " +
-              "aroud this.")
+              s"avoid errors. Increase the value of ${SQLConf.MAX_NESTED_VIEW_DEPTH.key} to work " +
+              "around this.")
           }
-          execute(child)
+          executeSameContext(child)
         }
         view.copy(child = newChild)
       case p @ SubqueryAlias(_, view: View) =>
@@ -639,7 +653,7 @@ class Analyzer(
         // Note that if the database is not defined, it is possible we are looking up a temp view.
         case e: NoSuchDatabaseException =>
           u.failAnalysis(s"Table or view not found: ${tableIdentWithDb.unquotedString}, the " +
-            s"database ${e.db} doesn't exsits.")
+            s"database ${e.db} doesn't exist.")
       }
     }
 
@@ -1269,7 +1283,7 @@ class Analyzer(
       do {
         // Try to resolve the subquery plan using the regular analyzer.
         previous = current
-        current = execute(current)
+        current = executeSameContext(current)
 
         // Use the outer references to resolve the subquery plan if it isn't resolved yet.
         val i = plans.iterator
@@ -1392,7 +1406,7 @@ class Analyzer(
               grouping,
               Alias(cond, "havingCondition")() :: Nil,
               child)
-          val resolvedOperator = execute(aggregatedCondition)
+          val resolvedOperator = executeSameContext(aggregatedCondition)
           def resolvedAggregateFilter =
             resolvedOperator
               .asInstanceOf[Aggregate]
@@ -1450,7 +1464,8 @@ class Analyzer(
           val aliasedOrdering =
             unresolvedSortOrders.map(o => Alias(o.child, "aggOrder")())
           val aggregatedOrdering = aggregate.copy(aggregateExpressions = aliasedOrdering)
-          val resolvedAggregate: Aggregate = execute(aggregatedOrdering).asInstanceOf[Aggregate]
+          val resolvedAggregate: Aggregate =
+            executeSameContext(aggregatedOrdering).asInstanceOf[Aggregate]
           val resolvedAliasedOrdering: Seq[Alias] =
             resolvedAggregate.aggregateExpressions.asInstanceOf[Seq[Alias]]
 
@@ -1509,7 +1524,7 @@ class Analyzer(
   }
 
   /**
-   * Extracts [[Generator]] from the projectList of a [[Project]] operator and create [[Generate]]
+   * Extracts [[Generator]] from the projectList of a [[Project]] operator and creates [[Generate]]
    * operator under [[Project]].
    *
    * This rule will throw [[AnalysisException]] for following cases:

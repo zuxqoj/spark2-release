@@ -23,6 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import org.apache.spark.sql.internal.SQLConf;
 import org.apache.spark.sql.types.*;
+import org.apache.spark.sql.vectorized.ColumnVector;
 import org.apache.spark.unsafe.array.ByteArrayMethods;
 import org.apache.spark.unsafe.types.UTF8String;
 
@@ -585,11 +586,11 @@ public abstract class WritableColumnVector extends ColumnVector {
   public final int appendStruct(boolean isNull) {
     if (isNull) {
       appendNull();
-      for (ColumnVector c: childColumns) {
+      for (WritableColumnVector c: childColumns) {
         if (c.type instanceof StructType) {
-          ((WritableColumnVector) c).appendStruct(true);
+          c.appendStruct(true);
         } else {
-          ((WritableColumnVector) c).appendNull();
+          c.appendNull();
         }
       }
     } else {
@@ -598,17 +599,13 @@ public abstract class WritableColumnVector extends ColumnVector {
     return elementsAppended;
   }
 
-  /**
-   * Returns the data for the underlying array.
-   */
+  // `WritableColumnVector` puts the data of array in the first child column vector, and puts the
+  // array offsets and lengths in the current column vector.
   @Override
   public WritableColumnVector arrayData() { return childColumns[0]; }
 
-  /**
-   * Returns the ordinal's child data column.
-   */
   @Override
-  public WritableColumnVector getChildColumn(int ordinal) { return childColumns[ordinal]; }
+  public WritableColumnVector getChild(int ordinal) { return childColumns[ordinal]; }
 
   /**
    * Returns the elements appended.
