@@ -254,7 +254,8 @@ abstract class AbstractCommandBuilder {
     String hadoopClientHome = "/usr/hdp/current/hadoop-client";
     File libdir;
     libdir = new File(hadoopClientHome, "lib");
-    checkState(libdir.isDirectory(), "Library directory '%s' does not exist.", libdir.getAbsolutePath());
+    checkState(libdir.isDirectory(), "Library directory '%s' does not exist.",
+      libdir.getAbsolutePath());
     final Pattern re = Pattern.compile("azure-storage.*\\.jar");
     FileFilter filter = new FileFilter() {
       @Override
