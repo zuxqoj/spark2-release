@@ -23,8 +23,8 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{CommonConfigurationKeysPublic, FileSystem, Path}
 import org.apache.hadoop.io.{NullWritable, Text}
 
-import org.apache.spark.cloud.TimeOperations
 import org.apache.spark.SparkConf
+import org.apache.spark.cloud.TimeOperations
 import org.apache.spark.rdd.RDD
 
 /**

@@ -122,8 +122,8 @@ class Main {
           "please set through HDP_VERSION in spark-env.sh or add a java-opts file in conf " +
           "with -Dhdp.version=xxx");
       } else if (hdpConfs.size() > 1) {
-        throw new IllegalStateException("hdp.version is set more than once with different versions," +
-          " please check your configurations and environments to remove redundancy.");
+        throw new IllegalStateException("hdp.version is set more than once with different " +
+          "versions, please check your configurations and environments to remove redundancy.");
       }
     }
 
