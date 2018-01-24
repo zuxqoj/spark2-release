@@ -59,7 +59,7 @@ private[cloud] abstract class CloudSuite extends SparkFunSuite with CloudTestKey
   /**
    * Accessor to the configuration, which mist be non-empty.
    */
-  protected val conf: Configuration = testConfiguration.get
+  protected val conf: Configuration = testConfiguration.getOrElse(new Configuration)
 
   /**
    * Map of keys defined on the command line.
