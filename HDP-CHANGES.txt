@@ -19,7 +19,6 @@ BUG FIXES
     BUG-52253   Support configuring YARN correctly for multiple Spark versions and their aux-services
     BUG-60289   Spark2 jersey and Timeline Jersey are incompatible
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
-    BUG-61726   SparkLauncherSuite unit test failing
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
     BUG-68592   Implement `spark-llap2` package for Spark 2.1.x
     BUG-71525   Support `spark.sql.hive.llap` configuration
