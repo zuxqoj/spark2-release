@@ -154,10 +154,12 @@ private[sql] class SessionState(
       throw new Exception("Spark conf does not contain config " + HIVESERVER2_JDBC_URL.key)
     }
 
-    if (sparkSession.conf.get(HIVESERVER2_CREDENTIAL_ENABLED, false)) {
+    if (sparkSession.conf.get(HIVESERVER2_CREDENTIAL_ENABLED, false) &&
+      org.apache.spark.util.Utils.isRunningInYarnContainer(sparkSession.sparkContext.conf)) {
       // 1. YARN Cluster mode for kerberized clusters
       s"${sparkSession.conf.get(HIVESERVER2_JDBC_URL.key)};auth=delegationToken"
-    } else if (sparkSession.sparkContext.conf.contains(HIVESERVER2_JDBC_URL_PRINCIPAL.key)) {
+    } else if (sparkSession.sparkContext.conf.contains(HIVESERVER2_JDBC_URL_PRINCIPAL.key) &&
+      !org.apache.spark.util.Utils.isRunningInYarnContainer(sparkSession.sparkContext.conf)) {
       // 2. YARN Client mode for kerberized clusters
       s"${sparkSession.conf.get(HIVESERVER2_JDBC_URL.key)};" +
         s"principal=${sparkSession.conf.get(HIVESERVER2_JDBC_URL_PRINCIPAL.key)}"
