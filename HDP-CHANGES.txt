@@ -39,3 +39,5 @@ BUG FIXES
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
     SPARK-23434 Spark should not warn `metadata directory` for a HDFS file path
     SPARK-23340 Upgrade Apache ORC to 1.4.3
+    SPARK-23456 Turn on `native` ORC impl and PPD by default
+    SPARK-21783 Turn on `native` ORC impl and PPD by default
