@@ -295,6 +295,7 @@ BUG FIXES
     
     (Backport from 2.1.2)
     [SPARK-19970] Table owner should be USER instead of PRINCIPAL in kerberized clusters
+    [SPARK-20922] Add whitelist of classes that can be deserialized by the launcher 
 
     (Backport from 2.2)
     [BUG-78776][SPARK-8617][WEBUI] HistoryServer: Include in-progress files during cleanup
