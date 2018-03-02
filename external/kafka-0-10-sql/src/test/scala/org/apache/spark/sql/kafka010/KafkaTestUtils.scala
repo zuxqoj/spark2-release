@@ -29,8 +29,8 @@ import scala.util.Random
 
 import kafka.admin.AdminUtils
 import kafka.api.Request
-import kafka.common.TopicAndPartition
-import kafka.server.{KafkaConfig, KafkaServer, OffsetCheckpoint}
+import kafka.server.{KafkaConfig, KafkaServer}
+import kafka.server.checkpoints.OffsetCheckpointFile
 import kafka.utils.ZkUtils
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer._
@@ -113,7 +113,7 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
       brokerConf = new KafkaConfig(brokerConfiguration, doLog = false)
       server = new KafkaServer(brokerConf)
       server.startup()
-      brokerPort = server.boundPort()
+      brokerPort = server.boundPort(brokerConf.interBrokerListenerName)
       (server, brokerPort)
     }, new SparkConf(), "KafkaBroker")
 
@@ -203,7 +203,12 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
 
   /** Add new partitions to a Kafka topic */
   def addPartitions(topic: String, partitions: Int): Unit = {
-    AdminUtils.addPartitions(zkUtils, topic, partitions)
+    val existingAssignment = zkUtils.getReplicaAssignmentForTopics(Seq(topic)).map {
+      case (topicPartition, replicas) => topicPartition.partition -> replicas
+    }
+    val allBrokers = AdminUtils.getBrokerMetadatas(zkUtils)
+    AdminUtils.addPartitions(zkUtils, topic, existingAssignment, allBrokers, partitions)
+
     // wait until metadata is propagated
     (0 until partitions).foreach { p =>
       waitUntilMetadataIsPropagated(topic, p)
@@ -296,6 +301,7 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
     props.put("replica.socket.timeout.ms", "1500")
     props.put("delete.topic.enable", "true")
     props.put("offsets.topic.num.partitions", "1")
+    props.put("offsets.topic.replication.factor", "1")
     // Can not use properties.putAll(propsMap.asJava) in scala-2.12
     // See https://github.com/scala/bug/issues/10418
     withBrokerProps.foreach { case (k, v) => props.put(k, v) }
@@ -327,7 +333,7 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
       topic: String,
       numPartitions: Int,
       servers: Seq[KafkaServer]): Unit = {
-    val topicAndPartitions = (0 until numPartitions).map(TopicAndPartition(topic, _))
+    val topicAndPartitions = (0 until numPartitions).map(new TopicPartition(topic, _))
 
     import ZkUtils._
     // wait until admin path for delete topic is deleted, signaling completion of topic deletion
@@ -337,7 +343,7 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
     assert(!zkUtils.pathExists(getTopicPath(topic)), s"${getTopicPath(topic)} still exists")
     // ensure that the topic-partition has been deleted from all brokers' replica managers
     assert(servers.forall(server => topicAndPartitions.forall(tp =>
-      server.replicaManager.getPartition(tp.topic, tp.partition) == None)),
+      server.replicaManager.getPartition(tp).isEmpty)),
       s"topic $topic still exists in the replica manager")
     // ensure that logs from all replicas are deleted if delete topic is marked successful
     assert(servers.forall(server => topicAndPartitions.forall(tp =>
@@ -345,8 +351,8 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
       s"topic $topic still exists in log mananger")
     // ensure that topic is removed from all cleaner offsets
     assert(servers.forall(server => topicAndPartitions.forall { tp =>
-      val checkpoints = server.getLogManager().logDirs.map { logDir =>
-        new OffsetCheckpoint(new File(logDir, "cleaner-offset-checkpoint")).read()
+      val checkpoints = server.getLogManager().allLogs.map { logDir =>
+        new OffsetCheckpointFile(new File(logDir.dir, "cleaner-offset-checkpoint")).read()
       }
       checkpoints.forall(checkpointsPerLogDir => !checkpointsPerLogDir.contains(tp))
     }), s"checkpoint for topic $topic still exists")
@@ -379,11 +385,11 @@ class KafkaTestUtils(withBrokerProps: Map[String, Object] = Map.empty) extends L
   private def waitUntilMetadataIsPropagated(topic: String, partition: Int): Unit = {
     def isPropagated = server.apis.metadataCache.getPartitionInfo(topic, partition) match {
       case Some(partitionState) =>
-        val leaderAndInSyncReplicas = partitionState.leaderIsrAndControllerEpoch.leaderAndIsr
+        val leaderAndInSyncReplicas = partitionState.basePartitionState
 
         zkUtils.getLeaderForPartition(topic, partition).isDefined &&
           Request.isValidBrokerId(leaderAndInSyncReplicas.leader) &&
-          leaderAndInSyncReplicas.isr.nonEmpty
+          !leaderAndInSyncReplicas.isr.isEmpty
 
       case _ =>
         false

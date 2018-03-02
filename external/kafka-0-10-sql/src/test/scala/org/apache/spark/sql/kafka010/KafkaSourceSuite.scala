@@ -1016,7 +1016,6 @@ class KafkaSourceStressForDontFailOnDataLossSuite extends StreamTest with Shared
         // 30 seconds delay (kafka.log.LogManager.InitialTaskDelayMs) so this test should run at
         // least 30 seconds.
         props.put("log.cleaner.backoff.ms", "100")
-        props.put("log.segment.bytes", "40")
         props.put("log.retention.bytes", "40")
         props.put("log.retention.check.interval.ms", "100")
         props.put("delete.retention.ms", "10")

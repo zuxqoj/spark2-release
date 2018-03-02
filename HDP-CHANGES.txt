@@ -12,6 +12,7 @@ IMPROVEMENTS
     BUG-70581 Add hadoop-3.0 profile
     BUG-84628 HiveServer2Credential Provider is enabled by default
     RMP-9454: SparkSQL Ranger integration for fine grained access control in Spark 2.2
+    BUG-97455 Update Spark to build against Kafka 1.0
 
 BUG FIXES
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
