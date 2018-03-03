@@ -35,9 +35,25 @@ BUG FIXES
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
 
+    (Backport from 2.3.1)
+    SPARK-23475 Show also skipped stages
+    SPARK-23438 Fix DStreams data loss with WAL when driver crashes
+    SPARK-23449 Preserve extraJavaOptions ordering
+    SPARK-23365 Do not adjust num executors when killing idle executors.
+    SPARK-23448 Clarify JSON and CSV parser behavior in document
+    SPARK-23508 Fix BlockmanagerId in case blockManagerIdCache cause oom
+    SPARK-23517 Make `pyspark.util._exception_message` produce the trace from Java side by Py4JJavaError
+    SPARK-23551 Exclude `hadoop-mapreduce-client-core` dependency from `orc-mapreduce`
+    SPARK-22883 Streaming tests for spark.ml.feature, from A to H
+
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
     SPARK-23434 Spark should not warn `metadata directory` for a HDFS file path
     SPARK-23340 Upgrade Apache ORC to 1.4.3
     SPARK-23456 Turn on `native` ORC impl and PPD by default
     SPARK-21783 Turn on `native` ORC impl and PPD by default
+    SPARK-23523 Fix the incorrect result caused by the rule OptimizeMetadataOnlyQuery
+    SPARK-23523 Minor refactor of OptimizeMetadataOnlyQuery
+    SPARK-23510 Support Hive 2.2 and Hive 2.3 metastore
+    SPARK-23518 Avoid metastore access when the users only want to read and write data frames
+    SPARK-23570 Add Spark 2.3.0 in HiveExternalCatalogVersionsSuite
