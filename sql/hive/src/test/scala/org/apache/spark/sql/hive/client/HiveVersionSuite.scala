@@ -38,6 +38,11 @@ private[client] abstract class HiveVersionSuite(version: String) extends SparkFu
       hadoopConf.set("datanucleus.schema.autoCreateAll", "true")
       hadoopConf.set("hive.metastore.schema.verification", "false")
     }
+    if (version == "3.0") {
+      hadoopConf.set("datanucleus.schema.autoCreateAll", "true")
+      hadoopConf.set("hive.metastore.schema.verification", "false")
+      hadoopConf.set("hive.execution.engine", "mr")
+    }
     HiveClientBuilder.buildClient(
       version,
       hadoopConf,

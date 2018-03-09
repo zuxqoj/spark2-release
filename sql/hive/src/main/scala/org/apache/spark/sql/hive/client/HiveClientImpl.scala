@@ -105,6 +105,7 @@ private[hive] class HiveClientImpl(
     case hive.v2_1 => new Shim_v2_1()
     case hive.v2_2 => new Shim_v2_2()
     case hive.v2_3 => new Shim_v2_3()
+    case hive.v3_0 => new Shim_v3_0()
   }
 
   // Create an internal session state for this HiveClientImpl.
@@ -168,6 +169,7 @@ private[hive] class HiveClientImpl(
     // 2: we set all spark confs to this hiveConf.
     // 3: we set all entries in config to this hiveConf.
     (hadoopConf.iterator().asScala.map(kv => kv.getKey -> kv.getValue)
+      ++ (if (version == hive.v3_0) Seq("hive.execution.engine" -> "mr") else Nil)
       ++ sparkConf.getAll.toMap ++ extraConfig).foreach { case (k, v) =>
       logDebug(
         s"""
