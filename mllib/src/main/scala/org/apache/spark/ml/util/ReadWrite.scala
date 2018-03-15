@@ -39,7 +39,7 @@ import org.apache.spark.ml.feature.RFormulaModel
 import org.apache.spark.ml.param.{ParamPair, Params}
 import org.apache.spark.ml.tuning.ValidatorParams
 import org.apache.spark.sql.{SparkSession, SQLContext}
-import org.apache.spark.util.{Utils, VersionUtils}
+import org.apache.spark.util.{ListenerBus, Utils, VersionUtils}
 
 /**
  * Trait for `MLWriter` and `MLReader`.
@@ -166,7 +166,8 @@ trait MLFormatRegister extends MLWriterFormat {
  * Abstract class for utility classes that can save ML instances in Spark's internal format.
  */
 @Since("1.6.0")
-abstract class MLWriter extends BaseReadWrite with Logging {
+abstract class MLWriter extends BaseReadWrite with Logging with
+  ListenerBus[MLListener, MLListenEvent]{
 
   protected var shouldOverwrite: Boolean = false
 
@@ -219,6 +220,10 @@ abstract class MLWriter extends BaseReadWrite with Logging {
   // override for Java compatibility
   @Since("1.6.0")
   override def context(sqlContext: SQLContext): this.type = super.session(sqlContext.sparkSession)
+
+  override protected def doPostEvent(listener: MLListener, event: MLListenEvent): Unit = {
+    listener.onEvent(event)
+  }
 }
 
 /**
