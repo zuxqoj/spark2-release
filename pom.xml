@@ -2224,9 +2224,6 @@
               <spark.unsafe.exceptionOnMemoryLeak>true</spark.unsafe.exceptionOnMemoryLeak>
               <!-- Needed by sql/hive tests. -->
               <test.src.tables>__not_used__</test.src.tables>
-              <!-- optionally set for cloud infrastructure tests -->
-              <cloud.test.configuration.file>${cloud.test.configuration.file}</cloud.test.configuration.file>
-              <test.method.keys>${test.method.keys}</test.method.keys>
             </systemProperties>
             <tagsToExclude>${test.exclude.tags}</tagsToExclude>
             <tagsToInclude>${test.include.tags}</tagsToInclude>
@@ -2714,9 +2711,6 @@
         <hadoop.version>2.7.3</hadoop.version>
         <curator.version>2.7.1</curator.version>
       </properties>
-      <modules>
-        <module>cloud</module>
-      </modules>
       <dependencyManagement>
         <dependencies>
           <dependency>
@@ -2793,74 +2787,9 @@
         <zookeeper.version>3.4.9</zookeeper.version>
       </properties>
       <modules>
-        <module>cloud</module>
+        <!-- turn on the hadoop cloud module -->
+        <module>hadoop-cloud</module>
       </modules>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-aws</artifactId>
-            <version>${hadoop.version}</version>
-            <scope>${hadoop.deps.scope}</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-
-          <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-openstack</artifactId>
-            <version>${hadoop.version}</version>
-            <scope>${hadoop.deps.scope}</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-
-          <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-azure</artifactId>
-            <version>${hadoop.version}</version>
-            <scope>${hadoop.deps.scope}</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
     </profile>
 
     <profile>
