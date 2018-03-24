@@ -36,7 +36,6 @@ BUG FIXES
     BUG-85326   spark-llap: Notify Hive on Spark query completions
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
-    BUG-84810   SPARK-23644 Complete application is not shown on Spark HS page
 
     (Backport from 2.3.1)
     SPARK-23475 Show also skipped stages
@@ -47,11 +46,51 @@ BUG FIXES
     SPARK-23508 Fix BlockmanagerId in case blockManagerIdCache cause oom
     SPARK-23517 Make `pyspark.util._exception_message` produce the trace from Java side by Py4JJavaError
     SPARK-23551 Exclude `hadoop-mapreduce-client-core` dependency from `orc-mapreduce`
+    SPARK-23570 Add Spark 2.3.0 in HiveExternalCatalogVersionsSuite
     SPARK-22883 Streaming tests for spark.ml.feature, from A to H
+    SPARK-23569 Allow pandas_udf to work with python3 style type-annotated functions
+    SPARK-23329 Fix documentation of trigonometric functions
+    SPARK-22882 ML test for structured streaming: ml.classification
+    SPARK-23457 Register task completion listeners first in ParquetFileFormat
+    SPARK-23434 Spark should not warn `metadata directory` for a HDFS file path
+    SPARK-23601 Remove .md5 files from release
+    SPARK-23525 Support ALTER TABLE CHANGE COLUMN COMMENT for external hive table
+    SPARK-23020 Fix another race in the in-process launcher test.
+    SPARK-23524 Big local shuffle blocks should not be checked for corruption.
+    SPARK-23490 Check storage.locationUri with existing table in CreateTable
+    SPARK-23406 Enable stream-stream self-joins for branch-2.3
+    SPARK-23436 Infer partition as Date only if it can be casted to Date
+    SPARK-23630 Allow user's hadoop conf customizations to take effect.
+    SPARK-23628 calculateParamLength should not return 1 + num of expressions
+    SPARK-23173 Avoid creating corrupt parquet files when loading data from JSON
+    SPARK-23624 Revise doc of method pushFilters in Datasource V2
+    SPARK-23462 improve missing field error message in `StructType`
+    SPARK-23598 Make methods in BufferedRowIterator public to avoid runtime error for a large query
+    SPARK-22915 Streaming tests for spark.ml.feature, from N to Z
+    SPARK-23642 AccumulatorV2 subclass isZero scaladoc fix
+    SPARK-23695 Fix the error message for Kinesis streaming tests
+    SPARK-23658 InProcessAppHandle uses the wrong class in getLogger
+    SPARK-23671 Fix condition to enable the SHS thread pool.
+    SPARK-23608 Add synchronization in SHS between attachSparkUI and detachSparkUI functions to avoid concurrent modification issue to Jetty Handlers
+    SPARK-23670 Fix memory leak on SparkPlanGraphWrapper
+    SPARK-23553 Tests should not assume the default value of `spark.sql.sources.default`
+    SPARK-23706 spark.conf.get(value, default=None) should produce None in PySpark
+    SPARK-23728 Fix ML tests with expected exceptions running streaming tests
+    SPARK-23660 Fix exception in yarn cluster mode when application ended fast
+    SPARK-23644 Use absolute path for REST call in SHS
+    SPARK-23691 Use sql_conf util in PySpark tests where possible
+    SPARK-23649 Skipping chars disallowed in UTF-8
+    SPARK-23264 Fix scala.MatchError in literals.sql.out
+    SPARK-23288 Fix output metrics with parquet sink
+    SPARK-23729 Respect URI fragment when resolving globs
+    SPARK-23760 CodegenContext.withSubExprEliminationExprs should save/restore CSE state correctly
+    SPARK-23614 Fix incorrect reuse exchange when caching is used
+    SPARK-23769 Remove comments that unnecessarily disable Scalastyle check
+    SPARK-23759 Unable to bind Spark UI to specific host name / IP
+    SPARK-23623 Avoid concurrent use of cached consumers in CachedKafkaConsumer (branch-2.3)
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
-    SPARK-23434 Spark should not warn `metadata directory` for a HDFS file path
     SPARK-23340 Upgrade Apache ORC to 1.4.3
     SPARK-23456 Turn on `native` ORC impl and PPD by default
     SPARK-21783 Turn on `native` ORC impl and PPD by default
@@ -59,5 +98,4 @@ BUG FIXES
     SPARK-23523 Minor refactor of OptimizeMetadataOnlyQuery
     SPARK-23510 Support Hive 2.2 and Hive 2.3 metastore
     SPARK-23518 Avoid metastore access when the users only want to read and write data frames
-    SPARK-23570 Add Spark 2.3.0 in HiveExternalCatalogVersionsSuite
     SPARK-23635 Spark executor env variable is overwritten by same name AM env variable
