@@ -28,7 +28,7 @@
   <artifactId>spark-streaming-kafka-0-10_2.11</artifactId>
   <properties>
     <sbt.project.name>streaming-kafka-0-10</sbt.project.name>
-    <kafka.version>1.0.0.2.6.5.0-SNAPSHOT</kafka.version>
+    <kafka.version>1.0.0</kafka.version>
   </properties>
   <packaging>jar</packaging>
   <name>Spark Integration for Kafka 0.10</name>
@@ -111,7 +111,7 @@
     <profile>
       <id>scala-2.12</id>
       <properties>
-        <kafka.version>1.0.0.2.6.5.0-SNAPSHOT</kafka.version>
+        <kafka.version>1.0.0</kafka.version>
       </properties>
     </profile>
   </profiles>
