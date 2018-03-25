@@ -88,6 +88,7 @@ BUG FIXES
     SPARK-23769 Remove comments that unnecessarily disable Scalastyle check
     SPARK-23759 Unable to bind Spark UI to specific host name / IP
     SPARK-23623 Avoid concurrent use of cached consumers in CachedKafkaConsumer (branch-2.3)
+    SPARK-23788 Fix race in StreamingQuerySuite
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
