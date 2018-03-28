@@ -28,7 +28,8 @@
   <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
   <properties>
     <sbt.project.name>streaming-kafka-0-8</sbt.project.name>
-    <kafka.version>0.10.0.2.6.0.0-SNAPSHOT</kafka.version>
+    <kafka8.version>0.10.1.2.6.4.0-91</kafka8.version>
+    <kafka8.scala.binary.version>2.11</kafka8.scala.binary.version>
   </properties>
   <packaging>jar</packaging>
   <name>Spark Integration for Kafka 0.8</name>
@@ -50,8 +51,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
-      <artifactId>kafka_${scala.binary.version}</artifactId>
-      <version>${kafka.version}</version>
+      <artifactId>kafka_${kafka8.scala.binary.version}</artifactId>
+      <version>${kafka8.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.sun.jmx</groupId>
