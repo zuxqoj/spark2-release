@@ -35,5 +35,6 @@ BUG FIXES
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
+    BUG-99560   Enable `kafka-0-8` build in atlantic by using Kafka `0.10.1.2.6.4.0-91`
     BUG-101806  Remove explicit adl sdk import from Spark build, and use hadoop transitive dependency instead.
     BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
