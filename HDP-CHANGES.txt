@@ -96,6 +96,7 @@ BUG FIXES
     SPARK-23599 Use RandomUUIDGenerator in Uuid expression
     SPARK-23806 Broadcast.unpersist can cause fatal exception when used with dynamic allocation
     SPARK-23808 Set default Spark session in test-only spark sessions.
+    SPARK-23639 Obtain token before init metastore client in SparkSQL CLI
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
