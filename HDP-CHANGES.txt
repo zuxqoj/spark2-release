@@ -93,6 +93,7 @@ BUG FIXES
     SPARK-23599 Add a UUID generator from Pseudo-Random Numbers
     SPARK-23645 Add docs RE `pandas_udf` with keyword args
     SPARK-23599 Use RandomUUIDGenerator in Uuid expression
+    SPARK-23806 Broadcast.unpersist can cause fatal exception when used with dynamic allocation
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
