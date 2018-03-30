@@ -97,6 +97,7 @@ BUG FIXES
     SPARK-23806 Broadcast.unpersist can cause fatal exception when used with dynamic allocation
     SPARK-23808 Set default Spark session in test-only spark sessions.
     SPARK-23639 Obtain token before init metastore client in SparkSQL CLI
+    SPARK-23827 StreamingJoinExec should ensure that input data is partitioned into specific number of partitions
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
