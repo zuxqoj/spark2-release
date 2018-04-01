@@ -36,6 +36,7 @@ BUG FIXES
     BUG-85326   spark-llap: Notify Hive on Spark query completions
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
+    BUG-99700   Remove unused Hive versions from VersionsSuite
 
     (Backport from 2.3.1)
     SPARK-23475 Show also skipped stages
