@@ -99,6 +99,7 @@ BUG FIXES
     SPARK-23639 Obtain token before init metastore client in SparkSQL CLI
     SPARK-23827 StreamingJoinExec should ensure that input data is partitioned into specific number of partitions
     SPARK-23040 Returns interruptible iterator for shuffle reader
+    SPARK-19964 Avoid reading from remote repos in SparkSubmitSuite.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
