@@ -103,6 +103,7 @@ BUG FIXES
     SPARK-19964 Avoid reading from remote repos in SparkSubmitSuite.
     SPARK-23802 PropagateEmptyRelation can leave query plan in unresolved state
     SPARK-23838 Running SQL query is displayed as "completed" in SQL tab
+    SPARK-23637 Yarn might allocate more resource if a same executor is killed multiple times
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
