@@ -105,6 +105,7 @@ BUG FIXES
     SPARK-23838 Running SQL query is displayed as "completed" in SQL tab
     SPARK-23637 Yarn might allocate more resource if a same executor is killed multiple times
     SPARK-23823 Keep origin in transformExpression
+    SPARK-23822 Improve error message for Parquet schema mismatches
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
