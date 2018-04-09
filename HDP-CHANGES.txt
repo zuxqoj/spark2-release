@@ -38,6 +38,7 @@ BUG FIXES
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
     BUG-99700   Remove unused Hive versions from VersionsSuite
     BUG-99560   Enable `kafka-0-8` build in atlantic by using Kafka `0.10.1.2.6.4.0-91`
+    BUG-100134  Revert `[SPARK-22919] Bump httpclient versions` to avoid conflicts with AWS library
 
     (Backport from 2.3.1)
     SPARK-23475 Show also skipped stages
