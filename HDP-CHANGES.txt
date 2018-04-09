@@ -105,6 +105,7 @@ BUG FIXES
     SPARK-23823 Keep origin in transformExpression
     SPARK-23822 Improve error message for Parquet schema mismatches
     SPARK-23809 Active SparkSession should be set by getOrCreate
+    SPARK-23881 Fix flaky test JobCancellationSuite."interruptible iterator of shuffle reader"
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
