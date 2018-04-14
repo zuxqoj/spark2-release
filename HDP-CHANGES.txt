@@ -107,6 +107,7 @@ BUG FIXES
     SPARK-23809 Active SparkSession should be set by getOrCreate
     SPARK-23881 Fix flaky test JobCancellationSuite."interruptible iterator of shuffle reader"
     SPARK-23816 Killed tasks should ignore FetchFailures.
+    SPARK-23942 PySpark's collect doesn't trigger QueryExecutionListener
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
