@@ -115,6 +115,7 @@ BUG FIXES
     SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
     SPARK-24364 Files deletion after globbing may fail StructuredStreaming jobs
     BUG-102285 Update py4j to version 0.10.7.
+    BUG-102285 Match pyspark features in SparkR communication protocol.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
