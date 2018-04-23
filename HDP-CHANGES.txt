@@ -15,6 +15,7 @@ IMPROVEMENTS
     RMP-9454: SparkSQL Ranger integration for fine grained access control in Spark 2.2
     BUG-97455 Update Spark to build against Kafka 1.0
     BUG-100381 Add Hive Metastore 3.0 support
+    BUG-100279 Add adl & wasb not loading
 
 BUG FIXES
     BUG-58486   Use cache file created by ambari as spark.yarn.archive

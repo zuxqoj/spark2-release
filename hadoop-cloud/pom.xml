@@ -64,7 +64,80 @@
       <version>${hadoop.version}</version>
       <scope>provided</scope>
     </dependency>
+    <!--
+      the AWS module pulls in jackson; its transitive dependencies can create
+      intra-jackson-module version problems.
+      -->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-aws</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>${hadoop.deps.scope}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-mapper-asl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-core-asl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-openstack</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>${hadoop.deps.scope}</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
+    <!--
+    Add joda time to ensure that anything downstream which doesn't pull in spark-hive
+    gets the correct joda time artifact, so doesn't have auth failures on later Java 8 JVMs
+    -->
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <scope>${hadoop.deps.scope}</scope>
+    </dependency>
     <!-- explicitly declare the jackson artifacts desired -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -93,21 +166,55 @@
       <artifactId>httpcore</artifactId>
       <scope>${hadoop.deps.scope}</scope>
     </dependency>
-
   </dependencies>
 
   <profiles>
 
+    <profile>
+      <id>hadoop-2.7</id>
+      <!-- 2.7+ adds the azure Jar to the set of dependencies -->
+      <dependencies>
+
+        <!--
+        Hadoop WASB client only arrived in Hadoop 2.7
+        -->
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-azure</artifactId>
+          <version>${hadoop.version}</version>
+          <scope>${hadoop.deps.scope}</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.hadoop</groupId>
+              <artifactId>hadoop-common</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.codehaus.jackson</groupId>
+              <artifactId>jackson-mapper-asl</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <artifactId>jackson-core</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>com.google.guava</groupId>
+              <artifactId>guava</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+    </profile>
+
     <!--
-     Hadoop 3 simplifies the classpath.
+     Hadoop 3 simplifies the classpath, and adds a new committer base class which
+     enables store-specific committers.
     -->
     <profile>
       <id>hadoop-3.0</id>
       <dependencies>
-
         <!--
         There's now a hadoop-cloud-storage which transitively pulls in the store JARs,
-        but it still needs some selective exclusion across versions, especially 3.0.
+        but it still needs some selective exclusion across versions, especially 3.0.x.
         -->
         <dependency>
           <groupId>org.apache.hadoop</groupId>
@@ -132,6 +239,24 @@
               <artifactId>guava</artifactId>
             </exclusion>
           </exclusions>
+        </dependency>
+        <!--
+        The jetty declarations are made
+        (a) to keep that jetty-util-ajax version in sync with the rest of Spark.
+        (b) to minimise the effects which Spark's jetty shading has on the
+            availability of the jetty JARs on for hadoop-azure, which depends
+            on them.
+         -->
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-util</artifactId>
+          <scope>${hadoop.deps.scope}</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-util-ajax</artifactId>
+          <version>${jetty.version}</version>
+          <scope>${hadoop.deps.scope}</scope>
         </dependency>
       </dependencies>
     </profile>
