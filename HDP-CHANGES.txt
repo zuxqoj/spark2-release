@@ -31,6 +31,5 @@ BUG FIXES
     BUG-86685   Fix SparkLauncherSuite.testChildProcLauncher
     BUG-86834   Add missing import package name in HiveServer2CredentialProvider
     BUG-88046   Update TopicExistsException due to KAFKA-2945 (Kafka 0.10.1.0)
-    BUG-85326   spark-llap: Notify Hive on Spark query completions
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
