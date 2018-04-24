@@ -177,6 +177,11 @@
             </exclusion>
           </exclusions>
         </dependency>
+        <dependency>
+          <groupId>com.google.cloud.bigdataoss</groupId>
+          <artifactId>gcs-connector</artifactId>
+          <classifier>shaded</classifier>
+        </dependency>
       </dependencies>
     </profile>
 

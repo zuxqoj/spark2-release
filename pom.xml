@@ -191,6 +191,7 @@
     -->
     <arrow.version>0.8.0</arrow.version>
     <adl.sdk.version>2.1.4</adl.sdk.version>
+    <gcs.version>1.8.1.2.6.5.0-SNAPSHOT</gcs.version>
 
     <test.java.home>${java.home}</test.java.home>
     <test.exclude.tags></test.exclude.tags>
@@ -2644,6 +2645,46 @@
              <artifactId>azure-data-lake-store-sdk</artifactId>
              <version>${adl.sdk.version}</version>
            </dependency>
+          <dependency>
+            <groupId>com.google.cloud.bigdataoss</groupId>
+            <artifactId>gcs-connector</artifactId>
+            <classifier>shaded</classifier>
+            <version>${gcs.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>com.google.api-client</groupId>
+                <artifactId>google-api-client-java6</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.api-client</groupId>
+                <artifactId>google-api-client-jackson2</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-storage</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.oauth-client</groupId>
+                <artifactId>google-oauth-client</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.oauth-client</groupId>
+                <artifactId>google-oauth-client-java6</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.cloud.bigdataoss</groupId>
+                <artifactId>util</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.cloud.bigdataoss</groupId>
+                <artifactId>gcsio</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.google.cloud.bigdataoss</groupId>
+                <artifactId>util-hadoop</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
         </dependencies>
       </dependencyManagement>
     </profile>
