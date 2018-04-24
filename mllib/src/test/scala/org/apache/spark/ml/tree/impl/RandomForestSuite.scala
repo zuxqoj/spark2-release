@@ -93,12 +93,12 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("find splits for a continuous feature") {
     // find splits for normal case
     {
-      val fakeMetadata = new DecisionTreeMetadata(1, 0, 0, 0,
+      val fakeMetadata = new DecisionTreeMetadata(1, 200000, 0, 0,
         Map(), Set(),
         Array(6), Gini, QuantileStrategy.Sort,
         0, 0, 0.0, 0, 0
       )
-      val featureSamples = Array.fill(200000)(math.random)
+      val featureSamples = Array.fill(10000)(math.random).filter(_ != 0.0)
       val splits = RandomForest.findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
       assert(splits.length === 5)
       assert(fakeMetadata.numSplits(0) === 5)
@@ -109,7 +109,7 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // SPARK-16957: Use midpoints for split values.
     {
-      val fakeMetadata = new DecisionTreeMetadata(1, 0, 0, 0,
+      val fakeMetadata = new DecisionTreeMetadata(1, 8, 0, 0,
         Map(), Set(),
         Array(3), Gini, QuantileStrategy.Sort,
         0, 0, 0.0, 0, 0
@@ -117,7 +117,7 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
       // possibleSplits <= numSplits
       {
-        val featureSamples = Array(0, 1, 0, 0, 1, 0, 1, 1).map(_.toDouble)
+        val featureSamples = Array(0, 1, 0, 0, 1, 0, 1, 1).map(_.toDouble).filter(_ != 0.0)
         val splits = RandomForest.findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
         val expectedSplits = Array((0.0 + 1.0) / 2)
         assert(splits === expectedSplits)
@@ -125,7 +125,7 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
       // possibleSplits > numSplits
       {
-        val featureSamples = Array(0, 0, 1, 1, 2, 2, 3, 3).map(_.toDouble)
+        val featureSamples = Array(0, 0, 1, 1, 2, 2, 3, 3).map(_.toDouble).filter(_ != 0.0)
         val splits = RandomForest.findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
         val expectedSplits = Array((0.0 + 1.0) / 2, (2.0 + 3.0) / 2)
         assert(splits === expectedSplits)
@@ -135,7 +135,7 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // find splits should not return identical splits
     // when there are not enough split candidates, reduce the number of splits in metadata
     {
-      val fakeMetadata = new DecisionTreeMetadata(1, 0, 0, 0,
+      val fakeMetadata = new DecisionTreeMetadata(1, 12, 0, 0,
         Map(), Set(),
         Array(5), Gini, QuantileStrategy.Sort,
         0, 0, 0.0, 0, 0
@@ -150,7 +150,7 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // find splits when most samples close to the minimum
     {
-      val fakeMetadata = new DecisionTreeMetadata(1, 0, 0, 0,
+      val fakeMetadata = new DecisionTreeMetadata(1, 18, 0, 0,
         Map(), Set(),
         Array(3), Gini, QuantileStrategy.Sort,
         0, 0, 0.0, 0, 0
@@ -164,12 +164,13 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // find splits when most samples close to the maximum
     {
-      val fakeMetadata = new DecisionTreeMetadata(1, 0, 0, 0,
+      val fakeMetadata = new DecisionTreeMetadata(1, 17, 0, 0,
         Map(), Set(),
         Array(2), Gini, QuantileStrategy.Sort,
         0, 0, 0.0, 0, 0
       )
-      val featureSamples = Array(0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2).map(_.toDouble)
+      val featureSamples = Array(0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+        .map(_.toDouble).filter(_ != 0.0)
       val splits = RandomForest.findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
       val expectedSplits = Array((1.0 + 2.0) / 2)
       assert(splits === expectedSplits)
@@ -177,12 +178,12 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // find splits for constant feature
     {
-      val fakeMetadata = new DecisionTreeMetadata(1, 0, 0, 0,
+      val fakeMetadata = new DecisionTreeMetadata(1, 3, 0, 0,
         Map(), Set(),
         Array(3), Gini, QuantileStrategy.Sort,
         0, 0, 0.0, 0, 0
       )
-      val featureSamples = Array(0, 0, 0).map(_.toDouble)
+      val featureSamples = Array(0, 0, 0).map(_.toDouble).filter(_ != 0.0)
       val featureSamplesEmpty = Array.empty[Double]
       val splits = RandomForest.findSplitsForContinuousFeature(featureSamples, fakeMetadata, 0)
       assert(splits === Array.empty[Double])
@@ -339,8 +340,8 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(topNode.stats.impurity > 0.0)
 
     // set impurity and predict for child nodes
-    assert(topNode.leftChild.get.toNode.prediction === 0.0)
-    assert(topNode.rightChild.get.toNode.prediction === 1.0)
+    assert(topNode.leftChild.get.toNode(isClassification = true).prediction === 0.0)
+    assert(topNode.rightChild.get.toNode(isClassification = true).prediction === 1.0)
     assert(topNode.leftChild.get.stats.impurity === 0.0)
     assert(topNode.rightChild.get.stats.impurity === 0.0)
   }
@@ -381,8 +382,8 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(topNode.stats.impurity > 0.0)
 
     // set impurity and predict for child nodes
-    assert(topNode.leftChild.get.toNode.prediction === 0.0)
-    assert(topNode.rightChild.get.toNode.prediction === 1.0)
+    assert(topNode.leftChild.get.toNode(isClassification = true).prediction === 0.0)
+    assert(topNode.rightChild.get.toNode(isClassification = true).prediction === 1.0)
     assert(topNode.leftChild.get.stats.impurity === 0.0)
     assert(topNode.rightChild.get.stats.impurity === 0.0)
   }
@@ -581,18 +582,18 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
                 left  right
      */
     val leftImp = new GiniCalculator(Array(3.0, 2.0, 1.0))
-    val left = new LeafNode(0.0, leftImp.calculate(), leftImp)
+    val left = new ClassificationLeafNode(0.0, leftImp.calculate(), leftImp)
 
     val rightImp = new GiniCalculator(Array(1.0, 2.0, 5.0))
-    val right = new LeafNode(2.0, rightImp.calculate(), rightImp)
+    val right = new ClassificationLeafNode(2.0, rightImp.calculate(), rightImp)
 
-    val parent = TreeTests.buildParentNode(left, right, new ContinuousSplit(0, 0.5))
+    val parent = TreeTests.buildParentNode(left, right, new ContinuousSplit(0, 0.5), true)
     val parentImp = parent.impurityStats
 
     val left2Imp = new GiniCalculator(Array(1.0, 6.0, 1.0))
-    val left2 = new LeafNode(0.0, left2Imp.calculate(), left2Imp)
+    val left2 = new ClassificationLeafNode(0.0, left2Imp.calculate(), left2Imp)
 
-    val grandParent = TreeTests.buildParentNode(left2, parent, new ContinuousSplit(1, 1.0))
+    val grandParent = TreeTests.buildParentNode(left2, parent, new ContinuousSplit(1, 1.0), true)
     val grandImp = grandParent.impurityStats
 
     // Test feature importance computed at different subtrees.
@@ -617,8 +618,8 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // Forest consisting of (full tree) + (internal node with 2 leafs)
     val trees = Array(parent, grandParent).map { root =>
-      new DecisionTreeClassificationModel(root, numFeatures = 2, numClasses = 3)
-        .asInstanceOf[DecisionTreeModel]
+      new DecisionTreeClassificationModel(root.asInstanceOf[ClassificationNode],
+        numFeatures = 2, numClasses = 3).asInstanceOf[DecisionTreeModel]
     }
     val importances: Vector = TreeEnsembleModel.featureImportances(trees, 2)
     val tree2norm = feature0importance + feature1importance

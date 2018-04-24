@@ -29,8 +29,9 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeMap, CurrentDate, CurrentTimestamp}
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution.SQLExecution
-import org.apache.spark.sql.execution.datasources.v2.{DataSourceV2Relation, StreamingDataSourceV2Relation, WriteToDataSourceV2}
+import org.apache.spark.sql.execution.datasources.v2.{StreamingDataSourceV2Relation, WriteToDataSourceV2}
 import org.apache.spark.sql.execution.streaming.{ContinuousExecutionRelation, StreamingRelationV2, _}
+import org.apache.spark.sql.sources.v2
 import org.apache.spark.sql.sources.v2.{ContinuousReadSupport, DataSourceOptions, StreamWriteSupport}
 import org.apache.spark.sql.sources.v2.reader.streaming.{ContinuousReader, PartitionOffset}
 import org.apache.spark.sql.streaming.{OutputMode, ProcessingTime, Trigger}
@@ -167,7 +168,7 @@ class ContinuousExecution(
 
     var insertedSourceId = 0
     val withNewSources = logicalPlan transform {
-      case ContinuousExecutionRelation(_, _, output) =>
+      case ContinuousExecutionRelation(source, options, output) =>
         val reader = continuousSources(insertedSourceId)
         insertedSourceId += 1
         val newOutput = reader.readSchema().toAttributes
@@ -180,7 +181,7 @@ class ContinuousExecution(
         val loggedOffset = offsets.offsets(0)
         val realOffset = loggedOffset.map(off => reader.deserializeOffset(off.json))
         reader.setStartOffset(java.util.Optional.ofNullable(realOffset.orNull))
-        new StreamingDataSourceV2Relation(newOutput, reader)
+        StreamingDataSourceV2Relation(newOutput, source, options, reader)
     }
 
     // Rewire the plan to use the new attributes that were returned by the source.
@@ -201,7 +202,7 @@ class ContinuousExecution(
     val withSink = WriteToDataSourceV2(writer, triggerLogicalPlan)
 
     val reader = withSink.collect {
-      case StreamingDataSourceV2Relation(_, r: ContinuousReader) => r
+      case StreamingDataSourceV2Relation(_, _, _, r: ContinuousReader) => r
     }.head
 
     reportTimeTaken("queryPlanning") {
@@ -317,8 +318,10 @@ class ContinuousExecution(
     synchronized {
       if (queryExecutionThread.isAlive) {
         commitLog.add(epoch)
-        val offset = offsetLog.get(epoch).get.offsets(0).get
+        val offset =
+          continuousSources(0).deserializeOffset(offsetLog.get(epoch).get.offsets(0).get.json)
         committedOffsets ++= Seq(continuousSources(0) -> offset)
+        continuousSources(0).commit(offset.asInstanceOf[v2.reader.streaming.Offset])
       } else {
         return
       }

@@ -353,6 +353,13 @@ object SQLConf {
     .booleanConf
     .createWithDefault(true)
 
+  val PARQUET_FILTER_PUSHDOWN_DATE_ENABLED = buildConf("spark.sql.parquet.filterPushdown.date")
+    .doc("If true, enables Parquet filter push-down optimization for Date. " +
+      "This configuration only has an effect when 'spark.sql.parquet.filterPushdown' is enabled.")
+    .internal()
+    .booleanConf
+    .createWithDefault(true)
+
   val PARQUET_WRITE_LEGACY_FORMAT = buildConf("spark.sql.parquet.writeLegacyFormat")
     .doc("Whether to be compatible with the legacy Parquet format adopted by Spark 1.4 and prior " +
       "versions, when converting Parquet schema to Spark SQL schema and vice versa.")
@@ -430,7 +437,8 @@ object SQLConf {
 
   val HIVE_VERIFY_PARTITION_PATH = buildConf("spark.sql.hive.verifyPartitionPath")
     .doc("When true, check all the partition paths under the table\'s root directory " +
-         "when reading data stored in HDFS.")
+         "when reading data stored in HDFS. This configuration will be deprecated in the future " +
+         "releases and replaced by spark.files.ignoreMissingFiles.")
     .booleanConf
     .createWithDefault(false)
 
@@ -479,6 +487,16 @@ object SQLConf {
     .checkValues(HiveCaseSensitiveInferenceMode.values.map(_.toString))
     .createWithDefault(HiveCaseSensitiveInferenceMode.INFER_AND_SAVE.toString)
 
+  val TYPECOERCION_COMPARE_DATE_TIMESTAMP_IN_TIMESTAMP =
+    buildConf("spark.sql.typeCoercion.compareDateTimestampInTimestamp")
+      .internal()
+      .doc("When true (default), compare Date with Timestamp after converting both sides to " +
+        "Timestamp. This behavior is compatible with Hive 2.2 or later. See HIVE-15236. " +
+        "When false, restore the behavior prior to Spark 2.4. Compare Date with Timestamp after " +
+        "converting both sides to string. This config will be removed in spark 3.0")
+      .booleanConf
+      .createWithDefault(true)
+
   val OPTIMIZER_METADATA_ONLY = buildConf("spark.sql.optimizer.metadataOnly")
     .doc("When true, enable the metadata-only query optimization that use the table's metadata " +
       "to produce the partition columns instead of table scans. It applies when all the columns " +
@@ -492,6 +510,14 @@ object SQLConf {
       "to parse.")
     .stringConf
     .createWithDefault("_corrupt_record")
+
+  val FROM_JSON_FORCE_NULLABLE_SCHEMA = buildConf("spark.sql.fromJsonForceNullableSchema")
+    .internal()
+    .doc("When true, force the output schema of the from_json() function to be nullable " +
+      "(including all the fields). Otherwise, the schema might not be compatible with" +
+      "actual data, which leads to curruptions.")
+    .booleanConf
+    .createWithDefault(true)
 
   val BROADCAST_TIMEOUT = buildConf("spark.sql.broadcastTimeout")
     .doc("Timeout in seconds for the broadcast wait time in broadcast joins.")
@@ -905,6 +931,13 @@ object SQLConf {
       .intConf
       .createWithDefault(100)
 
+  val STREAMING_CHECKPOINT_FILE_MANAGER_CLASS =
+    buildConf("spark.sql.streaming.checkpointFileManagerClass")
+      .doc("The class used to write checkpoint files atomically. This class must be a subclass " +
+        "of the interface CheckpointFileManager.")
+      .internal()
+      .stringConf
+
   val NDV_MAX_ERROR =
     buildConf("spark.sql.statistics.ndv.maxError")
       .internal()
@@ -1058,7 +1091,7 @@ object SQLConf {
       .intConf
       .createWithDefault(100)
 
-  val ARROW_EXECUTION_ENABLE =
+  val ARROW_EXECUTION_ENABLED =
     buildConf("spark.sql.execution.arrow.enabled")
       .doc("When true, make use of Apache Arrow for columnar data transfers. Currently available " +
         "for use with pyspark.sql.DataFrame.toPandas, and " +
@@ -1067,6 +1100,13 @@ object SQLConf {
         "BinaryType, MapType, ArrayType of TimestampType, and nested StructType.")
       .booleanConf
       .createWithDefault(false)
+
+  val ARROW_FALLBACK_ENABLED =
+    buildConf("spark.sql.execution.arrow.fallback.enabled")
+      .doc("When true, optimizations enabled by 'spark.sql.execution.arrow.enabled' will " +
+        "fallback automatically to non-optimized implementations if an error occurs.")
+      .booleanConf
+      .createWithDefault(true)
 
   val ARROW_EXECUTION_MAX_RECORDS_PER_BATCH =
     buildConf("spark.sql.execution.arrow.maxRecordsPerBatch")
@@ -1145,6 +1185,14 @@ object SQLConf {
   val ELT_OUTPUT_AS_STRING = buildConf("spark.sql.function.eltOutputAsString")
     .doc("When this option is set to false and all inputs are binary, `elt` returns " +
       "an output as binary. Otherwise, it returns as a string. ")
+    .booleanConf
+    .createWithDefault(false)
+
+  val ALLOW_CREATING_MANAGED_TABLE_USING_NONEMPTY_LOCATION =
+    buildConf("spark.sql.allowCreatingManagedTableUsingNonemptyLocation")
+    .internal()
+    .doc("When this option is set to true, creating managed tables with nonempty location " +
+      "is allowed. Otherwise, an analysis exception is thrown. ")
     .booleanConf
     .createWithDefault(false)
 
@@ -1325,6 +1373,8 @@ class SQLConf extends Serializable with Logging {
 
   def parquetFilterPushDown: Boolean = getConf(PARQUET_FILTER_PUSHDOWN_ENABLED)
 
+  def parquetFilterPushDownDate: Boolean = getConf(PARQUET_FILTER_PUSHDOWN_DATE_ENABLED)
+
   def orcFilterPushDown: Boolean = getConf(ORC_FILTER_PUSHDOWN_ENABLED)
 
   def verifyPartitionPath: Boolean = getConf(HIVE_VERIFY_PARTITION_PATH)
@@ -1337,6 +1387,9 @@ class SQLConf extends Serializable with Logging {
 
   def caseSensitiveInferenceMode: HiveCaseSensitiveInferenceMode.Value =
     HiveCaseSensitiveInferenceMode.withName(getConf(HIVE_CASE_SENSITIVE_INFERENCE))
+
+  def compareDateTimestampInTimestamp : Boolean =
+    getConf(TYPECOERCION_COMPARE_DATE_TIMESTAMP_IN_TIMESTAMP)
 
   def gatherFastStats: Boolean = getConf(GATHER_FASTSTAT)
 
@@ -1539,7 +1592,9 @@ class SQLConf extends Serializable with Logging {
 
   def rangeExchangeSampleSizePerPartition: Int = getConf(RANGE_EXCHANGE_SAMPLE_SIZE_PER_PARTITION)
 
-  def arrowEnable: Boolean = getConf(ARROW_EXECUTION_ENABLE)
+  def arrowEnabled: Boolean = getConf(ARROW_EXECUTION_ENABLED)
+
+  def arrowFallbackEnabled: Boolean = getConf(ARROW_FALLBACK_ENABLED)
 
   def arrowMaxRecordsPerBatch: Int = getConf(ARROW_EXECUTION_MAX_RECORDS_PER_BATCH)
 
@@ -1562,6 +1617,9 @@ class SQLConf extends Serializable with Logging {
   def concatBinaryAsString: Boolean = getConf(CONCAT_BINARY_AS_STRING)
 
   def eltOutputAsString: Boolean = getConf(ELT_OUTPUT_AS_STRING)
+
+  def allowCreatingManagedTableUsingNonemptyLocation: Boolean =
+    getConf(ALLOW_CREATING_MANAGED_TABLE_USING_NONEMPTY_LOCATION)
 
   def partitionOverwriteMode: PartitionOverwriteMode.Value =
     PartitionOverwriteMode.withName(getConf(PARTITION_OVERWRITE_MODE))
