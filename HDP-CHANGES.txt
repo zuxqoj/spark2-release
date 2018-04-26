@@ -3,7 +3,7 @@ Changes only in Hortonworks github and not in Apache SPARK-2.3.0 and hence not c
 INCOMPATIBLE CHANGES
 
 NEW FEATURES
-    SPARK-13587: Support virtualenv in pyspark    
+    SPARK-13587: Support virtualenv in pyspark
 
 IMPROVEMENTS
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
@@ -109,6 +109,7 @@ BUG FIXES
     SPARK-23809 Active SparkSession should be set by getOrCreate
     SPARK-23881 Fix flaky test JobCancellationSuite."interruptible iterator of shuffle reader"
     SPARK-23816 Killed tasks should ignore FetchFailures.
+    SPARK-24062 Fix SASL encryption cannot enabled issue in thrift server
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
