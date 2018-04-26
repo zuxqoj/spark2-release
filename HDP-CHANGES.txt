@@ -111,6 +111,22 @@ BUG FIXES
     SPARK-23881 Fix flaky test JobCancellationSuite."interruptible iterator of shuffle reader"
     SPARK-23816 Killed tasks should ignore FetchFailures.
     SPARK-23942 PySpark's collect doesn't trigger QueryExecutionListener
+    SPARK-23004 Ensure StateStore.commit is called only once in a streaming aggregation task
+    SPARK-24033 Fix Mismatched of Window Frame specifiedwindowframe(RowFrame, -1, -1)
+    SPARK-24022 Make SparkContextSuite not flaky
+    SPARK-23989 exchange should copy data before non-serialized shuffle
+    SPARK-24021 fix bug in BlacklistTracker's updateBlacklistForFetchFailure
+    SPARK-24014 Add onStreamingStarted method to StreamingListener
+    SPARK-23963 Properly handle large number of columns in query on text-based Hive table
+    SPARK-24007 EqualNullSafe for FloatType and DoubleType might generate a wrong result by codegen.
+    SPARK-23948 Trigger mapstage's job listener in submitMissingTasks
+    SPARK-23986 freshName can generate non-unique names
+    SPARK-23835 Add not-null check to Tuples' arguments deserialization
+    SPARK-23815 Spark writer dynamic partition overwrite mode may fail to write output on multi level partition
+    SPARK-23748 Fix SS continuous process doesn't support SubqueryAlias issue
+    SPARK-23867 use droppedCount in logWarning
+    SPARK-23962 Fix race in currentExecutionIds().
+    SPARK-22883 ML test for StructuredStreaming: spark.ml.feature, I-M
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
