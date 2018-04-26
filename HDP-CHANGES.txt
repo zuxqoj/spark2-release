@@ -127,6 +127,7 @@ BUG FIXES
     SPARK-23867 use droppedCount in logWarning
     SPARK-23962 Fix race in currentExecutionIds().
     SPARK-22883 ML test for StructuredStreaming: spark.ml.feature, I-M
+    SPARK-24062 Fix SASL encryption cannot enabled issue in thrift server
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
