@@ -140,3 +140,4 @@ BUG FIXES
     SPARK-23518 Avoid metastore access when the users only want to read and write data frames
     SPARK-23635 Spark executor env variable is overwritten by same name AM env variable
     SPARK-23787 Fix file download test in SparkSubmitSuite for Hadoop 2.9.
+    SPARK-23355 convertMetastore should not ignore table properties
