@@ -37,4 +37,5 @@ BUG FIXES
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
     BUG-99560   Enable `kafka-0-8` build in atlantic by using Kafka `0.10.1.2.6.4.0-91`
     BUG-101806  Remove explicit adl sdk import from Spark build, and use hadoop transitive dependency instead.
+    BUG-101699  Update HDP Spark to match hadoop3 profile with Apache
     BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
