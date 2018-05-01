@@ -131,6 +131,7 @@ BUG FIXES
     SPARK-24062 Fix SASL encryption cannot enabled issue in thrift server
     SPARK-24085 Query returns UnsupportedOperationException when scalar subquery is present in partitioning expression
     SPARK-24104 SQLAppStatusListener overwrites metrics onDriverAccumUpdates instead of updating them
+    SPARK-23853 Run Hive-related PySpark tests only for `-Phive`
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
