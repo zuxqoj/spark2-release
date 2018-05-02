@@ -133,6 +133,7 @@ BUG FIXES
     SPARK-24104 SQLAppStatusListener overwrites metrics onDriverAccumUpdates instead of updating them
     SPARK-23853 Run Hive-related PySpark tests only for `-Phive`
     SPARK-23941 Mesos task failed on specific spark app name
+    SPARK-24107 ChunkedByteBuffer.writeFully method has not reset the limit value
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
