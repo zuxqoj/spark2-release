@@ -143,3 +143,4 @@ BUG FIXES
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-15844 HistoryServer doesn't come up if spark.authenticate = true
     SPARK-21407 Support spnego for ThriftServer thrift/http auth
+    SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
