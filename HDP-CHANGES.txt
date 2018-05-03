@@ -138,6 +138,7 @@ BUG FIXES
     SPARK-23489 HiveExternalCatalogVersionsSuite should verify the downloaded file
     SPARK-24166 InMemoryTableScanExec should not access SQLConf at executor side
     SPARK-24133 Check for integer overflows when resizing WritableColumnVectors
+    SPARK-24169 JsonToStructs should not access SQLConf at executor side
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
