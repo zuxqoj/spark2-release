@@ -141,6 +141,7 @@ BUG FIXES
     SPARK-24169 JsonToStructs should not access SQLConf at executor side
     SPARK-23433 Late zombie task completions update all tasksets
     SPARK-24168 WindowExec should not access SQLConf at executor side
+    SPARK-23697 LegacyAccumulatorWrapper should define isZero correctly
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
