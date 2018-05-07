@@ -123,3 +123,4 @@ BUG FIXES
     SPARK-23518 Avoid metastore access when the users only want to read and write data frames
     SPARK-23635 Spark executor env variable is overwritten by same name AM env variable
     SPARK-23355 convertMetastore should not ignore table properties
+  SPARK-23291   R's substr should not reduce starting position by 1 when calling Scala API
