@@ -906,7 +906,9 @@ private[spark] class Client(
     if (isClusterMode) {
       val driverOpts = sparkConf.get(DRIVER_JAVA_OPTIONS)
       driverOpts.foreach { opts =>
-        javaOpts ++= Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
+        javaOpts ++= Utils.splitCommandString(opts)
+          .map(Utils.substituteAppId(_, appId.toString))
+          .map(YarnSparkHadoopUtil.escapeForShell)
       }
 
       if (sys.env.get("HDP_VERSION").isDefined) {
@@ -943,7 +945,9 @@ private[spark] class Client(
             s"(was '$opts'). Use spark.yarn.am.memory instead."
           throw new SparkException(msg)
         }
-        javaOpts ++= Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
+        javaOpts ++= Utils.splitCommandString(opts)
+          .map(Utils.substituteAppId(_, appId.toString))
+          .map(YarnSparkHadoopUtil.escapeForShell)
       }
 
       if (sys.env.get("HDP_VERSION").isDefined) {
