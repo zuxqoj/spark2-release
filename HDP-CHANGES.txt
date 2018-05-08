@@ -146,6 +146,7 @@ BUG FIXES
     BUG-102285 Match pyspark features in SparkR communication protocol.
     SPARK-23775 Make DataFrameRangeSuite not flaky
     SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
+    SPARK-24128 Mention configuration option in implicit CROSS JOIN error
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
