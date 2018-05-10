@@ -151,6 +151,7 @@ BUG FIXES
     SPARK-24188 Restore "/version" API endpoint.
     SPARK-24214 Fix toJSON for StreamingRelationV2/StreamingExecutionRelation/ContinuousExecutionRelation
     SPARK-24068 Propagating DataFrameReader's options to Text datasource on schema inferring
+    SPARK-19181 Fixing flaky "SparkListenerSuite.local metrics"
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
