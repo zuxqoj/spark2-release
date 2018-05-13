@@ -154,6 +154,7 @@ BUG FIXES
     SPARK-19181 Fixing flaky "SparkListenerSuite.local metrics"
     SPARK-10878 Fix race condition when multiple clients resolves artifacts at the same time
     SPARK-24263 SparkR java check breaks with openjdk
+    SPARK-24262 Fix typo in UDF type match error message
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
