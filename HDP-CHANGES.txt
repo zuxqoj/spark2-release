@@ -153,6 +153,7 @@ BUG FIXES
     SPARK-24068 Propagating DataFrameReader's options to Text datasource on schema inferring
     SPARK-19181 Fixing flaky "SparkListenerSuite.local metrics"
     SPARK-10878 Fix race condition when multiple clients resolves artifacts at the same time
+    SPARK-24263 SparkR java check breaks with openjdk
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
