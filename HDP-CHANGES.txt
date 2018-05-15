@@ -162,6 +162,7 @@ BUG FIXES
     SPARK-23852 Upgrade to Parquet 1.8.3
     SPARK-23852 Add withSQLConf(...) to test case
     SPARK-23780 Failed to use googleVis library with new SparkR
+    SPARK-24259 ArrayWriter for Arrow produces wrong output
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
