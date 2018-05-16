@@ -40,6 +40,7 @@ import org.apache.hadoop.hive.serde.serdeConstants
 
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.AnalysisException
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.FunctionIdentifier
 import org.apache.spark.sql.catalyst.analysis.NoSuchPermanentFunctionException
 import org.apache.spark.sql.catalyst.catalog.{CatalogFunction, CatalogTablePartition, CatalogUtils, FunctionResource, FunctionResourceType}
@@ -1200,7 +1201,7 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       classOf[Hive],
       "loadPartition",
       classOf[Path],
-      classOf[String],
+      classOf[Table],
       classOf[JMap[String, String]],
       clazzLoadFileType,
       JBoolean.TYPE,
@@ -1209,7 +1210,8 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       JBoolean.TYPE,
       JBoolean.TYPE,
       classOf[JLong],
-      JInteger.TYPE)
+      JInteger.TYPE,
+      JBoolean.TYPE)
   private lazy val loadTableMethod =
     findMethod(
       classOf[Hive],
@@ -1222,7 +1224,8 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       JBoolean.TYPE,
       JBoolean.TYPE,
       classOf[JLong],
-      JInteger.TYPE)
+      JInteger.TYPE,
+      JBoolean.TYPE)
   private lazy val loadDynamicPartitionsMethod =
     findMethod(
       classOf[Hive],
@@ -1249,16 +1252,20 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       inheritTableSpecs: Boolean,
       isSkewedStoreAsSubdir: Boolean,
       isSrcLocal: Boolean): Unit = {
+    val session = SparkSession.getActiveSession
+    assert(session.nonEmpty)
+    val database = session.get.sessionState.catalog.getCurrentDatabase
+    val table = hive.getTable(database, tableName)
     val loadFileType = if (replace) {
       clazzLoadFileType.getEnumConstants.find(_.toString.equalsIgnoreCase("REPLACE_ALL"))
     } else {
       clazzLoadFileType.getEnumConstants.find(_.toString.equalsIgnoreCase("KEEP_EXISTING"))
     }
     assert(loadFileType.isDefined)
-    loadPartitionMethod.invoke(hive, loadPath, tableName, partSpec, loadFileType.get,
+    loadPartitionMethod.invoke(hive, loadPath, table, partSpec, loadFileType.get,
       inheritTableSpecs: JBoolean, isSkewedStoreAsSubdir: JBoolean,
       isSrcLocal: JBoolean, isAcid, hasFollowingStatsTask,
-      writeIdInLoadTableOrPartition, stmtIdInLoadTableOrPartition)
+      writeIdInLoadTableOrPartition, stmtIdInLoadTableOrPartition, replace: JBoolean)
   }
 
 
@@ -1276,7 +1283,7 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
     assert(loadFileType.isDefined)
     loadTableMethod.invoke(hive, loadPath, tableName, loadFileType.get, isSrcLocal: JBoolean,
       isSkewedStoreAsSubdir, isAcidIUDoperation, hasFollowingStatsTask,
-      writeIdInLoadTableOrPartition, stmtIdInLoadTableOrPartition: JInteger)
+      writeIdInLoadTableOrPartition, stmtIdInLoadTableOrPartition: JInteger, replace: JBoolean)
   }
 
   override def loadDynamicPartitions(
@@ -1287,7 +1294,6 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       replace: Boolean,
       numDP: Int,
       listBucketingEnabled: Boolean): Unit = {
-    val isInsertOverwrite: JBoolean = replace
     val loadFileType = if (replace) {
       clazzLoadFileType.getEnumConstants.find(_.toString.equalsIgnoreCase("REPLACE_ALL"))
     } else {
@@ -1297,6 +1303,6 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
     loadDynamicPartitionsMethod.invoke(hive, loadPath, tableName, partSpec, loadFileType.get,
       numDP: JInteger, listBucketingLevel, isAcid, writeIdInLoadTableOrPartition,
       stmtIdInLoadTableOrPartition, hasFollowingStatsTask, AcidUtils.Operation.NOT_ACID,
-      isInsertOverwrite)
+      replace: JBoolean)
   }
 }

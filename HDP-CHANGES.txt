@@ -15,6 +15,7 @@ IMPROVEMENTS
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
     RMP-6448: hdp.version
     BUG-100381 Add Hive Metastore 3.0 support
+    BUG-102958 Update HiveShim for Hive 3.0.0
 
 BUG FIXES
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
