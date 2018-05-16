@@ -163,6 +163,7 @@ BUG FIXES
     SPARK-23852 Add withSQLConf(...) to test case
     SPARK-23780 Failed to use googleVis library with new SparkR
     SPARK-24259 ArrayWriter for Arrow produces wrong output
+    SPARK-23601 Keep md5 checksums for nexus artifacts.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
