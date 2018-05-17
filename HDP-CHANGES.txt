@@ -18,6 +18,7 @@ IMPROVEMENTS
     RMP-9454: SparkSQL Ranger integration for fine grained access control in Spark 2.2
     BUG-97455 Update Spark to build against Kafka 1.0
     BUG-100381 Add Hive Metastore 3.0 support
+    BUG-102958 Update HiveShim for Hive 3.0.0
     BUG-100279 Add adl & wasb not loading
 
 BUG FIXES
@@ -41,6 +42,7 @@ BUG FIXES
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
     BUG-99560   Enable `kafka-0-8` build in atlantic by using Kafka `0.10.1.2.6.4.0-91`
+    BUG-101806  Remove explicit adl sdk import from Spark build, and use hadoop transitive dependency instead.
 
     (Backport from 2.3.1)
     SPARK-23475 Show also skipped stages
@@ -134,6 +136,29 @@ BUG FIXES
     SPARK-23853 Run Hive-related PySpark tests only for `-Phive`
     SPARK-23941 Mesos task failed on specific spark app name
     SPARK-24107 ChunkedByteBuffer.writeFully method has not reset the limit value
+    SPARK-23971 Should not leak Spark sessions across test suites
+    SPARK-23489 HiveExternalCatalogVersionsSuite should verify the downloaded file
+    SPARK-24166 InMemoryTableScanExec should not access SQLConf at executor side
+    SPARK-24133 Check for integer overflows when resizing WritableColumnVectors
+    SPARK-24169 JsonToStructs should not access SQLConf at executor side
+    SPARK-23433 Late zombie task completions update all tasksets
+    SPARK-24168 WindowExec should not access SQLConf at executor side
+    SPARK-23697 LegacyAccumulatorWrapper should define isZero correctly
+    BUG-102285 Update py4j to version 0.10.7.
+    BUG-102285 Match pyspark features in SparkR communication protocol.
+    SPARK-23775 Make DataFrameRangeSuite not flaky
+    SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
+    SPARK-24128 Mention configuration option in implicit CROSS JOIN error
+    SPARK-24188 Restore "/version" API endpoint.
+    SPARK-24214 Fix toJSON for StreamingRelationV2/StreamingExecutionRelation/ContinuousExecutionRelation
+    SPARK-24068 Propagating DataFrameReader's options to Text datasource on schema inferring
+    SPARK-19181 Fixing flaky "SparkListenerSuite.local metrics"
+    SPARK-10878 Fix race condition when multiple clients resolves artifacts at the same time
+    SPARK-24263 SparkR java check breaks with openjdk
+    SPARK-24262 Fix typo in UDF type match error message
+    SPARK-24246 Improve AnalysisException by setting the cause when it's available
+    SPARK-23852 Upgrade to Parquet 1.8.3
+    SPARK-23852 Add withSQLConf(...) to test case
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession

@@ -15,39 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.spark;
+package org.apache.spark.api.r
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.{DataInputStream, DataOutputStream}
+import java.net.Socket
 
-import org.junit.After;
-import org.junit.Before;
+import org.apache.spark.SparkConf
+import org.apache.spark.security.SocketAuthHelper
 
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.SparkSession;
+private[spark] class RAuthHelper(conf: SparkConf) extends SocketAuthHelper(conf) {
 
-public abstract class SharedSparkSession implements Serializable {
-
-  protected transient SparkSession spark;
-  protected transient JavaSparkContext jsc;
-
-  @Before
-  public void setUp() throws IOException {
-    spark = SparkSession.builder()
-      .master("local[2]")
-      .appName(getClass().getSimpleName())
-      .getOrCreate();
-    jsc = new JavaSparkContext(spark.sparkContext());
+  override protected def readUtf8(s: Socket): String = {
+    SerDe.readString(new DataInputStream(s.getInputStream()))
   }
 
-  @After
-  public void tearDown() {
-    try {
-      spark.stop();
-      spark = null;
-    } finally {
-      SparkSession.clearDefaultSession();
-      SparkSession.clearActiveSession();
-    }
+  override protected def writeUtf8(str: String, s: Socket): Unit = {
+    val out = s.getOutputStream()
+    SerDe.writeString(new DataOutputStream(out), str)
+    out.flush()
   }
+
 }
