@@ -164,6 +164,7 @@ BUG FIXES
     SPARK-23780 Failed to use googleVis library with new SparkR
     SPARK-24259 ArrayWriter for Arrow produces wrong output
     SPARK-23601 Keep md5 checksums for nexus artifacts.
+    SPARK-24002 Task not serializable caused by org.apache.parquet.io.api.Binary$ByteBufferBackedBinary.getBytes
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
