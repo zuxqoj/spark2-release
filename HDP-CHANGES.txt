@@ -166,6 +166,7 @@ BUG FIXES
     SPARK-23601 Keep md5 checksums for nexus artifacts.
     SPARK-24002 Task not serializable caused by org.apache.parquet.io.api.Binary$ByteBufferBackedBinary.getBytes
     SPARK-21945 Make --py-files work with PySpark shell in Yarn client mode
+    SPARK-22371 Return None instead of throwing an exception when an accumulator is garbage collected.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
