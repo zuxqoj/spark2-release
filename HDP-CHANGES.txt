@@ -192,6 +192,7 @@ BUG FIXES
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
     SPARK-24149 Retrieve all federated namespaces tokens
     SPARK-24209 Automatic retrieve proxyBase from Knox headers
+    SPARK-24312 Upgrade to 2.3.3 for Hive Metastore Client 2.3
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
