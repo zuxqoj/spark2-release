@@ -175,3 +175,6 @@ BUG FIXES
     SPARK-23787 Fix file download test in SparkSubmitSuite for Hadoop 2.9.
     SPARK-23355 convertMetastore should not ignore table properties
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
+
+    (Jira in Apache Spark is IN PROGRESS)
+    SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
