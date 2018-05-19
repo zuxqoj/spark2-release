@@ -161,6 +161,12 @@ BUG FIXES
     SPARK-24246 Improve AnalysisException by setting the cause when it's available
     SPARK-23852 Upgrade to Parquet 1.8.3
     SPARK-23852 Add withSQLConf(...) to test case
+    SPARK-23780 Failed to use googleVis library with new SparkR
+    SPARK-24259 ArrayWriter for Arrow produces wrong output
+    SPARK-23601 Keep md5 checksums for nexus artifacts.
+    SPARK-24002 Task not serializable caused by org.apache.parquet.io.api.Binary$ByteBufferBackedBinary.getBytes
+    SPARK-21945 Make --py-files work with PySpark shell in Yarn client mode
+    SPARK-22371 Return None instead of throwing an exception when an accumulator is garbage collected.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
