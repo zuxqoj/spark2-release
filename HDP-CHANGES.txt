@@ -168,6 +168,7 @@ BUG FIXES
     SPARK-21945 Make --py-files work with PySpark shell in Yarn client mode
     SPARK-22371 Return None instead of throwing an exception when an accumulator is garbage collected.
     SPARK-23850 Add separate config for SQL options redaction.
+    SPARK-24309 AsyncEventQueue should stop on interrupt.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
