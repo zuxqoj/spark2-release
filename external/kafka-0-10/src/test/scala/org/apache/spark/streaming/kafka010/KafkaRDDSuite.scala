@@ -17,7 +17,7 @@
 
 package org.apache.spark.streaming.kafka010
 
-import java.{ util => ju }
+import java.{util => ju}
 import java.io.File
 
 import scala.collection.JavaConverters._
@@ -26,12 +26,14 @@ import scala.util.Random
 import kafka.common.TopicAndPartition
 import kafka.log._
 import kafka.message._
+import kafka.server.{BrokerTopicStats, LogDirFailureChannel}
 import kafka.utils.Pool
 import org.apache.kafka.common.TopicPartition
+import org.apache.kafka.common.record.{CompressionType, MemoryRecords, MemoryRecordsBuilder, SimpleRecord}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.scalatest.BeforeAndAfterAll
-
 import org.apache.spark._
+
 import org.apache.spark.scheduler.ExecutorCacheTaskLocation
 import org.apache.spark.streaming.kafka010.mocks.MockTime
 
@@ -72,33 +74,37 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
 
   private def compactLogs(topic: String, partition: Int, messages: Array[(String, String)]) {
     val mockTime = new MockTime()
-    // LogCleaner in 0.10 version of Kafka is still expecting the old TopicAndPartition api
-    val logs = new Pool[TopicAndPartition, Log]()
+    val logs = new Pool[TopicPartition, Log]()
     val logDir = kafkaTestUtils.brokerLogDir
     val dir = new File(logDir, topic + "-" + partition)
     dir.mkdirs()
     val logProps = new ju.Properties()
     logProps.put(LogConfig.CleanupPolicyProp, LogConfig.Compact)
     logProps.put(LogConfig.MinCleanableDirtyRatioProp, java.lang.Float.valueOf(0.1f))
-    val log = new Log(
+    val log = Log(
       dir,
       LogConfig(logProps),
       0L,
+      0L,
       mockTime.scheduler,
-      mockTime
-    )
-    messages.foreach { case (k, v) =>
-      val msg = new ByteBufferMessageSet(
-        NoCompressionCodec,
-        new Message(v.getBytes, k.getBytes, Message.NoTimestamp, Message.CurrentMagicValue))
-      log.append(msg)
-    }
-    log.roll()
-    logs.put(TopicAndPartition(topic, partition), log)
+      new BrokerTopicStats,
+      mockTime,
+      10000,
+      10000,
+      new LogDirFailureChannel(1))
 
-    val cleaner = new LogCleaner(CleanerConfig(), logDirs = Array(dir), logs = logs)
+    messages.foreach { case (k, v) =>
+        val simpleRec = new SimpleRecord(k.getBytes, v.getBytes)
+        log.appendAsLeader(MemoryRecords.withRecords(CompressionType.NONE, simpleRec), 0,
+          isFromClient = true)
+    }
+    log.roll(messages.length + 1)
+    logs.put(new TopicPartition(topic, partition), log)
+
+    val cleaner = new LogCleaner(CleanerConfig(), Array(dir), logs,
+      new LogDirFailureChannel(1), mockTime)
     cleaner.startup()
-    cleaner.awaitCleaned(topic, partition, log.activeSegment.baseOffset, 1000)
+    cleaner.awaitCleaned(new TopicPartition(topic, partition), log.activeSegment.baseOffset, 1000)
 
     cleaner.shutdown()
     mockTime.scheduler.shutdown()
