@@ -49,11 +49,11 @@ private[ui] class PoolPage(parent: StagesTab) extends WebUIPage("pool") {
         "stages/pool", parent.isFairScheduler, parent.killEnabled, false)
 
     val poolTable = new PoolTable(Map(pool -> uiPool), parent)
-    var content = <h4>Summary </h4> ++ poolTable.toNodeSeq
+    var content = <h4>Summary </h4> ++ poolTable.toNodeSeq(request)
     if (activeStages.nonEmpty) {
       content ++= <h4>Active Stages ({activeStages.size})</h4> ++ activeStagesTable.toNodeSeq
     }
 
-    UIUtils.headerSparkPage("Fair Scheduler Pool: " + poolName, content, parent)
+    UIUtils.headerSparkPage(request, "Fair Scheduler Pool: " + poolName, content, parent)
   }
 }

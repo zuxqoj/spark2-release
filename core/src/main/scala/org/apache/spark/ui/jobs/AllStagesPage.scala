@@ -129,7 +129,7 @@ private[ui] class AllStagesPage(parent: StagesTab) extends WebUIPage("") {
     var content = summary ++
       {
         if (sc.isDefined && isFairScheduler) {
-          <h4>Fair Scheduler Pools ({pools.size})</h4> ++ poolTable.toNodeSeq
+          <h4>Fair Scheduler Pools ({pools.size})</h4> ++ poolTable.toNodeSeq(request)
         } else {
           Seq.empty[Node]
         }
@@ -164,6 +164,6 @@ private[ui] class AllStagesPage(parent: StagesTab) extends WebUIPage("") {
       content ++= <h4 id ="failed">Failed Stages ({numFailedStages})</h4> ++
       failedStagesTable.toNodeSeq
     }
-    UIUtils.headerSparkPage("Stages for All Jobs", content, parent)
+    UIUtils.headerSparkPage(request, "Stages for All Jobs", content, parent)
   }
 }
