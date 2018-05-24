@@ -54,7 +54,7 @@ private[ui] class EnvironmentPage(
         <h4>Classpath Entries</h4> {classpathEntriesTable}
       </span>
 
-    UIUtils.headerSparkPage("Environment", content, parent)
+    UIUtils.headerSparkPage(request, "Environment", content, parent)
   }
 
   private def propertyHeader = Seq("Name", "Value")

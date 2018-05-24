@@ -168,6 +168,7 @@ BUG FIXES
     SPARK-21945 Make --py-files work with PySpark shell in Yarn client mode
     SPARK-22371 Return None instead of throwing an exception when an accumulator is garbage collected.
     SPARK-23850 Add separate config for SQL options redaction.
+    SPARK-24309 AsyncEventQueue should stop on interrupt.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
@@ -182,6 +183,8 @@ BUG FIXES
     SPARK-23787 Fix file download test in SparkSubmitSuite for Hadoop 2.9.
     SPARK-23355 convertMetastore should not ignore table properties
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
+    SPARK-24149 Retrieve all federated namespaces tokens
+    SPARK-24209 Automatic retrieve proxyBase from Knox headers
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
