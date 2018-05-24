@@ -112,6 +112,8 @@ BUG FIXES
     SPARK-23816 Killed tasks should ignore FetchFailures.
     SPARK-24062 Fix SASL encryption cannot enabled issue in thrift server
     SPARK-24188 Restore "/version" API endpoint.
+    SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
+    SPARK-24364 Files deletion after globbing may fail StructuredStreaming jobs
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
