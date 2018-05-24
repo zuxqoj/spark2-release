@@ -172,6 +172,7 @@ BUG FIXES
     SPARK-24313 Fix collection operations' interpreted evaluation for complex types
     SPARK-24257 LongToUnsafeRowMap calculate the new size may be wrong
     SPARK-24322 Upgrade Apache ORC to 1.4.4
+    SPARK-24364 Files deletion after globbing may fail StructuredStreaming jobs
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
