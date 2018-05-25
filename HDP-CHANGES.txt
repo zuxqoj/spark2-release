@@ -175,6 +175,7 @@ BUG FIXES
     SPARK-24364 Files deletion after globbing may fail StructuredStreaming jobs
     SPARK-24230 Fix SpecificParquetRecordReaderBase with dictionary filters.
     SPARK-24378 Fix date_trunc function incorrect examples
+    MINOR       Add port SSL config in toString and scaladoc[MINOR] Add port SSL config in toString and scaladoc
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
