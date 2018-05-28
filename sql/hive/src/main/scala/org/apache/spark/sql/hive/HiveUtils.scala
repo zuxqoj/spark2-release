@@ -342,9 +342,10 @@ private[spark] object HiveUtils extends Logging {
       // TODO: Support for loading the jars from an already downloaded location.
       logInfo(
         s"Initializing HiveMetastoreConnection version $hiveMetastoreVersion using maven.")
+      val v = VersionInfo.getVersion
       IsolatedClientLoader.forVersion(
         hiveMetastoreVersion = hiveMetastoreVersion,
-        hadoopVersion = VersionInfo.getVersion,
+        hadoopVersion = raw"(\d).(\d).(\d)".r.findFirstIn(v).getOrElse(v),
         sparkConf = conf,
         hadoopConf = hadoopConf,
         config = configurations,

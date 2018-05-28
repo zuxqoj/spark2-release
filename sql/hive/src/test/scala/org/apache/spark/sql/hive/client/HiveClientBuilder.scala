@@ -47,9 +47,10 @@ private[client] object HiveClientBuilder {
       version: String,
       hadoopConf: Configuration,
       extraConf: Map[String, String] = Map.empty): HiveClient = {
+    val v = VersionInfo.getVersion
     IsolatedClientLoader.forVersion(
       hiveMetastoreVersion = version,
-      hadoopVersion = VersionInfo.getVersion,
+      hadoopVersion = raw"(\d).(\d).(\d)".r.findFirstIn(v).getOrElse(v),
       sparkConf = new SparkConf(),
       hadoopConf = hadoopConf,
       config = buildConf(extraConf),
