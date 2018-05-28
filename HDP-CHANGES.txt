@@ -36,7 +36,6 @@ BUG FIXES
     BUG-85326   spark-llap: Notify Hive on Spark query completions
     BUG-90803   Added hadoop-azure-datalake and azure-data-lake-store-sdk to all the wasb locations
     BUG-95434   Fix connection string to use `isRunningInYarnContainer`
-    BUG-99700   Remove unused Hive versions from VersionsSuite
     BUG-99560   Enable `kafka-0-8` build in atlantic by using Kafka `0.10.1.2.6.4.0-91`
     BUG-100134  Revert `[SPARK-22919] Bump httpclient versions` to avoid conflicts with AWS library
     BUG-103408  ORC-306 `TimestampColumnVector.time` is different from ORC 1.4.3
