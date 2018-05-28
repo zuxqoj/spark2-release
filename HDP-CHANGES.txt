@@ -177,6 +177,7 @@ BUG FIXES
     SPARK-24230 Fix SpecificParquetRecordReaderBase with dictionary filters.
     SPARK-24378 Fix date_trunc function incorrect examples
     MINOR       Add port SSL config in toString and scaladoc[MINOR] Add port SSL config in toString and scaladoc
+    SPARK-24334 Fix race condition in ArrowPythonRunner causes unclean shutdown of Arrow memory allocator
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
