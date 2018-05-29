@@ -180,6 +180,7 @@ BUG FIXES
     SPARK-24334 Fix race condition in ArrowPythonRunner causes unclean shutdown of Arrow memory allocator
     SPARK-24392 Label pandas_udf as Experimental
     SPARK-24373 Add AnalysisBarrier to RelationalGroupedDataset's and KeyValueGroupedDataset's child
+    SPARK-19613 Random.nextString is not safe for directory namePrefix
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
