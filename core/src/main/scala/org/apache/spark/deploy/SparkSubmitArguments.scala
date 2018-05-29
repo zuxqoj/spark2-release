@@ -184,6 +184,7 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
     name = Option(name).orElse(sparkProperties.get("spark.app.name")).orNull
     jars = Option(jars).orElse(sparkProperties.get("spark.jars")).orNull
     files = Option(files).orElse(sparkProperties.get("spark.files")).orNull
+    pyFiles = Option(pyFiles).orElse(sparkProperties.get("spark.submit.pyFiles")).orNull
     ivyRepoPath = sparkProperties.get("spark.jars.ivy").orNull
     ivySettingsPath = sparkProperties.get("spark.jars.ivySettings")
     packages = Option(packages).orElse(sparkProperties.get("spark.jars.packages")).orNull
@@ -277,9 +278,6 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
     }
     if (numExecutors != null && Try(numExecutors.toInt).getOrElse(-1) <= 0) {
       SparkSubmit.printErrorAndExit("Number of executors must be a positive number")
-    }
-    if (pyFiles != null && !isPython) {
-      SparkSubmit.printErrorAndExit("--py-files given but primary resource is not a Python script")
     }
 
     if (master.startsWith("yarn")) {
