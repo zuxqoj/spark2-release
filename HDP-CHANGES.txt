@@ -16,6 +16,7 @@ IMPROVEMENTS
     RMP-6448: hdp.version
     BUG-100381 Add Hive Metastore 3.0 support
     BUG-102958 Update HiveShim for Hive 3.0.0
+    BUG-104039 Use official Hive 3.0.0 metastore library
 
 BUG FIXES
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
