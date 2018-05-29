@@ -542,8 +542,13 @@ private[spark] class SecurityManager(
       return
     }
 
-    secretKey = Utils.createSecret(sparkConf)
+    val rnd = new SecureRandom()
+    val length = sparkConf.getInt("spark.authenticate.secretBitLength", 256) / JByte.SIZE
+    val secretBytes = new Array[Byte](length)
+    rnd.nextBytes(secretBytes)
+
     val creds = new Credentials()
+    secretKey = HashCodes.fromBytes(secretBytes).toString()
     creds.addSecretKey(SECRET_LOOKUP_KEY, secretKey.getBytes(UTF_8))
     UserGroupInformation.getCurrentUser().addCredentials(creds)
   }

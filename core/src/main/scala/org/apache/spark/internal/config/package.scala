@@ -342,11 +342,6 @@ package object config {
       .regexConf
       .createOptional
 
-  private[spark] val AUTH_SECRET_BIT_LENGTH =
-    ConfigBuilder("spark.authenticate.secretBitLength")
-      .intConf
-      .createWithDefault(256)
-
   private[spark] val NETWORK_AUTH_ENABLED =
     ConfigBuilder("spark.authenticate")
       .booleanConf

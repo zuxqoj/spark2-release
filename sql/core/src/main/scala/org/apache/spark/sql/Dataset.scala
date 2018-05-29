@@ -3187,7 +3187,7 @@ class Dataset[T] private[sql](
     EvaluatePython.javaToPython(rdd)
   }
 
-  private[sql] def collectToPython(): Array[Any] = {
+  private[sql] def collectToPython(): Int = {
     EvaluatePython.registerPicklers()
     withNewExecutionId {
       val toJava: (Any) => Any = EvaluatePython.toJava(_, schema)
@@ -3200,14 +3200,14 @@ class Dataset[T] private[sql](
   /**
    * Collect a Dataset as ArrowPayload byte arrays and serve to PySpark.
    */
-  private[sql] def collectAsArrowToPython(): Array[Any] = {
+  private[sql] def collectAsArrowToPython(): Int = {
     withNewExecutionId {
       val iter = toArrowPayload.collect().iterator.map(_.asPythonSerializable)
       PythonRDD.serveIterator(iter, "serve-Arrow")
     }
   }
 
-  private[sql] def toPythonIterator(): Array[Any] = {
+  private[sql] def toPythonIterator(): Int = {
     withNewExecutionId {
       PythonRDD.toLocalIteratorAndServe(javaToPython.rdd)
     }
