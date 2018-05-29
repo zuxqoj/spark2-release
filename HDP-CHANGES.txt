@@ -20,6 +20,7 @@ IMPROVEMENTS
     BUG-97455 Update Spark to build against Kafka 1.0
     BUG-100381 Add Hive Metastore 3.0 support
     BUG-102958 Update HiveShim for Hive 3.0.0
+    BUG-104039 Use official Hive 3.0.0 metastore library
     BUG-100279 Add adl & wasb not loading
 
 BUG FIXES
