@@ -182,6 +182,7 @@ BUG FIXES
     SPARK-24392 Label pandas_udf as Experimental
     SPARK-24373 Add AnalysisBarrier to RelationalGroupedDataset's and KeyValueGroupedDataset's child
     SPARK-19613 Random.nextString is not safe for directory namePrefix
+    SPARK-23991 Fix data loss when WAL write fails in allocateBlocksToBatch
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
