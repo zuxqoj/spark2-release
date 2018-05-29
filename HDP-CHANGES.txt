@@ -116,6 +116,7 @@ BUG FIXES
     SPARK-24364 Files deletion after globbing may fail StructuredStreaming jobs
     BUG-102285 Update py4j to version 0.10.7.
     BUG-102285 Match pyspark features in SparkR communication protocol.
+    SPARK-19613 Random.nextString is not safe for directory namePrefix
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
