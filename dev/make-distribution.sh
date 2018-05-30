@@ -171,7 +171,7 @@ cp "$SPARK_HOME"/assembly/target/scala*/jars/* "$DISTDIR/jars/"
 # Add Hive 3.0 Metastore Client uber jar
 HIVE_VERSION=$("$MVN" help:evaluate -Dexpression=hive.version $@ 2>/dev/null | grep -v "INFO" | tail -n 1)
 mkdir "$DISTDIR/standalone-metastore"
-`cd "$DISTDIR/standalone-metastore"; curl -O http://nexus-private.hortonworks.com:8081/nexus/content/repositories/IN-QA/org/spark-project/hive/standalone-metastore/$HIVE_VERSION/standalone-metastore-$HIVE_VERSION-hive3.jar`
+`cd "$DISTDIR/standalone-metastore"; curl -O http://nexus-private.hortonworks.com:8081/nexus/content/repositories/IN-QA/org/spark-project/hive/standalone-metastore/$HIVE_VERSION/standalone-metastore-$HIVE_VERSION-hive3.jar; ln -s standalone-metastore-$HIVE_VERSION-hive3.jar standalone-metastore-hive3.jar`
 
 # Only create the yarn directory if the yarn artifacts were built.
 if [ -f "$SPARK_HOME"/common/network-yarn/target/scala*/spark-*-yarn-shuffle.jar ]; then
