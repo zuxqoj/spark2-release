@@ -549,6 +549,18 @@ private[spark] class Client(
             distribute(Utils.resolveURI(archive).toString,
               resType = LocalResourceType.ARCHIVE,
               destName = Some(LOCALIZED_LIB_DIR))
+
+            if (fs.exists(new Path("/hdp/apps/" + hdp_version.get +
+                "/spark2/spark2-hdp-hive-archive.tar.gz"))) {
+              val hiveArchive = fs.getUri().toString() + "/hdp/apps/" +
+                hdp_version.get + "/spark2/spark2-hdp-hive-archive.tar.gz"
+              logInfo("Distribute hdfs cache file as spark.sql.hive.metastore.jars for HDP, " +
+                "hdfsCacheFile:" + hiveArchive)
+              require(!isLocalUri(hiveArchive), s"${hiveArchive} cannot be a local URI.")
+              distribute(Utils.resolveURI(hiveArchive).toString,
+                resType = LocalResourceType.ARCHIVE,
+                destName = Some(LOCALIZED_HIVE_LIB_DIR))
+            }
           } else {
             // No configuration, so fall back to uploading local jar files.
             logWarning(s"Neither ${SPARK_JARS.key} nor ${SPARK_ARCHIVE.key} is set, falling back " +
@@ -1279,6 +1291,9 @@ private object Client extends Logging {
 
   // Subdirectory where Spark libraries will be placed.
   val LOCALIZED_LIB_DIR = "__spark_libs__"
+
+  // Subdirectory where Hive libraries will be placed.
+  val LOCALIZED_HIVE_LIB_DIR = "__hive_libs__"
 
   /**
    * Return the path to the given application's staging directory.

@@ -40,3 +40,4 @@ BUG FIXES
     BUG-101806  Remove explicit adl sdk import from Spark build, and use hadoop transitive dependency instead.
     BUG-101699  Update HDP Spark to match hadoop3 profile with Apache
     BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
+    BUG-104322  Use cache file created by ambari as spark.sql.hive.metastore.jars

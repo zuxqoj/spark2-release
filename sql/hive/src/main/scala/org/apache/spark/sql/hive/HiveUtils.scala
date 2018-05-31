@@ -29,6 +29,7 @@ import scala.collection.mutable.HashMap
 import scala.language.implicitConversions
 
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.Path
 import org.apache.hadoop.hive.common.`type`.HiveDecimal
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars
@@ -352,8 +353,17 @@ private[spark] object HiveUtils extends Logging {
         sharedPrefixes = hiveMetastoreSharedPrefixes)
     } else {
       // Convert to files and expand any directories.
-      val jars =
+      val hdp_version = sys.env.get("HDP_VERSION")
+      val LOCALIZED_HIVE_LIB_DIR = "__hive_libs__"
+      val path = new Path(LOCALIZED_HIVE_LIB_DIR)
+      val fs = path.getFileSystem(hadoopConf)
+      val hiveJars = if (hiveMetastoreJars.isEmpty && hdp_version.isDefined && fs.exists(path)) {
+        s"$LOCALIZED_HIVE_LIB_DIR/*"
+      } else {
         hiveMetastoreJars
+      }
+      val jars =
+        hiveJars
           .split(File.pathSeparator)
           .flatMap {
           case path if new File(path).getName == "*" =>
