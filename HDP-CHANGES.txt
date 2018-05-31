@@ -184,6 +184,7 @@ BUG FIXES
     SPARK-23991 Fix data loss when WAL write fails in allocateBlocksToBatch
     SPARK-24384 Add .py files correctly into PythonRunner in submit with client mode in spark-submit
     SPARK-23754 Re-raising StopIteration in client code
+    SPARK-24414 Calculate the correct number of tasks for a stage.
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
