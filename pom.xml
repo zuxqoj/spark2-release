@@ -2621,6 +2621,9 @@
         <dependencies>
         </dependencies>
       </dependencyManagement>
+      <modules>
+        <module>standalone-metastore</module>
+      </modules>
     </profile>
 
     <!--
