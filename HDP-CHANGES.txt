@@ -183,7 +183,6 @@ BUG FIXES
     SPARK-19613 Random.nextString is not safe for directory namePrefix
     SPARK-23991 Fix data loss when WAL write fails in allocateBlocksToBatch
     SPARK-24384 Add .py files correctly into PythonRunner in submit with client mode in spark-submit
-    SPARK-24369 Correct handling for multiple distinct aggregations having the same argument set
     SPARK-23754 Re-raising StopIteration in client code
 
     (Backport from 2.4)
