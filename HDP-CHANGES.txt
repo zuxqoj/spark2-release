@@ -25,10 +25,8 @@ BUG FIXES
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
     BUG-68592   Implement `spark-llap2` package for Spark 2.1.x
-    BUG-71525   Support `spark.sql.hive.llap` configuration
     SPARK-207   Remove hardcode FS scheme from Spark archive
     BUG-77149   Spark2 build failure in atlantic because [SPARK-17979] SPARK_YARN_USER_ENV and SPARK_JAVA_OPTS depreciated.
-    BUG-79168   Spark2 compilation failure because (1)LLAP related patches are missing (2) conflict between hdp-master and Apache/master in the Client.scala
     BUG-77776   Fix STS error handling logic on HiveSQLException
     BUG-81926   Issue with inserting data from Spark SQL using hivecontext
     BUG-77400   Fix HiveServer2 delegation token acquisition

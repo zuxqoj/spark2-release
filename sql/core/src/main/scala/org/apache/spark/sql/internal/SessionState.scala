@@ -110,64 +110,6 @@ private[sql] class SessionState(
   def refreshTable(tableName: String): Unit = {
     catalog.refreshTable(sqlParser.parseTableIdentifier(tableName))
   }
-
-  // ------------------------------------------------------
-  //  Helper methods for HDP Ranger with LLAP
-  // ------------------------------------------------------
-
-  private var userName = System.getProperty("user.name")
-
-  def setUser(user: String): Unit = {
-    userName = user
-  }
-
-  def getUser(): String = {
-    userName
-  }
-
-  /**
-   * Return connection URL (with replaced proxy user name if exists).
-   */
-  def getConnectionUrl(sparkSession: SparkSession): String = {
-    var userString = getUser()
-    if (userString == null) {
-      userString = ""
-    }
-    val urlString = getConnectionUrlFromConf(sparkSession)
-    urlString.replace("${user}", userString)
-  }
-
-  import org.apache.spark.sql.internal.SQLConf._
-  /**
-   * For the given HiveServer2 JDBC URLs, attach the postfix strings if needed.
-   *
-   * For kerberized clusters,
-   *
-   * 1. YARN cluster mode: ";auth=delegationToken"
-   * 2. YARN client mode: ";principal=hive/_HOST@EXAMPLE.COM"
-   *
-   * Non-kerberied clusters,
-   * 3. Use the given URLs.
-   */
-  private def getConnectionUrlFromConf(sparkSession: SparkSession): String = {
-    if (!sparkSession.conf.contains(HIVESERVER2_JDBC_URL.key)) {
-      throw new Exception("Spark conf does not contain config " + HIVESERVER2_JDBC_URL.key)
-    }
-
-    if (sparkSession.conf.get(HIVESERVER2_CREDENTIAL_ENABLED, false) &&
-      org.apache.spark.util.Utils.isRunningInYarnContainer(sparkSession.sparkContext.conf)) {
-      // 1. YARN Cluster mode for kerberized clusters
-      s"${sparkSession.conf.get(HIVESERVER2_JDBC_URL.key)};auth=delegationToken"
-    } else if (sparkSession.sparkContext.conf.contains(HIVESERVER2_JDBC_URL_PRINCIPAL.key) &&
-      !org.apache.spark.util.Utils.isRunningInYarnContainer(sparkSession.sparkContext.conf)) {
-      // 2. YARN Client mode for kerberized clusters
-      s"${sparkSession.conf.get(HIVESERVER2_JDBC_URL.key)};" +
-        s"principal=${sparkSession.conf.get(HIVESERVER2_JDBC_URL_PRINCIPAL.key)}"
-    } else {
-      // 3. For non-kerberized cluster
-      sparkSession.conf.get(HIVESERVER2_JDBC_URL.key)
-    }
-  }
 }
 
 private[sql] object SessionState {
