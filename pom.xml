@@ -2617,10 +2617,38 @@
       <activation>
       <activeByDefault>true</activeByDefault>
       </activation>
-      <dependencyManagement>
-        <dependencies>
-        </dependencies>
-      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.spark-project.hive</groupId>
+          <artifactId>standalone-metastore</artifactId>
+          <classifier>hive3</classifier>
+          <version>${hive.version}</version>
+          <exclusions>
+            <exclusion>
+              <groupId>*</groupId>
+              <artifactId>*</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/standalone-metastore</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <!--
