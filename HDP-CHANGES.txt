@@ -21,6 +21,7 @@ IMPROVEMENTS
     BUG-100279 Add adl & wasb not loading
     BUG-104421 Try HDP fallback paths for Hive jars
     BUG-108603 Update Hive Metastore 3.0 to reflect the signature change within HDP's Hive
+    BUG-103402 Spark distribution should have Hive 3.0 Metastore Client library
 
 BUG FIXES
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
