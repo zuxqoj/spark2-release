@@ -168,12 +168,6 @@ echo "Build flags: $@" >> "$DISTDIR/RELEASE"
 # Copy jars
 cp "$SPARK_HOME"/assembly/target/scala*/jars/* "$DISTDIR/jars/"
 
-# Only create the standalone metastore directory if metastore artifact were copied.
-if [ -f "$SPARK_HOME"/target/standalone-metastore/standalone-metastore-*.jar ]; then
-  mkdir "$DISTDIR/standalone-metastore"
-  cp "$SPARK_HOME"/target/standalone-metastore/standalone-metastore-*.jar "$DISTDIR/standalone-metastore"
-fi
-
 # Only create the yarn directory if the yarn artifacts were built.
 if [ -f "$SPARK_HOME"/common/network-yarn/target/scala*/spark-*-yarn-shuffle.jar ]; then
   mkdir "$DISTDIR/yarn"
