@@ -287,6 +287,12 @@ private[spark] object HiveUtils extends Logging {
     newClientForMetadata(conf, hadoopConf, configurations)
   }
 
+  private def pathExists(singleJarPath: String): Boolean = {
+    val file = new File(singleJarPath)
+    file.exists ||
+      (singleJarPath.endsWith("*") && file.getParent != null && new File(file.getParent).exists)
+  }
+
   protected[hive] def newClientForMetadata(
       conf: SparkConf,
       hadoopConf: Configuration,
@@ -354,13 +360,14 @@ private[spark] object HiveUtils extends Logging {
     } else {
       // Convert to files and expand any directories.
       val hdp_version = sys.env.get("HDP_VERSION")
-      val LOCALIZED_HIVE_LIB_DIR = "__hive_libs__"
-      val path = new Path(LOCALIZED_HIVE_LIB_DIR)
-      val fs = path.getFileSystem(hadoopConf)
-      val hiveJars = if (hiveMetastoreJars.isEmpty && hdp_version.isDefined && fs.exists(path)) {
-        s"$LOCALIZED_HIVE_LIB_DIR/*"
-      } else {
+      val hiveJars = if (pathExists(hiveMetastoreJars) || hdp_version.isEmpty) {
         hiveMetastoreJars
+      } else {
+        logWarning(s"Hive jar path '$hiveMetastoreJars' is invalid. Try fallback paths.")
+        Seq("__hive_libs__/*", s"/usr/hdp/${hdp_version.get}/spark2/standalone-metastore/*")
+          .find(pathExists).getOrElse {
+          throw new IllegalArgumentException("Unable to locate hive jars")
+        }
       }
       val jars =
         hiveJars
