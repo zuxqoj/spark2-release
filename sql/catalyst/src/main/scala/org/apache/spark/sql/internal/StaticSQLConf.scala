@@ -39,11 +39,6 @@ object StaticSQLConf {
     .checkValues(Set("hive", "in-memory"))
     .createWithDefault("in-memory")
 
-  val LLAP_ENABLED = buildStaticConf("spark.sql.hive.llap")
-    .internal()
-    .booleanConf
-    .createWithDefault(false)
-
   val GLOBAL_TEMP_DATABASE = buildStaticConf("spark.sql.globalTempDatabase")
     .internal()
     .stringConf

@@ -168,10 +168,11 @@ echo "Build flags: $@" >> "$DISTDIR/RELEASE"
 # Copy jars
 cp "$SPARK_HOME"/assembly/target/scala*/jars/* "$DISTDIR/jars/"
 
-# Add Hive 3.0 Metastore Client uber jar
-HIVE_VERSION=$("$MVN" help:evaluate -Dexpression=hive.version $@ 2>/dev/null | grep -v "INFO" | tail -n 1)
-mkdir "$DISTDIR/standalone-metastore"
-`cd "$DISTDIR/standalone-metastore"; curl -O http://nexus-private.hortonworks.com:8081/nexus/content/repositories/IN-QA/org/spark-project/hive/standalone-metastore/$HIVE_VERSION/standalone-metastore-$HIVE_VERSION-hive3.jar`
+# Only create the standalone metastore directory if metastore artifact were copied.
+if [ -f "$SPARK_HOME"/standalone-metastore/target/standalone-metastore-*.jar ]; then
+  mkdir "$DISTDIR/standalone-metastore"
+  cp "$SPARK_HOME"/standalone-metastore/target/standalone-metastore-*.jar "$DISTDIR/standalone-metastore"
+fi
 
 # Only create the yarn directory if the yarn artifacts were built.
 if [ -f "$SPARK_HOME"/common/network-yarn/target/scala*/spark-*-yarn-shuffle.jar ]; then

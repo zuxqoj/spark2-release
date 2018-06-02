@@ -2806,7 +2806,7 @@ private[spark] object Utils extends Logging {
         throw new IllegalArgumentException("Invalid Kubernetes master scheme: " + masterScheme)
     }
 
-    s"khttps.setSSLSocketFactory8s://$resolvedURL"
+    s"k8s://$resolvedURL"
   }
 
   def createSecret(conf: SparkConf): String = {

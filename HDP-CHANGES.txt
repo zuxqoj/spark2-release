@@ -9,7 +9,7 @@ NEW FEATURES
     BUG-97790  Spark Atlas Connector: support Kafka as external data source
     BUG-92048 Implement loading and visualizing Spark ML pipeline abstracts at Atlas
     BUG-96831 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism.
- 
+
 IMPROVEMENTS
     RMP-6461: Add --jarDirs and SPARK_APP_JARS to include directories in spark-submit and spark-shell
     RMP-6448: hdp.version
@@ -20,7 +20,9 @@ IMPROVEMENTS
     BUG-97455 Update Spark to build against Kafka 1.0
     BUG-100381 Add Hive Metastore 3.0 support
     BUG-102958 Update HiveShim for Hive 3.0.0
+    BUG-104039 Use official Hive 3.0.0 metastore library
     BUG-100279 Add adl & wasb not loading
+    BUG-104421 Try HDP fallback paths for Hive jars
 
 BUG FIXES
     BUG-58486   Use cache file created by ambari as spark.yarn.archive
@@ -30,10 +32,8 @@ BUG FIXES
     BUG-59418   changes to KafkaRDD MessageAndMetadata to use named params
     BUG-63858   S3CountLines application fails in yarn-cluster mode: user should not call system.exit(0) terminate the application in spark 2
     BUG-68592   Implement `spark-llap2` package for Spark 2.1.x
-    BUG-71525   Support `spark.sql.hive.llap` configuration
     SPARK-207   Remove hardcode FS scheme from Spark archive
     BUG-77149   Spark2 build failure in atlantic because [SPARK-17979] SPARK_YARN_USER_ENV and SPARK_JAVA_OPTS depreciated.
-    BUG-79168   Spark2 compilation failure because (1)LLAP related patches are missing (2) conflict between hdp-master and Apache/master in the Client.scala
     BUG-77776   Fix STS error handling logic on HiveSQLException
     BUG-81926   Issue with inserting data from Spark SQL using hivecontext
     BUG-77400   Fix HiveServer2 delegation token acquisition
@@ -45,6 +45,8 @@ BUG FIXES
     BUG-99560   Enable `kafka-0-8` build in atlantic by using Kafka `0.10.1.2.6.4.0-91`
     BUG-101806  Remove explicit adl sdk import from Spark build, and use hadoop transitive dependency instead.
     BUG-101699  Update HDP Spark to match hadoop3 profile with Apache
+    BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
+    BUG-104322  Use cache file created by ambari as spark.sql.hive.metastore.jars
 
     (Backport from 2.3.1)
     SPARK-23475 Show also skipped stages
@@ -176,6 +178,15 @@ BUG FIXES
     SPARK-24230 Fix SpecificParquetRecordReaderBase with dictionary filters.
     SPARK-24378 Fix date_trunc function incorrect examples
     MINOR       Add port SSL config in toString and scaladoc[MINOR] Add port SSL config in toString and scaladoc
+    SPARK-24334 Fix race condition in ArrowPythonRunner causes unclean shutdown of Arrow memory allocator
+    SPARK-24392 Label pandas_udf as Experimental
+    SPARK-24373 Add AnalysisBarrier to RelationalGroupedDataset's and KeyValueGroupedDataset's child
+    SPARK-19613 Random.nextString is not safe for directory namePrefix
+    SPARK-23991 Fix data loss when WAL write fails in allocateBlocksToBatch
+    SPARK-24384 Add .py files correctly into PythonRunner in submit with client mode in spark-submit
+    SPARK-23754 Re-raising StopIteration in client code
+    SPARK-24414 Calculate the correct number of tasks for a stage.
+    SPARK-24444 Improve Pandas UDF docs to explain column assignment
 
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
@@ -192,6 +203,8 @@ BUG FIXES
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
     SPARK-24149 Retrieve all federated namespaces tokens
     SPARK-24209 Automatic retrieve proxyBase from Knox headers
+    SPARK-24312 Upgrade to 2.3.3 for Hive Metastore Client 2.3
+    SPARK-24377 make --py-files work in non pyspark application
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
