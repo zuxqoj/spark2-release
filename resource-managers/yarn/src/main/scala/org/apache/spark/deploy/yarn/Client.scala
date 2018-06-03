@@ -549,18 +549,6 @@ private[spark] class Client(
             distribute(Utils.resolveURI(archive).toString,
               resType = LocalResourceType.ARCHIVE,
               destName = Some(LOCALIZED_LIB_DIR))
-
-            if (fs.exists(new Path("/hdp/apps/" + hdp_version.get +
-                "/spark2/spark2-hdp-hive-archive.tar.gz"))) {
-              val hiveArchive = fs.getUri().toString() + "/hdp/apps/" +
-                hdp_version.get + "/spark2/spark2-hdp-hive-archive.tar.gz"
-              logInfo("Distribute hdfs cache file as spark.sql.hive.metastore.jars for HDP, " +
-                "hdfsCacheFile:" + hiveArchive)
-              require(!isLocalUri(hiveArchive), s"${hiveArchive} cannot be a local URI.")
-              distribute(Utils.resolveURI(hiveArchive).toString,
-                resType = LocalResourceType.ARCHIVE,
-                destName = Some(LOCALIZED_HIVE_LIB_DIR))
-            }
           } else {
             // No configuration, so fall back to uploading local jar files.
             logWarning(s"Neither ${SPARK_JARS.key} nor ${SPARK_ARCHIVE.key} is set, falling back " +
@@ -589,6 +577,45 @@ private[spark] class Client(
               destName = Some(LOCALIZED_LIB_DIR))
             jarsArchive.delete()
           }
+      }
+
+      // Distribute Hive Metastore Jars
+      val hdp_version = sys.env.get("HDP_VERSION")
+      if (hdp_version.isDefined && fs.exists(new Path("/hdp/apps/" + hdp_version.get +
+        "/spark2/spark2-hdp-hive-archive.tar.gz"))) {
+        val hiveArchive = fs.getUri().toString() + "/hdp/apps/" +
+          hdp_version.get + "/spark2/spark2-hdp-hive-archive.tar.gz"
+        logInfo("Distribute hdfs cache file as spark.sql.hive.metastore.jars for HDP, " +
+          "hdfsCacheFile:" + hiveArchive)
+        require(!isLocalUri(hiveArchive), s"$hiveArchive cannot be a local URI.")
+        distribute(Utils.resolveURI(hiveArchive).toString,
+          resType = LocalResourceType.ARCHIVE,
+          destName = Some(LOCALIZED_HIVE_LIB_DIR))
+      } else {
+        logInfo("Falling back to uploading libraries in this host")
+        val jarsDir = new File("/usr/hdp/current/spark2-client/standalone-metastore")
+        val jarsArchive = File.createTempFile(LOCALIZED_HIVE_LIB_DIR, ".zip",
+          new File(Utils.getLocalDir(sparkConf)))
+        val jarsStream = new ZipOutputStream(new FileOutputStream(jarsArchive))
+
+        try {
+          jarsStream.setLevel(0)
+          jarsDir.listFiles().foreach { f =>
+            if (f.isFile && f.getName.toLowerCase(Locale.ROOT).endsWith(".jar") &&
+              f.canRead) {
+              jarsStream.putNextEntry(new ZipEntry(f.getName))
+              Files.copy(f, jarsStream)
+              jarsStream.closeEntry()
+            }
+          }
+        } finally {
+          jarsStream.close()
+        }
+
+        distribute(jarsArchive.toURI.getPath,
+          resType = LocalResourceType.ARCHIVE,
+          destName = Some(LOCALIZED_HIVE_LIB_DIR))
+        jarsArchive.delete()
       }
     }
 
