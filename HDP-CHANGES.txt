@@ -68,3 +68,4 @@ BUG FIXES
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
+    SPARK-24479 Added config for registering streamingQueryListeners
