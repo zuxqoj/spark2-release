@@ -51,6 +51,7 @@ BUG FIXES
     (Backport from 2.3.2)
     SPARK-24455 fix typo in TaskSchedulerImpl comment
     SPARK-24369 Correct handling for multiple distinct aggregations having the same argument set
+    SPARK-24468 Handle negative scale when adjusting precision for decimal operations
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
