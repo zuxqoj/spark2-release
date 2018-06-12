@@ -55,6 +55,7 @@ BUG FIXES
     SPARK-23732 Fix source links in generated scaladoc
     SPARK-24502 flaky test: UnsafeRowSerializerSuite
     SPARK-24531 Remove version 2.2.0 from testing versions in HiveExternalCatalogVersionsSuite
+    SPARK-24506 Add UI filters to tabs added after binding
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
