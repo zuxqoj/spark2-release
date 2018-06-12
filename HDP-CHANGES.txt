@@ -53,6 +53,7 @@ BUG FIXES
     SPARK-24369 Correct handling for multiple distinct aggregations having the same argument set
     SPARK-24468 Handle negative scale when adjusting precision for decimal operations
     SPARK-23732 Fix source links in generated scaladoc
+    SPARK-24502 flaky test: UnsafeRowSerializerSuite
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
