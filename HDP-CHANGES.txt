@@ -123,3 +123,4 @@ BUG FIXES
     SPARK-23635 Spark executor env variable is overwritten by same name AM env variable
 
     SPARK-23986 freshName can generate non-unique names
+    SPARK-24495 EnsureRequirement returns wrong plan when reordering equal keys
