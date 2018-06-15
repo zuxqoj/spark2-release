@@ -928,6 +928,7 @@ private[hive] object HiveClientImpl {
       table.storage.serde.getOrElse("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"))
     table.storage.properties.foreach { case (k, v) => hiveTable.setSerdeParam(k, v) }
     table.properties.foreach { case (k, v) => hiveTable.setProperty(k, v) }
+    hiveTable.setProperty("transactional", "false")
     table.comment.foreach { c => hiveTable.setProperty("comment", c) }
     // Hive will expand the view text, so it needs 2 fields: viewOriginalText and viewExpandedText.
     // Since we don't expand the view text, but only add table properties, we map the `viewText` to
