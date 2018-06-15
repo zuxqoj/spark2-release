@@ -59,6 +59,7 @@ BUG FIXES
     SPARK-23754 Move UDF stop iteration wrapping from driver to executor
     MINOR       Remove unnecessary sort in UnsafeInMemorySorterSuite
     MINOR       Fix typo in serializer exception
+    Revert SPARK-21743 top-most limit should not cause memory leak
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
