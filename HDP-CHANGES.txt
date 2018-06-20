@@ -58,6 +58,9 @@ BUG FIXES
     SPARK-24506 Add UI filters to tabs added after binding
     SPARK-23754 Move UDF stop iteration wrapping from driver to executor
     MINOR       Remove unnecessary sort in UnsafeInMemorySorterSuite
+    MINOR       Fix typo in serializer exception
+    Revert SPARK-21743 top-most limit should not cause memory leak
+    SPARK-24531 Replace 2.3.0 version with 2.3.1
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
