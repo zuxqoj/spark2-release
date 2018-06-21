@@ -124,3 +124,4 @@ BUG FIXES
 
     SPARK-23986 freshName can generate non-unique names
     SPARK-24495 EnsureRequirement returns wrong plan when reordering equal keys
+    SPARK-24589 Correctly identify tasks in output commit coordinator.
