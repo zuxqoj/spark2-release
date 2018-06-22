@@ -78,6 +78,7 @@ BUG FIXES
     SPARK-24312 Upgrade to 2.3.3 for Hive Metastore Client 2.3
     SPARK-24377 make --py-files work in non pyspark application
     SPARK-24479 Added config for registering streamingQueryListeners
+    SPARK-24518 Using Hadoop credential provider API to store password
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism

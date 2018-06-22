@@ -29,6 +29,7 @@ import com.google.common.io.Files
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.security.{Credentials, UserGroupInformation}
 
+import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.internal.Logging
 import org.apache.spark.internal.config._
 import org.apache.spark.launcher.SparkLauncher
@@ -254,8 +255,10 @@ private[spark] class SecurityManager(
     )
   }
 
+  private val hadoopConf = SparkHadoopUtil.get.newConfiguration(sparkConf)
   // the default SSL configuration - it will be used by all communication layers unless overwritten
-  private val defaultSSLOptions = SSLOptions.parse(sparkConf, "spark.ssl", defaults = None)
+  private val defaultSSLOptions =
+    SSLOptions.parse(sparkConf, hadoopConf, "spark.ssl", defaults = None)
 
   // SSL configuration for the file server. This is used by Utils.setupSecureURLConnection().
   val fileServerSSLOptions = getSSLOptions("fs")
@@ -303,7 +306,8 @@ private[spark] class SecurityManager(
   }
 
   def getSSLOptions(module: String): SSLOptions = {
-    val opts = SSLOptions.parse(sparkConf, s"spark.ssl.$module", Some(defaultSSLOptions))
+    val opts =
+      SSLOptions.parse(sparkConf, hadoopConf, s"spark.ssl.$module", Some(defaultSSLOptions))
     logDebug(s"Created SSL options for $module: $opts")
     opts
   }
