@@ -42,3 +42,4 @@ BUG FIXES
     BUG-101699  Update HDP Spark to match hadoop3 profile with Apache
     BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
     BUG-104322  Use cache file created by ambari as spark.sql.hive.metastore.jars
+    BUG-98248   Add configuration2 dependency into shared classes to avoid failures in `HiveClientImpl.runHive`
