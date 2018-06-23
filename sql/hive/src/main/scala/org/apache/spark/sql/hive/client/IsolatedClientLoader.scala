@@ -180,7 +180,10 @@ private[hive] class IsolatedClientLoader(
 
   protected def isSharedClass(name: String): Boolean = {
     val isHadoopClass =
-      name.startsWith("org.apache.hadoop.") && !name.startsWith("org.apache.hadoop.hive.")
+      name.startsWith("org.apache.hadoop.") && !name.startsWith("org.apache.hadoop.hive.") ||
+      // Also, includes configuration2 as a min fix for Hadoop 3+ for now. This is failed
+      // during class resolution. It is fine when 'sharesHadoopClasses' is disabled.
+      name.startsWith("org.apache.commons.configuration2.")
 
     name.contains("slf4j") ||
     name.contains("log4j") ||
