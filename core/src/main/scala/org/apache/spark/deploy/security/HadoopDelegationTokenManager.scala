@@ -96,17 +96,11 @@ private[spark] class HadoopDelegationTokenManager(
       }
     }
 
-    val isEnabledDeprecated = if (serviceName == "hiveserver2") {
-      deprecatedProviderEnabledConfigs.map { pattern =>
-        sparkConf.getBoolean(pattern.format(serviceName), false)
-      }.reduce(_ || _)
-    } else {
-      deprecatedProviderEnabledConfigs.forall { pattern =>
-        sparkConf
-          .getOption(pattern.format(serviceName))
-          .map(_.toBoolean)
-          .getOrElse(true)
-      }
+    val isEnabledDeprecated = deprecatedProviderEnabledConfigs.forall { pattern =>
+      sparkConf
+        .getOption(pattern.format(serviceName))
+        .map(_.toBoolean)
+        .getOrElse(true)
     }
 
     sparkConf
