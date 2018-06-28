@@ -581,6 +581,7 @@ private[spark] class Client(
 
       // Distribute Hive Metastore Jars
       val hdp_version = sys.env.get("HDP_VERSION")
+      val jarsDir = new File("/usr/hdp/current/spark2-client/standalone-metastore")
       if (hdp_version.isDefined && fs.exists(new Path("/hdp/apps/" + hdp_version.get +
         "/spark2/spark2-hdp-hive-archive.tar.gz"))) {
         val hiveArchive = fs.getUri().toString() + "/hdp/apps/" +
@@ -591,9 +592,8 @@ private[spark] class Client(
         distribute(Utils.resolveURI(hiveArchive).toString,
           resType = LocalResourceType.ARCHIVE,
           destName = Some(LOCALIZED_HIVE_LIB_DIR))
-      } else {
+      } else if (jarsDir.exists()) {
         logInfo("Falling back to uploading libraries in this host")
-        val jarsDir = new File("/usr/hdp/current/spark2-client/standalone-metastore")
         val jarsArchive = File.createTempFile(LOCALIZED_HIVE_LIB_DIR, ".zip",
           new File(Utils.getLocalDir(sparkConf)))
         val jarsStream = new ZipOutputStream(new FileOutputStream(jarsArchive))

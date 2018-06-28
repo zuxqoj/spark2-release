@@ -360,7 +360,10 @@ private[spark] object HiveUtils extends Logging {
           case path if new File(path).getName == "*" =>
             val files = new File(path).getParentFile.listFiles()
             if (files == null) {
-              logWarning(s"Hive jar path '$path' does not exist.")
+              if (!path.equals("__hive_libs__/*") &&
+                  !path.equals("/usr/hdp/current/spark2-client/standalone-metastore/*")) {
+                logWarning(s"Hive jar path '$path' does not exist.")
+              }
               Nil
             } else {
               files.filter(_.getName.toLowerCase(Locale.ROOT).endsWith(".jar"))
