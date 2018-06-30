@@ -32,8 +32,8 @@ import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.record.{CompressionType, MemoryRecords, MemoryRecordsBuilder, SimpleRecord}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.scalatest.BeforeAndAfterAll
-import org.apache.spark._
 
+import org.apache.spark._
 import org.apache.spark.scheduler.ExecutorCacheTaskLocation
 import org.apache.spark.streaming.kafka010.mocks.MockTime
 

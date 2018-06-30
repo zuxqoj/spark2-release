@@ -15,7 +15,6 @@ IMPROVEMENTS
     RMP-6448: hdp.version
     RMP-6954: SparkSQL Ranger integration for fine grained access control in Spark 2.1
     BUG-70581 Add hadoop-3.0 profile
-    BUG-84628 HiveServer2Credential Provider is enabled by default
     RMP-9454: SparkSQL Ranger integration for fine grained access control in Spark 2.2
     BUG-97455 Update Spark to build against Kafka 1.0
     BUG-100381 Add Hive Metastore 3.0 support
@@ -78,6 +77,8 @@ BUG FIXES
     SPARK-24312 Upgrade to 2.3.3 for Hive Metastore Client 2.3
     SPARK-24377 make --py-files work in non pyspark application
     SPARK-24479 Added config for registering streamingQueryListeners
+    SPARK-24518 Using Hadoop credential provider API to store password
+    SPARK-24660 Show correct error pages when downloading logs in SHS
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
