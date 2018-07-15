@@ -1,4 +1,4 @@
-Changes only in Hortonworks github and not in Apache SPARK-2.3.1 and hence not covered by CHANGES.txt.
+Changes only in Hortonworks github and not in Apache SPARK-2.3.2 and hence not covered by CHANGES.txt.
 
 INCOMPATIBLE CHANGES
 
@@ -47,21 +47,6 @@ BUG FIXES
     BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
     BUG-104322  Use cache file created by ambari as spark.sql.hive.metastore.jars
     BUG-98248   Add configuration2 dependency into shared classes to avoid failures in `HiveClientImpl.runHive`
-
-    (Backport from 2.3.2)
-    SPARK-24455 fix typo in TaskSchedulerImpl comment
-    SPARK-24369 Correct handling for multiple distinct aggregations having the same argument set
-    SPARK-24468 Handle negative scale when adjusting precision for decimal operations
-    SPARK-23732 Fix source links in generated scaladoc
-    SPARK-24502 flaky test: UnsafeRowSerializerSuite
-    SPARK-24531 Remove version 2.2.0 from testing versions in HiveExternalCatalogVersionsSuite
-    SPARK-24506 Add UI filters to tabs added after binding
-    SPARK-23754 Move UDF stop iteration wrapping from driver to executor
-    MINOR       Remove unnecessary sort in UnsafeInMemorySorterSuite
-    MINOR       Fix typo in serializer exception
-    Revert SPARK-21743 top-most limit should not cause memory leak
-    SPARK-24531 Replace 2.3.0 version with 2.3.1
-    SPARK-24495 EnsureRequirement returns wrong plan when reordering equal keys
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
