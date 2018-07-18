@@ -194,6 +194,7 @@
 
     <test.java.home>${java.home}</test.java.home>
     <test.exclude.tags></test.exclude.tags>
+    <test.include.tags></test.include.tags>
 
     <!-- Package to use when relocating shaded classes. -->
     <spark.shade.packageName>org.spark_project</spark.shade.packageName>
@@ -2176,6 +2177,7 @@
             </systemProperties>
             <failIfNoTests>false</failIfNoTests>
             <excludedGroups>${test.exclude.tags}</excludedGroups>
+            <groups>${test.include.tags}</groups>
           </configuration>
           <executions>
             <execution>
@@ -2227,6 +2229,7 @@
               <test.method.keys>${test.method.keys}</test.method.keys>
             </systemProperties>
             <tagsToExclude>${test.exclude.tags}</tagsToExclude>
+            <tagsToInclude>${test.include.tags}</tagsToInclude>
           </configuration>
           <executions>
             <execution>
