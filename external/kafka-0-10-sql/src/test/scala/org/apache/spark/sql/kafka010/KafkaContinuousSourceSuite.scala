@@ -20,6 +20,7 @@ package org.apache.spark.sql.kafka010
 import java.util.Properties
 import java.util.concurrent.atomic.AtomicInteger
 
+import org.scalatest.Ignore
 import org.scalatest.time.SpanSugar._
 import scala.collection.mutable
 import scala.util.Random
@@ -85,6 +86,7 @@ class KafkaContinuousSourceTopicDeletionSuite extends KafkaContinuousTest {
   }
 }
 
+@Ignore
 class KafkaContinuousSourceStressForDontFailOnDataLossSuite
     extends KafkaSourceStressForDontFailOnDataLossSuite {
   override protected def startStream(ds: Dataset[Int]) = {

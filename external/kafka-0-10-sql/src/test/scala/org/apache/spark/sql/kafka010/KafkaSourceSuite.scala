@@ -29,6 +29,7 @@ import scala.util.Random
 
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition
+import org.scalatest.Ignore
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.time.SpanSugar._
 
@@ -918,6 +919,7 @@ object KafkaSourceSuite {
 }
 
 
+@Ignore
 class KafkaSourceStressSuite extends KafkaSourceTest {
 
   import testImplicits._
