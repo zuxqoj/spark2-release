@@ -204,3 +204,4 @@ BUG FIXES
 
     (Jira in Apache Spark is IN PROGRESS)
     BUG-88428 SPARK-21549 Spark fails to complete job correctly in case of OutputFormat which do not write into hdfs
+  SPARK-24948   Delegate check access permissions to the file system
