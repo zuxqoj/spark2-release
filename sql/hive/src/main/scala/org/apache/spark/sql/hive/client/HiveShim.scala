@@ -1167,7 +1167,11 @@ private[client] class Shim_v2_2 extends Shim_v2_1
 
 private[client] class Shim_v2_3 extends Shim_v2_1
 
+// TODO: Consider have HDP specific Shim and revert this change. See BUG-108603.
 private[client] class Shim_v3_0 extends Shim_v2_3 {
+  // Naive Spark does not support transactional operations.
+  protected lazy val transactional = JBoolean.FALSE
+
   // Spark supports only non-ACID operations
   protected lazy val isAcidIUDoperation = JBoolean.FALSE
 
@@ -1190,6 +1194,7 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       classOf[Table],
       classOf[JMap[String, String]],
       clazzLoadFileType,
+      JBoolean.TYPE,
       JBoolean.TYPE,
       JBoolean.TYPE,
       JBoolean.TYPE,
@@ -1228,6 +1233,22 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       JBoolean.TYPE,
       classOf[AcidUtils.Operation],
       JBoolean.TYPE)
+  private lazy val alterTableMethod =
+    findMethod(
+      classOf[Hive],
+      "alterTable",
+      classOf[String],
+      classOf[Table],
+      classOf[EnvironmentContext],
+      JBoolean.TYPE)
+  private lazy val alterPartitionsMethod =
+    findMethod(
+      classOf[Hive],
+      "alterPartitions",
+      classOf[String],
+      classOf[JList[Partition]],
+      classOf[EnvironmentContext],
+      JBoolean.TYPE)
 
   override def loadPartition(
       hive: Hive,
@@ -1248,8 +1269,11 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       clazzLoadFileType.getEnumConstants.find(_.toString.equalsIgnoreCase("KEEP_EXISTING"))
     }
     assert(loadFileType.isDefined)
+    // Looks we should handle HIVE-19891 but looks no way to access the appropriate value here.
+    // Here, it just uses 'inheritTableSpecs' to keep the existing behaviour.
+    val inheritLocation = inheritTableSpecs
     loadPartitionMethod.invoke(hive, loadPath, table, partSpec, loadFileType.get,
-      inheritTableSpecs: JBoolean, isSkewedStoreAsSubdir: JBoolean,
+      inheritTableSpecs: JBoolean, inheritLocation: JBoolean, isSkewedStoreAsSubdir: JBoolean,
       isSrcLocal: JBoolean, isAcid, hasFollowingStatsTask,
       writeIdInLoadTableOrPartition, stmtIdInLoadTableOrPartition, replace: JBoolean)
   }
@@ -1290,5 +1314,14 @@ private[client] class Shim_v3_0 extends Shim_v2_3 {
       numDP: JInteger, listBucketingLevel, isAcid, writeIdInLoadTableOrPartition,
       stmtIdInLoadTableOrPartition, hasFollowingStatsTask, AcidUtils.Operation.NOT_ACID,
       replace: JBoolean)
+  }
+
+  override def alterTable(hive: Hive, tableName: String, table: Table): Unit = {
+    alterTableMethod.invoke(hive, tableName, table, environmentContextInAlterTable, transactional)
+  }
+
+  override def alterPartitions(hive: Hive, tableName: String, newParts: JList[Partition]): Unit = {
+    alterPartitionsMethod.invoke(
+      hive, tableName, newParts, environmentContextInAlterTable, transactional)
   }
 }
