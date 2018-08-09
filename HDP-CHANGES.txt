@@ -65,7 +65,6 @@ BUG FIXES
     SPARK-24479 Added config for registering streamingQueryListeners
     SPARK-24518 Using Hadoop credential provider API to store password
     SPARK-24660 Show correct error pages when downloading logs in SHS
-    SPARK-24950 DateTimeUtilsSuite daysToMillis and millisToDays fails w/java 8 181-b13
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
