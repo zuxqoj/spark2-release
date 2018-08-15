@@ -175,13 +175,15 @@ class Pipeline @Since("1.4.0") (
       }
     }
     val model = new PipelineModel(uid, transformers.toArray).setParent(this)
-    this.addListener(new MLListener {
-      override def onEvent(event: MLListenEvent): Unit = {
-        SparkContext.getOrCreate().listenerBus.post(event)
-      }
-    })
-    postToAll(CreatePipelineEvent(this, dataset))
-    postToAll(CreateModelEvent(model))
+    if (SparkContext.getOrCreate().getConf.getBoolean("use.sac", false)) {
+      this.addListener(new MLListener {
+        override def onEvent(event: MLListenEvent): Unit = {
+          SparkContext.getOrCreate().listenerBus.post(event)
+        }
+      })
+      postToAll(CreatePipelineEvent(this, dataset))
+      postToAll(CreateModelEvent(model))
+    }
     model
   }
 
@@ -219,12 +221,14 @@ object Pipeline extends MLReadable[Pipeline] {
 
     override protected def saveImpl(path: String): Unit = {
       SharedReadWrite.saveImpl(instance, instance.getStages, sc, path)
-      this.addListener(new MLListener {
-        override def onEvent(event: MLListenEvent): Unit = {
-          SparkContext.getOrCreate().listenerBus.post(event)
-        }
-      })
-      postToAll(SavePipelineEvent(instance.uid, path))
+      if (SparkContext.getOrCreate().getConf.getBoolean("use.sac", false)) {
+        this.addListener(new MLListener {
+          override def onEvent(event: MLListenEvent): Unit = {
+            SparkContext.getOrCreate().listenerBus.post(event)
+          }
+        })
+        postToAll(SavePipelineEvent(instance.uid, path))
+      }
     }
   }
 
@@ -327,12 +331,14 @@ class PipelineModel private[ml] (
   override def transform(dataset: Dataset[_]): DataFrame = {
     transformSchema(dataset.schema, logging = true)
     val result = stages.foldLeft(dataset.toDF)((cur, transformer) => transformer.transform(cur))
-    this.addListener(new MLListener {
-      override def onEvent(event: MLListenEvent): Unit = {
-        SparkContext.getOrCreate().listenerBus.post(event)
-      }
-    })
-    postToAll(TransformEvent(this, dataset, result))
+    if (SparkContext.getOrCreate().getConf.getBoolean("use.sac", false)) {
+      this.addListener(new MLListener {
+        override def onEvent(event: MLListenEvent): Unit = {
+          SparkContext.getOrCreate().listenerBus.post(event)
+        }
+      })
+      postToAll(TransformEvent(this, dataset, result))
+    }
     result
   }
 
@@ -366,12 +372,14 @@ object PipelineModel extends MLReadable[PipelineModel] with ListenerBus[MLListen
   @Since("1.6.0")
   override def load(path: String): PipelineModel = {
     val pipelinemode = super.load(path)
-    this.addListener(new MLListener {
-      override def onEvent(event: MLListenEvent): Unit = {
-        SparkContext.getOrCreate().listenerBus.post(event)
-      }
-    })
-    postToAll(LoadModelEvent(path, pipelinemode))
+    if (SparkContext.getOrCreate().getConf.getBoolean("use.sac", false)) {
+      this.addListener(new MLListener {
+        override def onEvent(event: MLListenEvent): Unit = {
+          SparkContext.getOrCreate().listenerBus.post(event)
+        }
+      })
+      postToAll(LoadModelEvent(path, pipelinemode))
+    }
     pipelinemode
   }
 
@@ -382,12 +390,14 @@ object PipelineModel extends MLReadable[PipelineModel] with ListenerBus[MLListen
     override protected def saveImpl(path: String): Unit = {
       SharedReadWrite.saveImpl(instance,
         instance.stages.asInstanceOf[Array[PipelineStage]], sc, path)
-      this.addListener(new MLListener {
-        override def onEvent(event: MLListenEvent): Unit = {
-          SparkContext.getOrCreate().listenerBus.post(event)
-        }
-      })
-      postToAll(SaveModelEvent(instance.uid, path))
+      if (SparkContext.getOrCreate().getConf.getBoolean("use.sac", false)) {
+        this.addListener(new MLListener {
+          override def onEvent(event: MLListenEvent): Unit = {
+            SparkContext.getOrCreate().listenerBus.post(event)
+          }
+        })
+        postToAll(SaveModelEvent(instance.uid, path))
+      }
     }
   }
 
