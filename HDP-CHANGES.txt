@@ -1,4 +1,4 @@
-Changes only in Hortonworks github and not in Apache SPARK-2.3.2 and hence not covered by CHANGES.txt.
+Changes only in Hortonworks github and not in Apache SPARK-2.3.2 RC5 and hence not covered by CHANGES.txt.
 
 INCOMPATIBLE CHANGES
 
@@ -49,6 +49,9 @@ BUG FIXES
     BUG-98248   Add configuration2 dependency into shared classes to avoid failures in `HiveClientImpl.runHive`
     BUG-108092  Disable flaky kafka test suites
 
+    (Backport from 2.3.2)
+    SPARK-25051 FixNullability should not stop on AnalysisBarrier
+
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
     SPARK-23456 Turn on `native` ORC impl and PPD by default
@@ -69,3 +72,4 @@ BUG FIXES
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
+    SPARK-24601 BUG-109244 Bump Jackson version
