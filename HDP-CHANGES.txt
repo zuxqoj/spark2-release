@@ -45,3 +45,4 @@ BUG FIXES
     BUG-104322  Use cache file created by ambari as spark.sql.hive.metastore.jars
     BUG-98248   Add configuration2 dependency into shared classes to avoid failures in `HiveClientImpl.runHive`
     BUG-108092  Disable flaky kafka test suites
+    BUG-109093  HiveThriftServer2 and its SparkContext should be started from keytab

@@ -17,6 +17,7 @@
 
 package org.apache.spark.sql.hive.thriftserver
 
+import java.security.PrivilegedExceptionAction
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -25,6 +26,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars
+import org.apache.hadoop.security.{SecurityUtil, UserGroupInformation}
 import org.apache.hive.service.cli.thrift.{ThriftBinaryCLIService, ThriftHttpCLIService}
 import org.apache.hive.service.server.HiveServer2
 
@@ -75,6 +77,27 @@ object HiveThriftServer2 extends Logging {
     val optionsProcessor = new HiveServer2.ServerOptionsProcessor("HiveThriftServer2")
     optionsProcessor.parse(args)
 
+    if (UserGroupInformation.isSecurityEnabled) {
+      val hiveConf = new HiveConf()
+      val principal = hiveConf.getVar(ConfVars.HIVE_SERVER2_KERBEROS_PRINCIPAL)
+      val keyTabFile = hiveConf.getVar(ConfVars.HIVE_SERVER2_KERBEROS_KEYTAB)
+      if (principal.isEmpty || keyTabFile.isEmpty) {
+        throw new java.io.IOException(
+          "HiveServer2 Kerberos principal or keytab is not correctly configured")
+      }
+
+      val serverPrincipal = SecurityUtil.getServerPrincipal(principal, "0.0.0.0")
+      UserGroupInformation.loginUserFromKeytab(serverPrincipal, keyTabFile)
+      val ugi = UserGroupInformation.getCurrentUser()
+      ugi.doAs(new PrivilegedExceptionAction[Unit] {
+        override def run(): Unit = {
+          startHiveThriftServer2()
+        }
+      })
+    }
+  }
+
+  private def startHiveThriftServer2() {
     logInfo("Starting SparkContext")
     SparkSQLEnv.init()
 
