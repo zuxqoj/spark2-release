@@ -40,6 +40,8 @@ BUG FIXES
     BUG-100134  Revert `[SPARK-22919] Bump httpclient versions` to avoid conflicts with AWS library
     BUG-103408  ORC-306 `TimestampColumnVector.time` is different from ORC 1.4.3
     BUG-103907  IsolatedClientLoader should receive Apache Hadoop version
+    BUG-109093  HiveThriftServer2 and its SparkContext should be started from keytab
+    BUG-109528  Thriftserver not starting in unsecure mode
 
     (Backport from 2.3.1)
     SPARK-23475 Show also skipped stages
