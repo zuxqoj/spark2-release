@@ -116,7 +116,7 @@
     <sbt.project.name>spark</sbt.project.name>
     <slf4j.version>1.7.16</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
-    <hadoop.version>3.1.0.3.0.1.0-SNAPSHOT</hadoop.version>
+    <hadoop.version>3.1.1.3.0.1.0-SNAPSHOT</hadoop.version>
     <protobuf.version>2.5.0</protobuf.version>
     <yarn.version>${hadoop.version}</yarn.version>
     <flume.version>1.6.0</flume.version>
@@ -2765,7 +2765,7 @@
     <profile>
       <id>hadoop-3.1</id>
       <properties>
-        <hadoop.version>3.1.0.3.0.1.0-SNAPSHOT</hadoop.version>
+        <hadoop.version>3.1.1.3.0.1.0-SNAPSHOT</hadoop.version>
         <curator.version>2.12.0</curator.version>
         <zookeeper.version>3.4.6.3.0.1.0-SNAPSHOT</zookeeper.version>
       </properties>
