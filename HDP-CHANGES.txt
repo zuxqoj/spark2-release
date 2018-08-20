@@ -136,3 +136,5 @@ BUG FIXES
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
     SPARK-24948 Delegate check access permissions to the file system
     SPARK-23679 Setting RM_HA_URLS for AmIpFilter to avoid redirect failure in YARN mode
+    SPARK-25183 Spark HiveServer2 registers shutdown hook with JVM, not ShutdownHookManager.
+    SPARK-23654 Cut jets3t as a dependency of spark-core
