@@ -85,6 +85,8 @@ object HiveThriftServer2 extends Logging {
         throw new java.io.IOException(
           "HiveServer2 Kerberos principal or keytab is not correctly configured")
       }
+      logInfo("Attempting to login to the Kerberos" +
+        s" using principal: $principal and keytab: $keyTabFile")
 
       val serverPrincipal = SecurityUtil.getServerPrincipal(principal, "0.0.0.0")
       UserGroupInformation.loginUserFromKeytab(serverPrincipal, keyTabFile)
