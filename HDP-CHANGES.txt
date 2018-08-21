@@ -53,6 +53,7 @@ BUG FIXES
     (Backport from 2.3.2)
     SPARK-25051 FixNullability should not stop on AnalysisBarrier
     SPARK-25144 Free aggregate map when task ends
+    SPARK-25114 Fix RecordBinaryComparator when subtraction between two words is divisible by Integer.MAX_VALUE.
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
