@@ -94,6 +94,8 @@ object HiveThriftServer2 extends Logging {
           startHiveThriftServer2()
         }
       })
+    } else {
+      startHiveThriftServer2()
     }
   }
 
