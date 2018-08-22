@@ -48,6 +48,7 @@ BUG FIXES
     BUG-98248   Add configuration2 dependency into shared classes to avoid failures in `HiveClientImpl.runHive`
     BUG-108092  Disable flaky kafka test suites
     BUG-109093  HiveThriftServer2 and its SparkContext should be started from keytab
+    BUG-109528  Thriftserver not starting in unsecure mode
 
     (Backport from 2.3.2)
     SPARK-25051 FixNullability should not stop on AnalysisBarrier
@@ -75,3 +76,4 @@ BUG FIXES
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
     SPARK-24601 BUG-109244 Bump Jackson version
+
