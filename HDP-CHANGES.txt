@@ -73,6 +73,7 @@ BUG FIXES
     SPARK-24518 Using Hadoop credential provider API to store password
     SPARK-24660 Show correct error pages when downloading logs in SHS
     SPARK-23654 remove jets3t as a dependency of spark
+    SPARK-25126 Avoid creating Reader for all orc files
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
