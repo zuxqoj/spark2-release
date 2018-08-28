@@ -74,6 +74,7 @@ BUG FIXES
     SPARK-24660 Show correct error pages when downloading logs in SHS
     SPARK-23654 remove jets3t as a dependency of spark
     SPARK-25126 Avoid creating Reader for all orc files
+    SPARK-23679 Setting RM_HA_URLS for AmIpFilter to avoid redirect failure in YARN mode
 
     (Jira in Apache Spark is IN PROGRESS)
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
