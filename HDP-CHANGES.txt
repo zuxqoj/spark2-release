@@ -135,3 +135,4 @@ BUG FIXES
     SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
     SPARK-24948 Delegate check access permissions to the file system
+    SPARK-23679 Setting RM_HA_URLS for AmIpFilter to avoid redirect failure in YARN mode
