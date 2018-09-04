@@ -1046,8 +1046,9 @@ trait ArraySortLike extends ExpectsInputTypes {
       } else {
         s"int $c = ${ctx.genComp(elementType, s"(($jt) $o1)", s"(($jt) $o2)")};"
       }
-      val nonNullPrimitiveAscendingSort =
-        if (CodeGenerator.isPrimitiveType(elementType) && !containsNull) {
+      val canPerformFastSort =
+        CodeGenerator.isPrimitiveType(elementType) && elementType != BooleanType && !containsNull
+      val nonNullPrimitiveAscendingSort = if (canPerformFastSort) {
           val javaType = CodeGenerator.javaType(elementType)
           val primitiveTypeName = CodeGenerator.primitiveTypeName(elementType)
           s"""
@@ -1464,17 +1465,29 @@ case class ArrayContains(left: Expression, right: Expression)
     nullSafeCodeGen(ctx, ev, (arr, value) => {
       val i = ctx.freshName("i")
       val getValue = CodeGenerator.getValue(arr, right.dataType, i)
-      s"""
-      for (int $i = 0; $i < $arr.numElements(); $i ++) {
-        if ($arr.isNullAt($i)) {
-          ${ev.isNull} = true;
-        } else if (${ctx.genEqual(right.dataType, value, getValue)}) {
-          ${ev.isNull} = false;
-          ${ev.value} = true;
-          break;
-        }
+      val loopBodyCode = if (nullable) {
+        s"""
+           |if ($arr.isNullAt($i)) {
+           |   ${ev.isNull} = true;
+           |} else if (${ctx.genEqual(right.dataType, value, getValue)}) {
+           |   ${ev.isNull} = false;
+           |   ${ev.value} = true;
+           |   break;
+           |}
+         """.stripMargin
+      } else {
+        s"""
+           |if (${ctx.genEqual(right.dataType, value, getValue)}) {
+           |  ${ev.value} = true;
+           |  break;
+           |}
+         """.stripMargin
       }
-     """
+      s"""
+         |for (int $i = 0; $i < $arr.numElements(); $i ++) {
+         |  $loopBodyCode
+         |}
+       """.stripMargin
     })
   }
 
@@ -1623,12 +1636,13 @@ case class ArraysOverlap(left: Expression, right: Expression)
     val set = ctx.freshName("set")
     val addToSetFromSmallerCode = nullSafeElementCodegen(
       smaller, i, s"$set.add($getFromSmaller);", s"${ev.isNull} = true;")
+    val setIsNullCode = if (nullable) s"${ev.isNull} = false;" else ""
     val elementIsInSetCode = nullSafeElementCodegen(
       bigger,
       i,
       s"""
          |if ($set.contains($getFromBigger)) {
-         |  ${ev.isNull} = false;
+         |  $setIsNullCode
          |  ${ev.value} = true;
          |  break;
          |}
@@ -1653,12 +1667,13 @@ case class ArraysOverlap(left: Expression, right: Expression)
     val j = ctx.freshName("j")
     val getFromSmaller = CodeGenerator.getValue(smaller, elementType, j)
     val getFromBigger = CodeGenerator.getValue(bigger, elementType, i)
+    val setIsNullCode = if (nullable) s"${ev.isNull} = false;" else ""
     val compareValues = nullSafeElementCodegen(
       smaller,
       j,
       s"""
          |if (${ctx.genEqual(elementType, getFromSmaller, getFromBigger)}) {
-         |  ${ev.isNull} = false;
+         |  $setIsNullCode
          |  ${ev.value} = true;
          |}
        """.stripMargin,
