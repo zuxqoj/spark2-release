@@ -62,7 +62,6 @@ BUG FIXES
     SPARK-24909 Always unregister pending partition on task completion.
     SPARK-25231 Fix synchronization of executor heartbeat receiver in TaskSchedulerImpl
     SPARK-25313 Fix regression in FileFormatWriter output names
-    SPARK-25072 Forbid extra value for custom Row
     SPARK-23243 Fix RDD.repartition() data correctness issue
     SPARK-25330 Revert Hadoop 2.7 to 2.7.3
     SPARK-24415 Fixed the aggregated stage metrics by retaining stage objects in liveStages until all tasks are complete
