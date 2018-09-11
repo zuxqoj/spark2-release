@@ -66,6 +66,7 @@ BUG FIXES
     SPARK-25330 Revert Hadoop 2.7 to 2.7.3
     SPARK-24415 Fixed the aggregated stage metrics by retaining stage objects in liveStages until all tasks are complete
     SPARK-25368 Incorrect predicate pushdown returns wrong result
+    SPARK-25313 Fix InsertIntoHiveDirCommand output schema in Parquet issue
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
