@@ -68,6 +68,7 @@ BUG FIXES
     SPARK-25368 Incorrect predicate pushdown returns wrong result
     SPARK-25313 Fix InsertIntoHiveDirCommand output schema in Parquet issue
     SPARK-24889 Update block info when unpersist rdds
+    SPARK-25371 struct() should allow being called with 0 args
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
