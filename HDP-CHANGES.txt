@@ -70,6 +70,7 @@ BUG FIXES
     SPARK-24889 Update block info when unpersist rdds
     SPARK-25371 struct() should allow being called with 0 args
     SPARK-25402 Null handling in BooleanSimplification
+    SPARK-25357 Add metadata to SparkPlanInfo to dump more information like file path to event log
 
     (Backport from 2.4)
     SPARK-21783 Turn on `native` ORC impl and PPD by default
