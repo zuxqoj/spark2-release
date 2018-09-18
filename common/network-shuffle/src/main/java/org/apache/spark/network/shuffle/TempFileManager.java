@@ -17,15 +17,20 @@
 
 package org.apache.spark.network.shuffle;
 
-import org.apache.spark.network.buffer.ManagedBuffer;
-
-import java.io.OutputStream;
-import java.nio.channels.WritableByteChannel;
+import java.io.File;
 
 /**
- * A channel for writing data which is fetched to disk, which allows access to the written data only
- * after the writer has been closed.  Used with DownloadFile and DownloadFileManager.
+ * A manager to create temp block files to reduce the memory usage and also clean temp
+ * files when they won't be used any more.
  */
-public interface DownloadFileWritableChannel extends WritableByteChannel {
-  public ManagedBuffer closeAndRead();
+public interface TempFileManager {
+
+  /** Create a temp block file. */
+  File createTempFile();
+
+  /**
+   * Register a temp file to clean up when it won't be used any more. Return whether the
+   * file is registered successfully. If `false`, the caller should clean up the file by itself.
+   */
+  boolean registerTempFileToClean(File file);
 }
