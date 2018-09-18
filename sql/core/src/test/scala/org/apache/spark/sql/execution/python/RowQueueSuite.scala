@@ -20,15 +20,12 @@ package org.apache.spark.sql.execution.python
 import java.io.File
 
 import org.apache.spark.{SparkConf, SparkFunSuite}
-import org.apache.spark.internal.config._
-import org.apache.spark.memory.{TaskMemoryManager, TestMemoryManager}
-import org.apache.spark.security.{CryptoStreamUtils, EncryptionFunSuite}
-import org.apache.spark.serializer.{JavaSerializer, SerializerManager}
+import org.apache.spark.memory.{MemoryManager, TaskMemoryManager, TestMemoryManager}
 import org.apache.spark.sql.catalyst.expressions.UnsafeRow
 import org.apache.spark.unsafe.memory.MemoryBlock
 import org.apache.spark.util.Utils
 
-class RowQueueSuite extends SparkFunSuite with EncryptionFunSuite {
+class RowQueueSuite extends SparkFunSuite {
 
   test("in-memory queue") {
     val page = MemoryBlock.fromLongArray(new Array[Long](1<<10))
@@ -56,20 +53,10 @@ class RowQueueSuite extends SparkFunSuite with EncryptionFunSuite {
     queue.close()
   }
 
-  private def createSerializerManager(conf: SparkConf): SerializerManager = {
-    val ioEncryptionKey = if (conf.get(IO_ENCRYPTION_ENABLED)) {
-      Some(CryptoStreamUtils.createKey(conf))
-    } else {
-      None
-    }
-    new SerializerManager(new JavaSerializer(conf), conf, ioEncryptionKey)
-  }
-
-  encryptionTest("disk queue") { conf =>
-    val serManager = createSerializerManager(conf)
+  test("disk queue") {
     val dir = Utils.createTempDir().getCanonicalFile
     dir.mkdirs()
-    val queue = DiskRowQueue(new File(dir, "buffer"), 1, serManager)
+    val queue = DiskRowQueue(new File(dir, "buffer"), 1)
     val row = new UnsafeRow(1)
     row.pointTo(new Array[Byte](16), 16)
     val n = 1000
@@ -94,12 +81,11 @@ class RowQueueSuite extends SparkFunSuite with EncryptionFunSuite {
     queue.close()
   }
 
-  encryptionTest("hybrid queue") { conf =>
-    val serManager = createSerializerManager(conf)
-    val mem = new TestMemoryManager(conf)
+  test("hybrid queue") {
+    val mem = new TestMemoryManager(new SparkConf())
     mem.limit(4<<10)
     val taskM = new TaskMemoryManager(mem, 0)
-    val queue = HybridRowQueue(taskM, Utils.createTempDir().getCanonicalFile, 1, serManager)
+    val queue = HybridRowQueue(taskM, Utils.createTempDir().getCanonicalFile, 1)
     val row = new UnsafeRow(1)
     row.pointTo(new Array[Byte](16), 16)
     val n = (4<<10) / 16 * 3
