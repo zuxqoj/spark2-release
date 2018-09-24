@@ -76,3 +76,5 @@ BUG FIXES
     SPARK-23977 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
     SPARK-24601 BUG-109244 Bump Jackson version
 
+    (Security fix in Apache Spark)
+    BUG-110890 Fix a security issue createRDDFromFile - large object ser/deserialization between R / JVM
