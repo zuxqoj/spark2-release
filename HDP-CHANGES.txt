@@ -47,3 +47,6 @@ BUG FIXES
     BUG-108092  Disable flaky kafka test suites
     BUG-109093  HiveThriftServer2 and its SparkContext should be started from keytab
     BUG-109528  Thriftserver not starting in unsecure mode
+
+    (Jira in Apache Spark is IN PROGRESS)
+    SPARK-23977 BUG-96831 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism
