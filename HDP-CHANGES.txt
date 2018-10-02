@@ -1,4 +1,4 @@
-Changes only in Hortonworks github and not in Apache SPARK-2.1.0 and hence not covered by CHANGES.txt.
+Changes only in Hortonworks github and not in Apache SPARK-2.4.0 and hence not covered by CHANGES.txt.
 
 INCOMPATIBLE CHANGES
 
