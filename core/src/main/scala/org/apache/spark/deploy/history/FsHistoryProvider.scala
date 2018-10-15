@@ -112,7 +112,7 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
 
   private val hadoopConf = SparkHadoopUtil.get.newConfiguration(conf)
   // Visible for testing
-  private[history] val fs = new Path(logDir).getFileSystem(hadoopConf)
+  private[history] val fs: FileSystem = new Path(logDir).getFileSystem(hadoopConf)
 
   // Used by check event thread and clean log thread.
   // Scheduled thread pool size must be one, otherwise it will have concurrent issues about fs

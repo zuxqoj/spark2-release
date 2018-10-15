@@ -2271,12 +2271,6 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df, df.collect())
   }
 
-  test("SPARK-25051: fix nullabilities of outer join attributes doesn't stop on AnalysisBarrier") {
-    val df1 = spark.range(4).selectExpr("id", "cast(id as string) as name")
-    val df2 = spark.range(3).selectExpr("id")
-    assert(df1.join(df2, Seq("id"), "left_outer").where(df2("id").isNull).collect().length == 1)
-    }
-
   test("SPARK-24313: access map with binary keys") {
     val mapWithBinaryKey = map(lit(Array[Byte](1.toByte)), lit(1))
     checkAnswer(spark.range(1).select(mapWithBinaryKey.getItem(Array[Byte](1.toByte))), Row(1))

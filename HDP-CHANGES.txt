@@ -43,85 +43,6 @@ BUG FIXES
     BUG-109093  HiveThriftServer2 and its SparkContext should be started from keytab
     BUG-109528  Thriftserver not starting in unsecure mode
 
-    (Backport from 2.3.1)
-    SPARK-23475 Show also skipped stages
-    SPARK-23438 Fix DStreams data loss with WAL when driver crashes
-    SPARK-23449 Preserve extraJavaOptions ordering
-    SPARK-23365 Do not adjust num executors when killing idle executors.
-    SPARK-23448 Clarify JSON and CSV parser behavior in document
-    SPARK-23508 Fix BlockmanagerId in case blockManagerIdCache cause oom
-    SPARK-23517 Make `pyspark.util._exception_message` produce the trace from Java side by Py4JJavaError
-    SPARK-23551 Exclude `hadoop-mapreduce-client-core` dependency from `orc-mapreduce`
-    SPARK-23570 Add Spark 2.3.0 in HiveExternalCatalogVersionsSuite
-    SPARK-22883 Streaming tests for spark.ml.feature, from A to H
-    SPARK-23569 Allow pandas_udf to work with python3 style type-annotated functions
-    SPARK-23329 Fix documentation of trigonometric functions
-    SPARK-22882 ML test for structured streaming: ml.classification
-    SPARK-23457 Register task completion listeners first in ParquetFileFormat
-    SPARK-23434 Spark should not warn `metadata directory` for a HDFS file path
-    SPARK-23601 Remove .md5 files from release
-    SPARK-23525 Support ALTER TABLE CHANGE COLUMN COMMENT for external hive table
-    SPARK-23020 Fix another race in the in-process launcher test.
-    SPARK-23524 Big local shuffle blocks should not be checked for corruption.
-    SPARK-23490 Check storage.locationUri with existing table in CreateTable
-    SPARK-23406 Enable stream-stream self-joins for branch-2.3
-    SPARK-23436 Infer partition as Date only if it can be casted to Date
-    SPARK-23630 Allow user's hadoop conf customizations to take effect.
-    SPARK-23628 calculateParamLength should not return 1 + num of expressions
-    SPARK-23173 Avoid creating corrupt parquet files when loading data from JSON
-    SPARK-23624 Revise doc of method pushFilters in Datasource V2
-    SPARK-23462 improve missing field error message in `StructType`
-    SPARK-23598 Make methods in BufferedRowIterator public to avoid runtime error for a large query
-    SPARK-22915 Streaming tests for spark.ml.feature, from N to Z
-    SPARK-23642 AccumulatorV2 subclass isZero scaladoc fix
-    SPARK-23695 Fix the error message for Kinesis streaming tests
-    SPARK-23658 InProcessAppHandle uses the wrong class in getLogger
-    SPARK-23671 Fix condition to enable the SHS thread pool.
-    SPARK-23608 Add synchronization in SHS between attachSparkUI and detachSparkUI functions to avoid concurrent modification issue to Jetty Handlers
-    SPARK-23670 Fix memory leak on SparkPlanGraphWrapper
-    SPARK-23553 Tests should not assume the default value of `spark.sql.sources.default`
-    SPARK-23706 spark.conf.get(value, default=None) should produce None in PySpark
-    SPARK-23728 Fix ML tests with expected exceptions running streaming tests
-    SPARK-23660 Fix exception in yarn cluster mode when application ended fast
-    SPARK-23644 Use absolute path for REST call in SHS
-    SPARK-23691 Use sql_conf util in PySpark tests where possible
-    SPARK-23649 Skipping chars disallowed in UTF-8
-    SPARK-23264 Fix scala.MatchError in literals.sql.out
-    SPARK-23288 Fix output metrics with parquet sink
-    SPARK-23729 Respect URI fragment when resolving globs
-    SPARK-23760 CodegenContext.withSubExprEliminationExprs should save/restore CSE state correctly
-    SPARK-23614 Fix incorrect reuse exchange when caching is used
-    SPARK-23769 Remove comments that unnecessarily disable Scalastyle check
-    SPARK-23759 Unable to bind Spark UI to specific host name / IP
-    SPARK-23623 Avoid concurrent use of cached consumers in CachedKafkaConsumer (branch-2.3)
-    SPARK-23788 Fix race in StreamingQuerySuite
-    SPARK-23599 Add a UUID generator from Pseudo-Random Numbers
-    SPARK-23645 Add docs RE `pandas_udf` with keyword args
-    SPARK-23599 Use RandomUUIDGenerator in Uuid expression
-    SPARK-23806 Broadcast.unpersist can cause fatal exception when used with dynamic allocation
-    SPARK-23808 Set default Spark session in test-only spark sessions.
-    SPARK-23639 Obtain token before init metastore client in SparkSQL CLI
-    SPARK-23827 StreamingJoinExec should ensure that input data is partitioned into specific number of partitions
-    SPARK-23040 Returns interruptible iterator for shuffle reader
-    SPARK-19964 Avoid reading from remote repos in SparkSubmitSuite.
-    SPARK-23802 PropagateEmptyRelation can leave query plan in unresolved state
-    SPARK-23838 Running SQL query is displayed as "completed" in SQL tab
-    SPARK-23637 Yarn might allocate more resource if a same executor is killed multiple times
-    SPARK-23823 Keep origin in transformExpression
-    SPARK-23822 Improve error message for Parquet schema mismatches
-    SPARK-23809 Active SparkSession should be set by getOrCreate
-    SPARK-23881 Fix flaky test JobCancellationSuite."interruptible iterator of shuffle reader"
-    SPARK-23816 Killed tasks should ignore FetchFailures.
-    SPARK-24062 Fix SASL encryption cannot enabled issue in thrift server
-    SPARK-24188 Restore "/version" API endpoint.
-    SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
-    SPARK-24364 Files deletion after globbing may fail StructuredStreaming jobs
-    SPARK-19613 Random.nextString is not safe for directory namePrefix
-    SPARK-24384 Add .py files correctly into PythonRunner in submit with client mode in spark-submit
-    BUG-102285 Update py4j to version 0.10.7.
-    BUG-102285 Match pyspark features in SparkR communication protocol.
-    SPARK-23942 PySpark's collect doesn't trigger QueryExecutionListener
-
     (Backport from 2.4)
     SPARK-23228 Add Python Created jsparkSession to JVM's defaultSession
     SPARK-23456 Turn on `native` ORC impl and PPD by default
@@ -132,10 +53,7 @@ BUG FIXES
     SPARK-23518 Avoid metastore access when the users only want to read and write data frames
     SPARK-23635 Spark executor env variable is overwritten by same name AM env variable
     SPARK-23355 convertMetastore should not ignore table properties
-    SPARK-23291 R's substr should not reduce starting position by 1 when calling Scala API
     SPARK-24110 Avoid UGI.loginUserFromKeytab in STS
-    SPARK-24948 Delegate check access permissions to the file system
     SPARK-23679 Setting RM_HA_URLS for AmIpFilter to avoid redirect failure in YARN mode
     SPARK-25183 Spark HiveServer2 registers shutdown hook with JVM, not ShutdownHookManager.
     SPARK-23654 Cut jets3t as a dependency of spark-core
-    SPARK-25183 Spark HiveServer2 to use Spark ShutdownHookManager
