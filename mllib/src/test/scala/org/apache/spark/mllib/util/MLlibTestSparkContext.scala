@@ -36,6 +36,7 @@ trait MLlibTestSparkContext extends TempDirectory { self: Suite =>
     spark = SparkSession.builder
       .master("local[2]")
       .appName("MLlibUnitTest")
+      .config("use.sac", true)
       .getOrCreate()
     sc = spark.sparkContext
 
