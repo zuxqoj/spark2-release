@@ -181,8 +181,8 @@ class Pipeline @Since("1.4.0") (
           SparkContext.getOrCreate().listenerBus.post(event)
         }
       })
-      postToAll(CreatePipelineEvent(this, dataset))
-      postToAll(CreateModelEvent(model))
+      postToAll(CreatePipelineEvent(this.uid, dataset))
+      postToAll(CreateModelEvent(model.uid))
     }
     model
   }
@@ -337,7 +337,7 @@ class PipelineModel private[ml] (
           SparkContext.getOrCreate().listenerBus.post(event)
         }
       })
-      postToAll(TransformEvent(this, dataset, result))
+      postToAll(TransformEvent(this.uid))
     }
     result
   }
@@ -378,7 +378,7 @@ object PipelineModel extends MLReadable[PipelineModel] with ListenerBus[MLListen
           SparkContext.getOrCreate().listenerBus.post(event)
         }
       })
-      postToAll(LoadModelEvent(path, pipelinemode))
+      postToAll(LoadModelEvent(path, pipelinemode.uid))
     }
     pipelinemode
   }

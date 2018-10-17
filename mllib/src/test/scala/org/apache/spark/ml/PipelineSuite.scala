@@ -146,14 +146,14 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
     })
   }
 
-  /*
+
   testWithPipeline("pipelineJobTracker") { (df, newPipeline, checkEvents) =>
     val pipelineModel = newPipeline.fit(df)
 
-    checkEvents(CreatePipelineEvent(newPipeline, df) :: CreateModelEvent(
-      pipelineModel) :: Nil)
+    checkEvents(CreatePipelineEvent(newPipeline.uid, df) :: CreateModelEvent(
+      pipelineModel.uid) :: Nil)
   }
-  */
+
 
   test("pipeline with duplicate stages") {
     val estimator = mock[Estimator[MyModel]]
@@ -203,13 +203,13 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
     })
   }
 
-  /*
+
   testWithPipelineModel(
     "pipeline model transform tracker") { (df, newPipelineModel, checkEvents) =>
     val output = newPipelineModel.transform(df)
-    checkEvents(TransformEvent(newPipelineModel, df, output) :: Nil)
+    checkEvents(TransformEvent(newPipelineModel.uid) :: Nil)
   }
-  */
+
 
   test("PipelineModel.copy") {
     val hashingTF = new HashingTF()
@@ -274,7 +274,7 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
     })
   }
 
-  /*
+
   testWithPipelineReadWrite(
     "Pipeline read/write tracker") { (pipelineWriter, uid, path, checkEvents) =>
 
@@ -282,7 +282,7 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
 
     checkEvents(SavePipelineEvent(uid, path) :: Nil)
   }
-  */
+
 
   test("Pipeline read/write with non-Writable stage") {
     val unWritableStage = new UnWritableStage("unwritableStage")
@@ -329,7 +329,7 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
     })
   }
 
-  /*
+
   testWithPipelineModelReadWrite(
     "PipelineModel read/write tracker") { (pipelineModelWriter, uid, path, checkEvents) =>
 
@@ -337,7 +337,7 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
 
     checkEvents(SaveModelEvent(uid, path) :: Nil)
   }
-  */
+
 
   test("PipelineModel read/write: getStagePath") {
     val stageUid = "myStage"
