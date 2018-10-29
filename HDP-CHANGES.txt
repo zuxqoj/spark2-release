@@ -52,6 +52,7 @@ BUG FIXES
     BUG-109528  Thriftserver not starting in unsecure mode
 
     (Backport from 2.4.1)
+    SPARK-25767 Fix lazily evaluated stream of expressions in code generation
     SPARK-25918 LOAD DATA LOCAL INPATH should handle a relative path
 
     (Jira in Apache Spark is IN PROGRESS)
