@@ -5,8 +5,6 @@ INCOMPATIBLE CHANGES
 NEW FEATURES
     SPARK-13587: Support virtualenv in pyspark
 
-    (Support Spark Atlas Connector)
-    BUG-97790  Spark Atlas Connector: support Kafka as external data source
     BUG-92048 Implement loading and visualizing Spark ML pipeline abstracts at Atlas
     BUG-92048 Add switch to enable/disable Spark Atlas Connector
     BUG-96831 Add commit protocol binding to Hadoop 3.1 PathOutputCommitter mechanism.
