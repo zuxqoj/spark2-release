@@ -127,3 +127,4 @@ BUG FIXES
     SPARK-24589 Correctly identify tasks in output commit coordinator.
     SPARK-25368 Incorrect predicate pushdown returns wrong result
     SPARK-26682 Use taskAttemptID instead of attemptNumber for Hadoop.
+    SPARK-27160 Fix DecimalType when building orc filters
