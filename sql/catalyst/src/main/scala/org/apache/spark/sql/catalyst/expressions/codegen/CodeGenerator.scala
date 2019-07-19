@@ -1472,7 +1472,12 @@ object CodeGenerator extends Logging {
       }
     }.flatten
 
-    codeSizes.max
+
+    if (codeSizes.nonEmpty) {
+      codeSizes.max
+    } else {
+      0
+    }
   }
 
   /**
