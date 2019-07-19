@@ -233,7 +233,7 @@
     <test.method.keys />
   </properties>
   <repositories>
-    <rrepository>
+    <repository>
       <id>hortonworks</id>
       <name>hortonworks</name>
       <url>http://repo.hortonworks.com/content/repositories/releases/</url>
